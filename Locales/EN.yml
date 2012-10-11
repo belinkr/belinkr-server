@@ -1,0 +1,252 @@
+en:
+  activity:
+    attributes:
+      actor:        actor
+      action:       action
+      object:       object
+      target:       target
+      description:  description
+      entity_id:    entity
+      request_id:   request
+
+  polymorphic:
+    attributes:
+      kind:         kind
+      resource:     resource
+
+  entity:
+    attributes:
+      name:         name
+      phone:        phone
+      address:      address
+
+  event:
+    attributes:
+      user_id:      user
+      kind:         kind
+      text:         text
+
+  file:
+    attributes:
+      mime_type:          mime type
+      original_filename:  original filename
+      entity_id:          entity
+
+  follower:
+    attributes:
+      user_id:      user
+      entity_id:    entity
+
+  following:
+    attributes:
+      user_id:      user
+      entity_id:    entity
+
+  reply:
+    attributes:
+      id:             id
+      text:           text
+      status_id:      status
+      user_id:        user
+      entity_id:      entity
+      workspace_id:   workspace
+      scrapbook_id:   scrapbook
+
+  reset:
+    attributes:
+      id:             id
+      email:          e-mail
+
+  session:
+    attributes:
+      id:             id
+      user_id:        user_id
+      profile_id:     profile_id
+      entity_id:      entity_id
+
+  scrapbook:
+    favorites:        favorites
+    drafts:           drafts
+    attributes:
+      name:           name
+      kind:           kind
+
+  scrap:
+    attributes:
+      text:           text
+      user_id:        user
+      scrapbook_id:   scrapbook
+  
+  status:
+    attributes:
+      text:           text
+      kind:           kind
+      user_id:        user
+      entity_id:      entity
+      workspace_id:   workspace
+      scrapbook_id:   scrapbook
+      forwarder_id:   forwarder
+
+  user:
+    attributes:
+      first:          first name
+      last:           last name
+      workspace_id:   workspace
+      profile_ids:    profile_ids
+      timezone:       timezone
+      locale:         locale
+      password:       password
+      name_order:     name order
+      request_id:     request
+
+  profile:
+    attributes:
+      mobile:         mobile
+      landline:       landline
+      fax:            fax
+      position:       position
+      department:     department
+      entity_id:      entity
+      user_id:        user
+
+  workspace:
+    attributes:
+      name:           name
+      kind:           kind
+      entity_id:      entity
+
+  membership:
+    attributes:
+      kind:           kind
+      user_id:        user
+      entity_id:      entity
+      
+  board:
+    attributes:
+      name:           name
+      user_id:        user
+      workspace_id:   workspace
+      entity_id:      entity
+
+  story:
+    attributes:
+      name:           name
+      start:          StartDate
+      end:            EndDate
+      entity_id:      entity  
+      workspace_id:   workspace
+      board_id:       board
+  
+  invitation:
+    attributes:
+      id:             id
+      invited_name:   invited name
+      invited_email:  invited e-mail
+      locale:         locale
+
+      state:          state
+      inviter_id:     inviter
+      invited_id:     invited
+      workspace_id:   workspace
+      entity_id:      entity
+
+  request:
+    attributes:
+      user_id:          user        
+      entity_id:        entity
+      title:            title
+      description:      description
+      state:            state
+      from:             from
+      to:               to
+      approver_ids:     approver_ids
+      approved_by_ids:  approved_by_ids
+      kind:             kind
+
+  autoinvitation:
+    attributes:
+      entity_id:        entity
+      workspace_id:     workspace
+      invited_id:       invited
+      state:            state
+
+  message:
+    attributes:
+      from:             from
+      to:               to
+      template:         template
+      locale:           locale
+      substitutions:    substitutions
+
+  appointment:
+    attributes:
+      entity_id:        entity
+      user_id:          user
+      kind:             kind
+      name:             name
+      description:      description
+
+  notification:
+    attributes:
+      entity_id:        entity
+      user_id:          user
+
+  models:
+    appointment:    appointment
+    autoinvitation: autoinvitation
+    board:          board
+    entity:         entity
+    file:           file
+    follower:       follower
+    following:      following
+    invitation:     invitation
+    membership:     membership
+    message:        message
+    reply:          reply
+    request:        request
+    reset:          reset
+    scrap:          scrap
+    scrapbook:      scrapbook
+    session:        session
+    status:         status
+    story:          story
+    user:           user
+    workspace:      workspace
+
+  mailer:
+    invitation:
+      subject:      "[belinkr] %{inviter_name} has invited you to belinkr"
+    reset:
+      subject:      "[belinkr] Your request to reset your password"
+
+  validation:
+    errors:
+      invitation_expired:       "this invitation has expired"
+      already_invited:          "user has already been invited"
+      already_requested:        "user has already requested to join"
+      already_in_workspace:     "user is already in the workspace"
+      already_registered:       "is already registered in this company"
+      must_be_sha256:           "%{attribute} must be a SHA256 hash"
+      nil:                      "%{attribute} must not be nil"
+      blank:                    "%{attribute} must not be blank"
+      not_nil:                  "%{attribute} must be nil"
+      not_blank:                "%{attribute} must be blank"
+      invalid:                  "%{attribute} has an invalid format"
+      inclusion:                "%{attribute} must be one of %{set}"
+      accepted:                 "%{attribute} is not accepted"
+      confirmation:             "%{attribute} does not match the confirmation"
+      length_between:           "%{attribute} must be between %{min} and %{max} characters long"
+      too_long:                 "%{attribute} must be at most %{maximum} characters long"
+      too_short:                "%{attribute} must be at least %{minimum} characters long"
+      wrong_length:             "%{attribute} must be %{length} characters long"
+      not_a_number:             "%{attribute} must be a number"
+      not_an_integer:           "%{attribute} must be an integer"
+      greater_than:             "%{attribute} must be greater than %{minimum}"
+      greater_than_or_equal_to: "%{attribute} must be greater than or equal to %{minimum}"
+      equal_to:                 "%{attribute} must be equal to %{expected}"
+      not_equal_to:             "%{attribute} must not be equal to %{value}"
+      less_than:                "%{attribute} must be less than %{maximum}"
+      less_than_or_equal_to:    "%{attribute} must be less than or equal to %{maximum}"
+      value_between:            "%{attribute} must be between %{minimum} and %{maximum}"
+      not_unique:               "%{attribute} is already taken"
+      primitive:                "%{attribute} must be of type %{value}"

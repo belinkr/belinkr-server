@@ -1,0 +1,116 @@
+es:
+  credential:
+    attributes:
+      first:        "nombre"
+      last:         "apellido"
+      email:        "e-mail"
+      password:     "contraseña"
+      wrong:        "usuario / cotraseña erróneos"
+
+  entity:
+    attributes:
+      name:         "nombre"
+      phone:        "teléfono"
+      address:      "dirección"
+
+  follow:
+    attributes:
+      kind:         "tipo"
+      follower_id:  "follower"
+      followed_id:  "persona seguida"
+      user_id:      "usuario"
+      entity_id:    "compañía"
+
+  reply:
+    attributes:
+      id:           "id"
+      text:         "texto"
+      status_id:    "actualización de estado"
+      user_id:      "usuario"
+      entity_id:    "compañía"
+
+  scrapbook:
+    attributes:
+      name:         "nombre"
+      user_id:      "usuario"
+      kind:         "tipo"
+
+  scrap:
+    attributes:
+      text:         "texto"
+      user_id:      "usuario"
+      scrapbook_id: "scrapbook"
+  
+  status:
+    attributes:
+      text:         "texto"
+      kind:         "tipo"
+      workspace_id: "workspace"
+      user_id:      "usuario"
+      entity_id:    "compañía"
+
+  user:
+    attributes:
+      first:        "nombre"
+      last:         "apellido"
+      workspace_id: "workspace"
+      entity_id:    "compañía"
+
+  workspace:
+    attributes:
+      name:         "nombre"
+      kind:         "tipo"
+      entity_id:    "compañía"
+
+  invitation:
+    attributes:
+      token:          "token"
+      invited_name:   "nombre persona invitada"
+      invited_email:  "nombre persona invitada"
+      locale:         "idioma"
+
+      state:        "estado"
+      inviter_id:   "persona que invita"
+      invited_id:   "persona invitada"
+      workspace_id: "workspace"
+      entity_id:    "compañía"
+
+  models:
+    credential:   "credencial"
+    entity:       "compañía"
+    follow:       "follow"
+    invitation:   "invitación"
+    reply:        "respuesta"
+    scrap:        "apunte"
+    scrapbook:    "scrapbook"
+    status:       "actualización de estado"
+    user:         "usuario"
+    workspace:    "workspace"
+
+  validation:
+    errors:
+      already_registered:       "ya está registrado en esta compañía"
+      must_be_sha256:           "%{attribute} debe ser un hash SHA256"
+      nil:                      "%{attribute} no puede ser nulo"
+      blank:                    "%{attribute} no debe quedar vacío"
+      not_nil:                  "%{attribute} debe ser nulo"
+      not_blank:                "%{attribute} debe quedar vacío"
+      invalid:                  "%{attribute} tiene un formato no valido"
+      inclusion:                "%{attribute} debe ser uno de los siguientes: %{set}"
+      accepted:                 "%{attribute} no se ha aceptado"
+      confirmation:             "%{attribute} no coincide con la confirmacion"
+      length_between:           "%{attribute} must be between %{min} and %{max} characters long"
+      too_long:                 "%{attribute} must be at most %{maximum} characters long"
+      too_short:                "%{attribute} must be at least %{minimum} characters long"
+      wrong_length:             "%{attribute} must be %{length} characters long"
+      not_a_number:             "%{attribute} must be a number"
+      not_an_integer:           "%{attribute} must be an integer"
+      greater_than:             "%{attribute} must be greater than %{minimum}"
+      greater_than_or_equal_to: "%{attribute} must be greater than or equal to %{minimum}"
+      equal_to:                 "%{attribute} must be equal to %{expected}"
+      not_equal_to:             "%{attribute} must not be equal to %{value}"
+      less_than:                "%{attribute} must be less than %{maximum}"
+      less_than_or_equal_to:    "%{attribute} must be less than or equal to %{maximum}"
+      value_between:            "%{attribute} must be between %{minimum} and %{maximum}"
+      not_unique:               "%{attribute} is already taken"
+      primitive:                "%{attribute} must be of type %{value}"
