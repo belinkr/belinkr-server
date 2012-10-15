@@ -9,8 +9,11 @@ module Belinkr
       KEYS_MAP  = 'users:locator:keys_map'
 
       def self.add(key, user_id)
-        $redis.hset KEYS_MAP, key, user_id
-        $redis.hset IDS_MAP, user_id, keys_for(user_id).push(key).to_json
+        keys = keys_for(user_id)
+        $redis.multi do
+          $redis.hset KEYS_MAP, key, user_id
+          $redis.hset IDS_MAP, user_id, keys.push(key).to_json
+        end
       end
 
       def self.user_from(key)
@@ -24,8 +27,8 @@ module Belinkr
       end
 
       def self.remove(user_id)
-        $redis.hdel KEYS_MAP, keys_for(user_id)
-        $redis.hdel IDS_MAP,  user_id
+        keys_for(user_id).each { |key| $redis.hdel KEYS_MAP, key }
+        $redis.hdel IDS_MAP, user_id
       end
 
       def self.registered?(user_id)

@@ -65,10 +65,8 @@ describe Locator do
       Locator.remove(@user1.id)
 
       Locator.keys_for(@user1.id).must_be_empty
-      lambda { Locator.user_from('user1@belinkr.com').must_raise NotFound }
-        .must_raise NotFound
-      lambda { Locator.user_from('user1').must_raise NotFound }
-        .must_raise NotFound
+      lambda { Locator.user_from('user1@belinkr.com') }.must_raise NotFound
+      lambda { Locator.user_from('user1') }.must_raise NotFound
     end
   end # remove
 
