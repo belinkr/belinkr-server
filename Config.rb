@@ -4,7 +4,7 @@ module Belinkr
   module Config
     HOSTNAME                  = 'www.belinkr.com'
     
-    AVAILABLE_LOCALES         = ['en.yml', 'zh.yml', 'es.yml']
+    AVAILABLE_LOCALES         = ['EN', 'ZH', 'ES']
     DEFAULT_LOCALE            = :en
     DEFAULT_TIMEZONE          = 'Etc/UTC'
     AUTHENTICATOR_STORAGE_KEY = 'authenticator'
