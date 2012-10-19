@@ -1,119 +1,159 @@
 # encoding: utf-8
-require_relative "./Exceptions"
+require 'set'
+require_relative './Exceptions'
 
 module Tinto
   class SortedSet
+    include Tinto::Exceptions
     include Enumerable
 
-    PER_PAGE = 20
+    PER_PAGE          = 20
+    NOT_IN_SET_SCORE  = -1.0
 
-    def initialize(collection, member_class, storage_key, members=[])
-      @collection   = collection 
-      @member_class = member_class
-      @storage_key  = storage_key
-      @members      = members
+    def initialize(collection)
+      @collection = collection
+      @member_ids = ::Set.new
+      @scores     = {}
+      @backlog    = []
+    end #initialize
 
-      unless @collection && @storage_key && @member_class
-        raise ArgumentError "collection, storage_key and member_class required"
+    def sync
+      ensure_valid(@collection)
+      $redis.pipelined { @backlog.each { |command| command.call } }
+      @backlog.clear
+      self
+    end #sync
+
+    def synced?
+      ensure_valid(@collection)
+      @backlog.empty?
+    end #synced?
+
+    def page(page_number=0)
+      ensure_valid(@collection)
+      from = page_number * PER_PAGE
+      to   = from + PER_PAGE - 1
+
+      ($redis.zrevrange @collection.storage_key, from, to, with_scores: true )
+      .each do |tuple|
+        @member_ids.add tuple.first
+        @scores[tuple.first] = tuple.last.to_f
       end
-    end
+      @fetched = true
+      self
+    end #page
 
-    def each(&block)
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      @members.each do |i| 
-        if i.is_a? Numeric or i.is_a? String
-          yield @member_class.new({ id: i }.merge! member_init_params)
-        else
-          yield i
-        end
+    def fetch
+      ensure_valid(@collection)
+      @member_ids = ::Set.new
+      @scores     = {}
+      ($redis.zrange @collection.storage_key, 0, -1, with_scores: true ).each do |tuple|
+        @member_ids.add tuple.first
+        @scores[tuple.first] = tuple.last.to_f
       end
-    end
+      @fetched = true
+      self
+    end #fetch
+
+    def reset(members=[])
+      raise ArgumentError unless members.respond_to? :each
+      ensure_valid(@collection)
+
+      @backlog.push(lambda { 
+        $redis.zadd @collection.storage_key, scores_for(members) 
+      }) unless members.empty?
+
+      members.each { |member| @scores[member.id.to_s] = score_for(member) }
+      @member_ids = ::Set.new(members.map { |member| member.id.to_s })
+
+      @fetched = true
+      self
+    end #reset
+
+    def each
+      ensure_valid(@collection)
+      page unless @fetched
+      return @member_ids.each unless block_given?
+      @member_ids.each { |id| yield @collection.instantiate_member(id: id) }
+    end #each
 
     def size
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      $redis.zcard @storage_key
-    end
+      ensure_valid(@collection)
+      sync if !@fetched && !synced?
+
+      return @member_ids.size if @fetched
+      $redis.zcard @collection.storage_key
+    end #size
 
     alias_method :length, :size
 
-    def include?(member)
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      !$redis.zscore(@storage_key, member.id).nil?
-    end
-
     def empty?
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      !(size > 0 if exists?)
-    end
+      ensure_valid(@collection)
+      !(size.to_i > 0)
+    end #empty?
 
     def exists?
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      $redis.exists @storage_key
-    end
+      !empty?
+    end #exists?
 
-    def all
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      @members = $redis.zrevrange(@storage_key, 0, -1)
+    def include?(element)
+      ensure_valid(@collection)
+      sync if !@fetched && !synced?
+
+      element_id = element.id.to_s
+      return @member_ids.include?(element_id) if @fetched
+      $redis.sismember @collection.storage_key, element_id
+    end #include?
+
+    def add(element)
+      ensure_valid(@collection)
+      ensure_valid(element)
+
+      @backlog.push(lambda { 
+        $redis.zadd @collection.storage_key, score_for(element), element.id
+      })
+      @scores[element.id.to_s] = score_for(element)
+      @member_ids.add element.id.to_s
       self
-    end
+    end #add
 
-    def page(number=0)
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      per_page = @page_size || PER_PAGE
-      from     = per_page * number.to_i
-      to       = from + per_page - 1
-      @members = $redis.zrevrange(@storage_key, from, to)
-      @collection
-    end
+    def delete(element)
+      ensure_valid(@collection)
+      ensure_valid(element)
 
-    def page_size(number=0)
-      @page_size = number.to_i
-      @page_size = nil      if number.to_i == 0
-      @page_size = PER_PAGE if number.to_i > PER_PAGE
+      element_id = element.id.to_s
+      @backlog.push(lambda { $redis.zrem @collection.storage_key, element_id })
+      @member_ids.delete element_id
+      @scores.delete element_id
       self
-    end
+    end #delete
 
-    def merge(enumerable)
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      enumerable.each { |member| add member }
-    end
-
-    def add(member, score=nil)
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      $redis.zadd @storage_key, (score || member.score), member.id
+    def clear
+      ensure_valid(@collection)
+      @backlog.push(lambda { $redis.del @collection.storage_key })
+      @member_ids.clear
+      @scores.clear
       self
-    end
+    end #clear
 
-    alias_method :<<, :add
-
-    def remove(member)
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      $redis.zrem @storage_key, member.id
-      self
-    end
-
-    def score(member, score)
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      # PENDING: investigate how to know if we are running inside
-      # a multi do..end block. If we aren't, then we should run these
-      # redis methods inside a multi do..end block
-      #$redis.multi do
-        remove(member)
-        add(member, score)
-      #end
-    end
-
-    def delete
-      raise Tinto::Exceptions::InvalidResource unless @collection.valid?
-      $redis.del @storage_key
-      self
+    def score(element)
+      @scores.fetch(element.id.to_s, NOT_IN_SET_SCORE)
     end
 
     private
 
-    def member_init_params
-      return {} unless @collection.respond_to? :member_init_params
-      @collection.member_init_params
-    end
-  end # Collection
+    def ensure_valid(resource)
+      return if resource.valid?
+      raise InvalidCollection if resource.respond_to?(:instantiate_member)
+      raise InvalidMember
+    end #ensure_valid
+
+    def scores_for(members)
+      members.flat_map { |member| [score_for(member), member.id.to_s ] }
+    end #scores_for
+
+    def score_for(member)
+      member.updated_at.to_f
+    end #score_for
+  end # SortedSet
 end # Tinto

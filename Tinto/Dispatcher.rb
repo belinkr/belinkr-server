@@ -43,9 +43,11 @@ module Tinto
 
     def handle(exception)
       case exception
-      when Exceptions::InvalidResource  then [400, present]
-      when Exceptions::NotAllowed       then [403]
-      when Exceptions::NotFound         then [404]
+      when Exceptions::InvalidResource    then [400, present]
+      when Exceptions::InvalidMember      then [400, present]
+      when Exceptions::InvalidCollection  then [400, present]
+      when Exceptions::NotAllowed         then [403]
+      when Exceptions::NotFound           then [404]
       else raise exception
       end
     end
