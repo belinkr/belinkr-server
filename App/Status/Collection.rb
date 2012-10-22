@@ -31,7 +31,7 @@ module Belinkr
       end
 
       def instantiate_member(attributes={})
-        Member.new attributes.merge(user_id: user_id, entity_id: entity_id)
+        Member.new attributes.merge!(context: context)
       end
 
       def storage_key
