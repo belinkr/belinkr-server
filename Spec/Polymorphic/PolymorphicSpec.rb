@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'ostruct'
+require 'json'
 require_relative '../../Config'
 require_relative '../../Locales/Loader'
 require_relative '../../App/Polymorphic/Polymorphic'
@@ -54,4 +55,21 @@ describe Polymorphic::Member do
       end
     end
   end # validations
+
+  describe '#to_json' do
+    it 'renders a json representation of previewable attributes' do
+      @resource = OpenStruct.new(
+        name:                   'resource 1',
+        non_previewable_field:  'whatever'
+      )
+      def @resource.to_hash; marshal_dump; end
+
+      workspace = Polymorphic::Member.new
+      workspace.resource = @resource
+
+      workspace = Polymorphic::Member.new JSON.parse(workspace.to_json)
+      workspace.resource.non_previewable_field  .must_be_nil
+      workspace.resource.name                   .wont_be_nil
+    end
+  end #to_json
 end # Polymorphic::Member

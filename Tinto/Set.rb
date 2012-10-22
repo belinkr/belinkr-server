@@ -7,54 +7,68 @@ module Tinto
     include Enumerable
     include Tinto::Exceptions
 
+    PER_PAGE  = 20
+    INTERFACE = %w{ verify sync synced? page fetch reset each size length
+                    empty? exists? include? add merge delete clear }
+
     def initialize(collection)
       @collection = collection
-      @member_ids = ::Set.new
+      @page       = @member_ids = ::Set.new
       @backlog    = []
     end #initialize
 
     def sync
-      ensure_valid(@collection)
+      verify
       $redis.pipelined { @backlog.each { |command| command.call } }
       @backlog.clear
-      self
+      @collection
     end #sync
 
     def synced?
-      ensure_valid(@collection)
+      verify
       @backlog.empty?
     end #synced?
 
+    def page(page_number=0)
+      verify
+      from = page_number * PER_PAGE
+      to   = from + PER_PAGE - 1
+
+      fetch
+      @page = @member_ids.to_a.slice(from..to)
+      @collection
+    end #page
+
     def fetch
-      ensure_valid(@collection)
+      verify
       @member_ids = ::Set.new($redis.smembers @collection.storage_key)
       @fetched = true
-      self
+      @collection
     end #fetch
 
     def reset(members=[])
+      verify
       raise ArgumentError unless members.respond_to? :each
-      ensure_valid(@collection)
       member_ids = members.map { |m| m.id.to_s }
 
       @backlog.push(
         lambda { $redis.sadd @collection.storage_key, member_ids }
       ) unless member_ids.empty?
 
-      @member_ids = ::Set.new(member_ids)
+      @page = @member_ids = ::Set.new(member_ids)
       @fetched = true
-      self
+      @collection
     end #reset
 
     def each
-      ensure_valid(@collection)
+      verify
       fetch unless @fetched
-      return @member_ids.each unless block_given?
-      @member_ids.each { |id| yield @collection.instantiate_member(id: id) }
+      return @page.each unless block_given?
+      @page.each { |id| yield @collection.instantiate_member(id: id) }
     end #each
 
     def size
-      ensure_valid(@collection)
+      verify
       sync if !@fetched && !synced?
 
       return @member_ids.size if @fetched
@@ -64,7 +78,7 @@ module Tinto
     alias_method :length, :size
 
     def empty?
-      ensure_valid(@collection)
+      verify
       !(size.to_i > 0)
     end #empty?
 
@@ -72,48 +86,53 @@ module Tinto
       !empty?
     end #exists?
 
-    def include?(element)
-      ensure_valid(@collection)
+    def include?(member)
+      verify
       sync if !@fetched && !synced?
 
-      element = element.id.to_s
-      return @member_ids.include?(element) if @fetched
-      $redis.sismember @collection.storage_key, element
+      member_id = member.id.to_s
+      return @member_ids.include?(member_id) if @fetched
+      $redis.sismember @collection.storage_key, member_id
     end #include?
 
-    def add(element)
-      ensure_valid(@collection)
-      ensure_valid(element)
+    def add(member)
+      verify
+      member.verify
 
-      element = element.id.to_s
-      @backlog.push(lambda { $redis.sadd @collection.storage_key, element })
-      @member_ids.add element
-      self
+      member_id = member.id.to_s
+      @backlog.push(lambda { $redis.sadd @collection.storage_key, member_id })
+      @member_ids.add member_id
+      @collection
     end #add
 
-    def delete(element)
-      ensure_valid(@collection)
-      ensure_valid(element)
+    def merge(enumerable)
+      member_ids = enumerable.map { |member| member.id }
+      @backlog.push(lambda { $redis.sadd @collection.storage_key, member_ids })
+      @member_ids.merge member_ids
+      @collection
+    end #merge
 
-      element = element.id.to_s
-      @backlog.push(lambda { $redis.srem @collection.storage_key, element })
-      @member_ids.delete element
-      self
+    def delete(member)
+      verify
+      member.verify
+
+      member_id = member.id.to_s
+      @backlog.push(lambda { $redis.srem @collection.storage_key, member_id })
+      @member_ids.delete member_id
+      @collection
     end #delete
 
     def clear
-      ensure_valid(@collection)
+      verify
       @backlog.push(lambda { $redis.del @collection.storage_key })
       @member_ids.clear
-      self
+      @collection
     end #clear
 
     private
 
-    def ensure_valid(resource)
-      return if resource.valid?
-      raise InvalidCollection if resource.respond_to?(:instantiate_member)
-      raise InvalidMember
-    end #ensure_valid
+    def verify
+      raise InvalidCollection unless @collection.valid?
+    end #verify
   end # Set
 end # Tinto

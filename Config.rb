@@ -49,6 +49,7 @@ module Belinkr
       'workspace'                   => 'Belinkr::Workspace::Member',
       'workspace::invitation'       => 'Belinkr::Workspace::Invitation::Member',
       'workspace::autoinvitation'   => 'Belinkr::Workspace::Autoinvitation::Member',
+      'scrapbook'                   => 'Belinkr::Scrapbook::Member',
       'request'                     => 'Belinkr::Request::Member'
     }
 

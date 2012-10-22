@@ -13,12 +13,6 @@ describe Invitation::Collection do
         collection.valid?.must_equal false
         collection.errors[:entity_id].must_include 'entity must not be blank'
       end
-
-      it 'is a integer' do
-        collection = Invitation::Collection.new(entity_id: 'ad')
-        collection.valid?.must_equal false
-        collection.errors[:entity_id].must_include 'entity must be a number'
-      end
     end #entity_id
   end # validations
 end # Invitation::Collection

@@ -2,25 +2,31 @@
 require_relative '../../Locales/Loader'
 require_relative '../Reset/Collection'
 require_relative '../../Workers/Mailer/Message'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class RequestPasswordReset
+    include Tinto::Context
+
     BASE_PATH = "https://#{Belinkr::Config::HOSTNAME}/resets"
 
-    def initialize(actor, reset)
+    def initialize(actor, reset, resets=Reset::Collection.new)
       @actor  = actor
       @reset  = reset
-      @resets = Reset::Collection.new
+      @resets = resets
     end
 
     def call
       @reset.email    = @actor.email
       @reset.user_id  = @actor.id
-      @reset.save
+
+      @reset.verify
       @resets.add @reset
       Mailer::Message.new(message_for @actor, @reset).queue
+
+      @to_sync = [@reset, @resets]
       @reset
-    end
+    end #call
 
     private
 

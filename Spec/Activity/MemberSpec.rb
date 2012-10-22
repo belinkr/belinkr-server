@@ -6,9 +6,6 @@ require_relative '../../App/User/Member'
 require_relative '../Factories/User'
 require_relative '../Factories/Activity'
 
-$redis = Redis.new
-$redis.select 8
-
 include Belinkr
 
 describe Activity::Member do
@@ -19,13 +16,8 @@ describe Activity::Member do
         activity.valid?.must_equal false
         activity.errors[:entity_id].must_include "entity must not be blank"
       end
-
-      it "must be a number" do
-        activity = Activity::Member.new(entity_id: "a")
-        activity.valid?.must_equal false
-        activity.errors[:entity_id].must_include "entity must be a number"
-      end
     end #entity_id
+
     describe 'actor' do
       it 'must be present' do
         activity = Activity::Member.new
@@ -76,15 +68,16 @@ describe Activity::Member do
 
   describe 'activity resource integration' do
     it 'accepts any kind of resource for Polymorphic fields' do
-      user      = Factory.user.save
+      user      = Factory.user
       activity  = Factory.activity(actor: user, action: 'invite', object: user)
 
       activity.actor.kind           .must_equal 'user'
       activity.actor.resource.first .must_equal user.first
-      activity.save
 
-      activity = Activity::Member
-                  .new(id: activity.id, entity_id: activity.entity_id)
+      activity.verify
+      serialized  = activity.to_json
+      activity    = Activity::Member.new(JSON.parse(serialized))
+
       activity.actor.kind           .must_equal 'user'
       activity.actor.resource       .must_be_instance_of User::Member
       activity.object.resource      .must_be_instance_of User::Member

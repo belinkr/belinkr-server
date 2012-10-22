@@ -1,18 +1,21 @@
 # encoding: utf-8
 require_relative '../Entity/Collection'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class DeleteEntity
-    def initialize(entity)
+    include Tinto::Context
+
+    def initialize(entity, entities=Entity::Collection.new)
       @entity   = entity
-      @entities = Entity::Collection.new
+      @entities = entities
     end # initialize
 
     def call
-      $redis.multi do
-        @entity.delete
-        @entities.remove @entity
-      end
+      @entity.delete
+      @entities.delete @entity
+
+      @to_sync = [@entity, @entities]
       @entity
     end # call
   end # DeleteEntity

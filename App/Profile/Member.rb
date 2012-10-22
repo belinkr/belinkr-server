@@ -3,7 +3,6 @@ require 'forwardable'
 require 'virtus'
 require 'aequitas'
 require_relative '../../Tinto/Member'
-require_relative '../../Config'
 
 module Belinkr
   module Profile
@@ -15,34 +14,30 @@ module Belinkr
       MODEL_NAME  = 'profile'
       WHITELIST   = 'mobile landline fax position department'
 
-      attribute :id,              Integer
+      attribute :id,              String
       attribute :mobile,          String
       attribute :landline,        String
       attribute :fax,             String
       attribute :position,        String
       attribute :department,      String
-      attribute :entity_id,       Integer
-      attribute :user_id,         Integer
+      attribute :entity_id,       String
+      attribute :user_id,         String
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
 
-      validates_numericalness_of  :entity_id, :user_id
-      validates_presence_of       :entity_id, :user_id
+      validates_presence_of       :id, :entity_id, :user_id
       validates_length_of         :mobile,      max: 50
       validates_length_of         :landline,    max: 50
       validates_length_of         :fax,         max: 50
       validates_length_of         :position,    max: 250
       validates_length_of         :department,  max: 250
 
-      def_delegators :@member,    :==, :score, :to_json, :read, :save, :update,
-                                  :sanitize, :delete, :undelete, :destroy
+      def_delegators :@member,    *Tinto::Member::INTERFACE
 
-      alias_method :to_hash, :attributes
-
-      def initialize(attrs={}, retrieve=true)
+      def initialize(attrs={})
         super attrs
-        @member = Tinto::Member.new self, retrieve
+        @member = Tinto::Member.new self
       end
 
       def storage_key

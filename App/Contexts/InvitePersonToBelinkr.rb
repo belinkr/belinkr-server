@@ -2,48 +2,43 @@
 require 'i18n'
 require_relative '../../Locales/Loader'
 require_relative '../../Config'
-require_relative '../Invitation/Collection'
-require_relative '../Entity/Member'
-require_relative '../Activity/Collection'
-require_relative '../Activity/Member'
 require_relative '../../Workers/Mailer/Message'
+require_relative './RegisterActivity'
 
 module Belinkr
   class InvitePersonToBelinkr
     BASE_PATH = "https://#{Belinkr::Config::HOSTNAME}/invitations"
 
-    def initialize(actor, invitation, entity)
+    def initialize(actor, invitation, invitations, entity)
       @actor        = actor
       @invitation   = invitation
+      @invitations  = invitations
       @entity       = entity
-      @activities   = Activity::Collection.new(entity_id: entity.id)
-      @invitations  = Invitation::Collection.new(entity_id: entity.id)
-    end
+    end # initialize
 
     def call
       @invitation.inviter_id  = @actor.id
       @invitation.entity_id   = @entity.id
 
-      message = message_for(@actor, @invitation, @entity)
-      @invitation.save
+      @invitation.verify
+      @invitations.add @invitation
 
-      activity = Activity::Member.new(
+      message = message_for(@actor, @invitation, @entity)
+      Mailer::Message.new(message).queue
+
+      @activity_context = RegisterActivity.new(
         actor:      @actor, 
         action:     'invite', 
         # Since invited person doesn't have User::Member yet,
         # we use the invited_name
         object:     @invitation.invited_name,
         entity_id:  @entity.id
-      ).save
+      ).call
 
-      $redis.multi do
-        @invitations.add @invitation
-        @activities.add activity
-        Mailer::Message.new(message).queue
-      end
       
+      @to_sync = [@invitation, @invitations, @activity_context]
       @invitation
-    end
+    end #call
 
     private
 

@@ -13,12 +13,6 @@ describe Profile::Member do
         profiles.valid?.must_equal false
         profiles.errors[:entity_id].must_include 'entity must not be blank'
       end
-
-      it 'must be a number' do
-        profiles = Profile::Collection.new(entity_id: 'a')
-        profiles.valid?.must_equal false
-        profiles.errors[:entity_id].must_include 'entity must be a number'
-      end
-    end # entity_id
-  end
-end
+    end #entity_id
+  end # validations
+end # Profile::Member

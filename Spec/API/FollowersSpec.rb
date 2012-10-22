@@ -2,9 +2,9 @@
 require 'minitest/autorun'
 require 'rack/test'
 require 'json'
-require_relative '../support/api_helpers'
-require_relative '../factories/account'
-require_relative '../../api/followers'
+#require_relative '../support/api_helpers'
+#require_relative '../factories/account'
+#require_relative '../../api/followers'
 
 include Belinkr
 $redis ||= Redis.new

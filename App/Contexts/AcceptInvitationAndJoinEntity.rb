@@ -1,38 +1,36 @@
 # encoding: utf-8
-require_relative '../Contexts/CreateProfileInEntity'
+require_relative './CreateProfileInEntity'
+require_relative './RegisterActivity'
 require_relative '../Profile/Member'
-require_relative '../Activity/Member'
-require_relative '../Activity/Collection'
+require_relative '../Profile/Collection'
 
 module Belinkr
   class AcceptInvitationAndJoinEntity
-    def initialize(actor, invitation, entity)
+    def initialize(actor, invitation, entity, profile=Profile::Member.new)
       @actor      = actor
       @invitation = invitation
       @entity     = entity
-      @profile    = Profile::Member.new(user_id: @actor.id, entity_id: @entity.id)
-      @activities = Activity::Collection.new(entity_id: @entity.id)
-    end
+      @profile    = profile
+      @profiles   = Profile::Collection.new(entity_id: @entity.id)
+    end #initialize
 
     def call
-      @actor.save
+      @profile.id         = @actor.id
+      @profile.entity_id  = @entity.id
       @invitation.accept
-      CreateProfileInEntity.new(@actor, @profile, @entity).call
-      
-      activity = Activity::Member.new(
-        actor:      @actor, 
-        action:     'accept',
-        object:     @invitation,
-        entity_id:  @entity.id
-      ).save
 
-      $redis.multi do
-        @invitation.save
-        @activities.add activity
-      end
+      @profile_context    = CreateProfileInEntity
+                              .new(@actor, @profile, @profiles, @entity).call
+      @activity_context   = RegisterActivity.new(
+                              actor:      @actor, 
+                              action:     'accept',
+                              object:     @invitation,
+                              entity_id:  @entity.id
+                            ).call
 
+      @to_sync = [@invitation, @profile_context, @activity_context]
       @invitation
-    end
+    end #call
   end
 end # Belinkr
 

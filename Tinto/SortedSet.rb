@@ -9,7 +9,9 @@ module Tinto
 
     PER_PAGE          = 20
     NOT_IN_SET_SCORE  = -1.0
-
+    INTERFACE         = %w{ verify sync synced? page fetch reset each size
+                            length empty? exists? include? add merge delete 
+                            clear score } 
     def initialize(collection)
       @collection = collection
       @member_ids = ::Set.new
@@ -18,21 +20,24 @@ module Tinto
     end #initialize
 
     def sync
-      ensure_valid(@collection)
+      verify
       $redis.pipelined { @backlog.each { |command| command.call } }
       @backlog.clear
-      self
+      @collection
     end #sync
 
     def synced?
-      ensure_valid(@collection)
+      verify
       @backlog.empty?
     end #synced?
 
     def page(page_number=0)
-      ensure_valid(@collection)
+      verify
       from = page_number * PER_PAGE
       to   = from + PER_PAGE - 1
+
+      @member_ids = ::Set.new
+      @scores     = {}
 
       ($redis.zrevrange @collection.storage_key, from, to, with_scores: true )
       .each do |tuple|
@@ -40,11 +45,11 @@ module Tinto
         @scores[tuple.first] = tuple.last.to_f
       end
       @fetched = true
-      self
+      @collection
     end #page
 
     def fetch
-      ensure_valid(@collection)
+      verify
       @member_ids = ::Set.new
       @scores     = {}
       ($redis.zrange @collection.storage_key, 0, -1, with_scores: true ).each do |tuple|
@@ -52,12 +57,12 @@ module Tinto
         @scores[tuple.first] = tuple.last.to_f
       end
       @fetched = true
-      self
+      @collection
     end #fetch
 
     def reset(members=[])
       raise ArgumentError unless members.respond_to? :each
-      ensure_valid(@collection)
+      verify
 
       @backlog.push(lambda { 
         $redis.zadd @collection.storage_key, scores_for(members) 
@@ -67,18 +72,18 @@ module Tinto
       @member_ids = ::Set.new(members.map { |member| member.id.to_s })
 
       @fetched = true
-      self
+      @collection
     end #reset
 
     def each
-      ensure_valid(@collection)
+      verify
       page unless @fetched
       return @member_ids.each unless block_given?
       @member_ids.each { |id| yield @collection.instantiate_member(id: id) }
     end #each
 
     def size
-      ensure_valid(@collection)
+      verify
       sync if !@fetched && !synced?
 
       return @member_ids.size if @fetched
@@ -88,7 +93,7 @@ module Tinto
     alias_method :length, :size
 
     def empty?
-      ensure_valid(@collection)
+      verify
       !(size.to_i > 0)
     end #empty?
 
@@ -96,57 +101,68 @@ module Tinto
       !empty?
     end #exists?
 
-    def include?(element)
-      ensure_valid(@collection)
+    def include?(member)
+      verify
       sync if !@fetched && !synced?
 
-      element_id = element.id.to_s
-      return @member_ids.include?(element_id) if @fetched
-      $redis.sismember @collection.storage_key, element_id
+      member_id = member.id.to_s
+      return @member_ids.include?(member_id) if @fetched
+      $redis.sismember @collection.storage_key, member_id
     end #include?
 
-    def add(element)
-      ensure_valid(@collection)
-      ensure_valid(element)
+    def add(member)
+      verify
+      member.verify
 
       @backlog.push(lambda { 
-        $redis.zadd @collection.storage_key, score_for(element), element.id
+        $redis.zadd @collection.storage_key, score_for(member), member.id
       })
-      @scores[element.id.to_s] = score_for(element)
-      @member_ids.add element.id.to_s
-      self
+      @scores[member.id.to_s] = score_for(member)
+      @member_ids.add member.id.to_s
+      @collection
     end #add
 
-    def delete(element)
-      ensure_valid(@collection)
-      ensure_valid(element)
+    def merge(enumerable)
+      enumerable.each do |member|
+        @scores[member.id.to_s] = score_for(member)
+        @member_ids.add member.id.to_s
+      end
 
-      element_id = element.id.to_s
-      @backlog.push(lambda { $redis.zrem @collection.storage_key, element_id })
-      @member_ids.delete element_id
-      @scores.delete element_id
-      self
+      members_scores = enumerable.map { |member| [member.id, member.score] }
+      @backlog.push(
+        lambda { $redis.zadd @collection.storage_key, members_scores }
+      )
+      @collection
+    end #merge
+
+    def delete(member)
+      verify
+      member.verify
+
+      member_id = member.id.to_s
+      @backlog.push(lambda { $redis.zrem @collection.storage_key, member_id })
+      @member_ids.delete member_id
+      @scores.delete member_id
+      @collection
     end #delete
 
     def clear
-      ensure_valid(@collection)
+      verify
       @backlog.push(lambda { $redis.del @collection.storage_key })
       @member_ids.clear
       @scores.clear
-      self
+      @collection
     end #clear
 
-    def score(element)
-      @scores.fetch(element.id.to_s, NOT_IN_SET_SCORE)
+    def score(member)
+      @scores.fetch(member.id.to_s, NOT_IN_SET_SCORE)
     end
 
     private
 
-    def ensure_valid(resource)
-      return if resource.valid?
-      raise InvalidCollection if resource.respond_to?(:instantiate_member)
-      raise InvalidMember
-    end #ensure_valid
+    def verify
+      raise InvalidCollection unless @collection.valid?
+    end #verify
 
     def scores_for(members)
       members.flat_map { |member| [score_for(member), member.id.to_s ] }

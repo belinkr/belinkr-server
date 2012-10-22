@@ -53,7 +53,8 @@ describe Tinto::Set do
       set.sync
       set.size.must_equal 1
 
-      set = Tinto::Set.new(@collection).fetch
+      set = Tinto::Set.new(@collection)
+      set.fetch
       set.size.must_equal 1
     end
   end #sync
@@ -67,17 +68,42 @@ describe Tinto::Set do
       set.sync
       set.synced?.must_equal true
     end
-  end
+  end #synced?
+
+  describe '#page' do 
+    it 'loads a page of records' do
+      elements  = (1..100).map { |i| factory(id: i) }
+      set       = Tinto::Set.new(@collection)
+      set.reset(elements)
+      set.sync
+
+      set       = Tinto::Set.new(@collection)
+      set.page
+      set.to_a.length.must_equal 20
+
+      set.page(1)
+      set.to_a.length.must_equal 20
+
+      set.page(2)
+      set.to_a.length.must_equal 20
+    end
+  end #page
 
   describe '#fetch' do
     it 'populates the set with the elements stored in the DB' do
-      Tinto::Set.new(@collection).reset([factory(id: 1)]).sync
-      set = Tinto::Set.new(@collection).fetch
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
+      set.sync
+
+      set = Tinto::Set.new(@collection)
+      set.fetch
       set.size.must_equal 1
     end
 
     it 'it discards pending commands in the backlog' do
-      set = Tinto::Set.new(@collection).reset([factory(id: 1)]).sync
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
+      set.sync
       set.delete factory(id: 1)
       set.fetch
       set.size.must_equal 1
@@ -99,7 +125,8 @@ describe Tinto::Set do
     end
 
     it 'allows to work with the set off the database' do
-      set           = Tinto::Set.new(@collection).reset
+      set           = Tinto::Set.new(@collection)
+      set.reset
       $sync_called  = false
       def set.sync; $sync_called = true; super; end
 
@@ -124,7 +151,8 @@ describe Tinto::Set do
     end
 
     it 'yields instances of the member class' do
-      set = Tinto::Set.new(@collection).reset([factory(id: 1)])
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
       set.each do |element|
         element     .must_be_instance_of OpenStruct
         element.id  .must_be_instance_of String
@@ -134,7 +162,8 @@ describe Tinto::Set do
 
   describe '#size' do
     it 'returns the number of elements in the set' do
-      set = Tinto::Set.new(@collection).reset([factory(id: 1)])
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
       set.size.must_equal 1
     end
   end #size
@@ -145,7 +174,8 @@ describe Tinto::Set do
       set.add factory(id: 1)
       set.empty?.must_equal false
 
-      empty_set = Tinto::Set.new(@collection).reset([factory(id: 1)])
+      empty_set = Tinto::Set.new(@collection)
+      empty_set.reset([factory(id: 1)])
       empty_set.delete factory(id: 1)
       empty_set.empty?.must_equal true
       empty_set.sync
@@ -157,12 +187,14 @@ describe Tinto::Set do
 
   describe '#exists?' do
     it 'returns true if there is some element in the collection' do
-      set = Tinto::Set.new(@collection).reset([factory(id: 1)])
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
       set.exists?.must_equal true
 
       collection = factory(storage_key: 'key:test:1')
       def collection.valid?; true; end
-      empty_set = Tinto::Set.new(collection).reset([factory(id: 1)])
+      empty_set = Tinto::Set.new(collection)
+      empty_set.reset([factory(id: 1)])
       empty_set.delete factory(id: 1)
       empty_set.exists?.must_equal false
     end
@@ -170,7 +202,8 @@ describe Tinto::Set do
 
   describe '#include?' do
     it 'returns true if the set includes the id of the passed object' do
-      set = Tinto::Set.new(@collection).reset([factory(id: 1)])
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
       set.include?(factory(id: 1)).must_equal true
       set.include?(factory(id: 2)).must_equal false
     end
@@ -178,7 +211,8 @@ describe Tinto::Set do
 
   describe '#add' do
     it 'adds the id of a member to the collection, if not included yet' do
-      set = Tinto::Set.new(@collection).reset([factory(id: 1)])
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
       4.times { set.add factory(id: 2) }
       set.size.must_equal 2
 
@@ -186,18 +220,31 @@ describe Tinto::Set do
       set.size.must_equal 3
     end
 
-    it 'raises InvalidMember if element is not valid' do
+    it 'verifies the member' do
       set     = Tinto::Set.new(@collection)
       element = factory(id: 5)
 
-      def element.valid?; false; end
+      def element.verify; raise InvalidMember; end
       lambda { set.add(element) }.must_raise InvalidMember
     end
   end #add
 
+  describe '#merge' do
+    it 'adds the elements in the passed enumerable' do
+      elements  = (1..20).map { |i| factory(id: i) }
+      set       = Tinto::Set.new(@collection)
+      set.reset
+
+      elements.size.must_equal 20
+      set.size.must_equal 0
+      set.merge(elements)
+      set.size.must_equal 20
+    end
+  end #merge
   describe '#delete' do
     it 'deletes an element from the collection' do
-      set = Tinto::Set.new(@collection).reset([factory(id: 1)])
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
       4.times { set.delete(factory(id: 5)) }
       set.size.must_equal 1
 
@@ -205,18 +252,19 @@ describe Tinto::Set do
       set.size.must_equal 0
     end
 
-    it 'raises InvalidMember if element is not valid' do
+    it 'verifies the member' do
       set     = Tinto::Set.new(@collection)
       element = factory(id: 5)
 
-      def element.valid?; false; end
+      def element.verify; raise InvalidMember; end
       lambda { set.delete(element) }.must_raise InvalidMember
     end
   end #delete
 
   describe '#clear' do
     it 'removes all members' do
-      set = Tinto::Set.new(@collection).reset([factory(id: 1)])
+      set = Tinto::Set.new(@collection)
+      set.reset([factory(id: 1)])
       set.clear
       set.size.must_equal 0
     end
@@ -224,7 +272,7 @@ describe Tinto::Set do
 
   def factory(attrs={})
     member = OpenStruct.new(attrs)
-    def member.valid?; true; end
+    def member.verify; true; end
     member
   end
 end # Tinto::Set

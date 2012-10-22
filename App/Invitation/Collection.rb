@@ -1,8 +1,9 @@
 # encoding: utf-8
+require 'forwardable'
 require 'virtus'
 require 'aequitas'
-require_relative 'Member'
-require_relative '../../Tinto/SortedSet'
+require_relative './Member'
+require_relative '../../Tinto/Set'
 
 module Belinkr
   module Invitation
@@ -10,30 +11,22 @@ module Belinkr
       extend Forwardable
       include Virtus
       include Aequitas
-      include Enumerable
 
       MODEL_NAME = 'invitation'
 
-      attribute :entity_id,       Integer
-
+      attribute :entity_id,       String
       validates_presence_of       :entity_id
-      validates_numericalness_of  :entity_id
 
-      def_delegators :@zset,      :each, :size, :length, :include?, :empty?,
-                                  :exists?, :all, :page, :<<, :add, :remove,
-                                  :delete, :merge, :score
+      def_delegators :@set,       *Tinto::Set::INTERFACE
 
-      def initialize(attributes={}, members=[])
+      def initialize(attributes={})
         super attributes
-        @zset = Tinto::SortedSet
-          .new(self, Invitation::Member, storage_key, members)
+        @set = Tinto::Set.new self
       end
 
-      def member_init_params
-        { entity_id: entity_id }
+      def instantiate_member(attributes={})
+        Member.new attributes.merge(entity_id: entity_id)
       end
-
-      private
 
       def storage_key
         "entities:#{entity_id}:invitations"
@@ -41,3 +34,4 @@ module Belinkr
     end # Collection
   end # Invitation
 end # Belinkr
+

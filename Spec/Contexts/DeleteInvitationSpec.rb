@@ -8,27 +8,28 @@ require_relative '../Factories/Invitation'
 require_relative '../Factories/Entity'
 require_relative '../Factories/User'
 
+include Belinkr
+
 $redis ||= Redis.new
 $redis.select 8
 
-include Belinkr
-
 describe 'delete invitation' do
   before do
-    @entity     = Factory.entity.save
-    @invitation = Factory.invitation(entity_id: @entity.id)
-    @actor      = Factory.user(entity_id: @entity.id).save
-    InvitePersonToBelinkr.new(@actor, @invitation, @entity).call
+    @entity       = Factory.entity
+    @invitation   = Factory.invitation(entity_id: @entity.id)
+    @actor        = Factory.user(entity_id: @entity.id)
+    @invitations  = Invitation::Collection.new(entity_id: @entity.id)
+    InvitePersonToBelinkr.new(@actor, @invitation, @invitations, @entity).call
   end
 
   it 'marks the invitation as deleted' do
     @invitation.deleted_at.must_be_nil
-    DeleteInvitation.new(@actor, @invitation, @entity).call
+    DeleteInvitation.new(@actor, @invitation, @invitations, @entity).call
     @invitation.deleted_at.wont_be_nil
   end
 
   it 'removes the invitation from the invitations collection of the entity' do
-    DeleteInvitation.new(@actor, @invitation, @entity).call
-    Invitation::Collection.new(entity_id: @entity.id).wont_include @invitation
+    DeleteInvitation.new(@actor, @invitation, @invitations, @entity).call
+    @invitations.wont_include @invitation
   end
 end

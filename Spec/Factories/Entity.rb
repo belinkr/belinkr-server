@@ -6,11 +6,7 @@ module Belinkr
   class Factory
     def self.entity(attrs={})
       Entity::Member.new(
-        {
-          id:       attrs[:id]      || random_number,
-          name:     attrs[:name]    || random_string * 3,
-        },
-        false
+        name:     attrs[:name]    || random_string * 3,
       )
     end
   end # Factory

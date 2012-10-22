@@ -81,6 +81,8 @@ en:
     attributes:
       text:           text
       kind:           kind
+      forwarder:      forwarder
+      author:         author
       user_id:        user
       entity_id:      entity
       workspace_id:   workspace
@@ -91,6 +93,7 @@ en:
     attributes:
       first:          first name
       last:           last name
+      name:           name
       workspace_id:   workspace
       profile_ids:    profile_ids
       timezone:       timezone

@@ -1,27 +1,24 @@
 # encoding: utf-8
-require 'virtus'
+require 'forwardable'
 require 'aequitas'
-require_relative 'Member'
-require_relative '../../Tinto/SortedSet'
+require_relative './Member'
+require_relative '../../Tinto/Set'
 
 module Belinkr
   module Reset
     class Collection
       extend Forwardable
-      include Enumerable
-      include Virtus
       include Aequitas
 
-      def_delegators :@zset,    :each, :size, :length, :include?, :empty?,
-                                :exists?, :all, :page, :<<, :add, :remove,
-                                :delete, :merge, :score
+      def_delegators :@set, *Tinto::Set::INTERFACE
 
-      def initialize(attributes={}, members=[])
-        super attributes
-        @zset = Tinto::SortedSet.new(self, Reset::Member, storage_key, members)
+      def initialize
+        @set = Tinto::Set.new self
       end
 
-      private
+      def instantiate_member(attributes={})
+        Member.new attributes
+      end
 
       def storage_key
         'resets'
@@ -29,3 +26,4 @@ module Belinkr
     end # Collection
   end # Reset
 end # Belinkr
+

@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'json'
-require 'Sanitize'
+require 'sanitize'
 
 module Tinto
   class Sanitizer

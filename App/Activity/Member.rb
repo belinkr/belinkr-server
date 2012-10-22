@@ -1,5 +1,4 @@
 # encoding: utf-8
-require 'json'
 require 'forwardable'
 require 'virtus'
 require 'aequitas'
@@ -18,8 +17,8 @@ module Belinkr
       ACTIONS     = Config::ACTIVITY_ACTIONS + 
                     Config::ACTIVITY_ACTIONS_EXTENSIONS
                     
-      attribute :id,              Integer
-      attribute :entity_id,       Integer
+      attribute :id,              String
+      attribute :entity_id,       String
       attribute :actor,           Polymorphic
       attribute :action,          String
       attribute :object,          Polymorphic
@@ -31,19 +30,15 @@ module Belinkr
       attribute :deleted_at,      Time
 
 
-      validates_presence_of       :entity_id, :actor, :action, :object
-      validates_numericalness_of  :entity_id
+      validates_presence_of       :id, :entity_id, :actor, :action, :object
       validates_within            :action, set: ACTIONS
       validates_length_of         :description, max: 250
 
-      def_delegators :@member,    :==, :score, :read, :save, :update, :to_json,
-                                  :delete, :undelete 
+      def_delegators :@member,    *Tinto::Member::INTERFACE
 
-      alias_method :to_hash, :attributes
-
-      def initialize(attrs={}, retrieve=true)
+      def initialize(attrs={})
         super attrs
-        @member = Tinto::Member.new self, retrieve
+        @member = Tinto::Member.new self
       end
 
       def storage_key
@@ -52,3 +47,4 @@ module Belinkr
     end # Member
   end # Activity
 end # Belinkr
+

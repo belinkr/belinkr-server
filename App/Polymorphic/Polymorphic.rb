@@ -1,7 +1,7 @@
 # encoding: utf-8
-require "virtus"
-require "aequitas"
-require_relative "../../Config"
+require 'virtus'
+require 'aequitas'
+require_relative '../../Config'
 
 module Belinkr
   class Polymorphic < Virtus::Attribute::Object
@@ -16,8 +16,9 @@ module Belinkr
       include Virtus::ValueObject
       include Aequitas
 
-      MODEL_NAME  = "polymorphic"
-      MAP         = Belinkr::Config::RESOURCE_MAP
+      MODEL_NAME          = 'polymorphic'
+      MAP                 = Belinkr::Config::RESOURCE_MAP
+      PREVIEWABLE_FIELDS  = %w{ id name kind resource avatar }
 
       attribute :kind,        String
       attribute :resource,    Hash
@@ -43,11 +44,36 @@ module Belinkr
         super(resource)
       end
 
+      def attributes
+        { kind: @kind, resource: @resource.attributes }
+      end
+
       def to_json(*args)
-        attributes.to_json
+        {
+          kind:     @kind,
+          resource: json_for(@resource)
+        }.to_json(*args)
+      end
+
+      def method_missing(method, *args)
+        resource.send method, *args if resource.respond_to? method
+      end
+
+      def respond_to?(method, include_private=false)
+        resource.respond_to?(method, include_private) || 
+          super(method, include_private)
       end
 
       private
+
+      def json_for(resource)
+        return resource unless resource.respond_to? :keys
+        resource.select { |k, v| previewable?(k) }
+      end
+
+      def previewable?(key)
+        PREVIEWABLE_FIELDS.include?(key.to_s) || key.match(/.*_id$/)
+      end
 
       def hydrate
         klass = klass_for(MAP.fetch(self.kind)) 
@@ -60,9 +86,10 @@ module Belinkr
 
       def klass_for(klass_name)
         klass = Object
-        klass_name.split("::").each { |part| klass = klass.const_get(part) }
+        klass_name.split('::').each { |part| klass = klass.const_get(part) }
         klass
       end
     end # Member
   end # Polymorphic
 end # Belinkr
+

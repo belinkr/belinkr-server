@@ -1,16 +1,19 @@
 # encoding: utf-8
-require_relative '../Entity/Collection'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class CreateEntity
-    def initialize(entity)
+    include Tinto::Context
+
+    def initialize(entity, entities)
       @entity   = entity
-      @entities = Entity::Collection.new
+      @entities = entities
     end # initialize
 
     def call
-      @entity.save
       @entities.add @entity
+
+      @to_sync = [@entity, @entities]
       @entity
     end # call
   end # CreateEntity

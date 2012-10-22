@@ -4,6 +4,7 @@ group :production do
   gem 'i18n' 
   gem 'tzinfo' 
   gem 'json' 
+  gem 'uuidtools'
   gem 'bcrypt-ruby'
   gem 'rack' 
   gem 'sinatra', require: 'sinatra/base' 

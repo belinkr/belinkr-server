@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require_relative '../../init'
-require_relative '../../app/following/collection'
+require_relative '../../Locales/Loader'
+require_relative '../../App/Following/Collection'
 
 include Belinkr
 
@@ -14,13 +14,6 @@ describe Following::Collection do
 
         collection.errors[:user_id].must_include 'user must not be blank'
       end
-
-      it 'must be a number' do
-        collection = Following::Collection.new
-        collection.valid?.must_equal false
-
-        collection.errors[:user_id].must_include 'user must be a number'
-      end
     end #user_id
 
     describe '#entity_id' do
@@ -29,13 +22,6 @@ describe Following::Collection do
         collection.valid?.must_equal false
 
         collection.errors[:entity_id].must_include 'entity must not be blank'
-      end
-
-      it 'must be a number' do
-        collection = Following::Collection.new
-        collection.valid?.must_equal false
-
-        collection.errors[:entity_id].must_include 'entity must be a number'
       end
     end #entity_id
   end # validations

@@ -1,18 +1,22 @@
 # encoding: utf-8
 require_relative '../Session/Collection'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class LogOut
-    def initialize(session)
+    include Tinto::Context
+
+    def initialize(session, sessions=Session::Collection.new)
       @session  = session
-      @sessions = Session::Collection.new
+      @sessions = sessions
     end # initialize
 
     def call
-      $redis.multi do
-        @sessions.remove @session
-        @session.delete.destroy
-      end
+      @sessions.delete @session
+      @session.delete
+      @session.destroy
+
+      @to_sync = [@sessions]
       @session
     end # call
   end # LogOut

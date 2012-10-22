@@ -5,7 +5,6 @@ require 'virtus'
 require 'aequitas'
 require 'statemachine'
 require_relative '../../Tinto/Member'
-require_relative '../../Tinto/Utils'
 
 module Belinkr
   module Invitation
@@ -18,8 +17,8 @@ module Belinkr
       WHITELIST         = %w{ invited_name invited_email locale }
 
       attribute :id,              String
-      attribute :entity_id,       Integer
-      attribute :inviter_id,      Integer
+      attribute :entity_id,       String
+      attribute :inviter_id,      String
       attribute :invited_name,    String
       attribute :invited_email,   String
       attribute :locale,          String, default: 'en'
@@ -30,23 +29,17 @@ module Belinkr
 
       validates_presence_of       :id, :entity_id, :inviter_id,
                                   :invited_name, :invited_email, :locale 
-      validates_with_block        :id do Tinto::Utils.is_sha256?(@id) end
       validates_length_of         :invited_name, min: 1, max: 150
       validates_format_of         :invited_email, as: :email_address
-      validates_numericalness_of  :entity_id, :inviter_id
       validates_within            :locale, 
                                     set: I18n.available_locales.map(&:to_s)
 
       def_delegators :@fsm,       :accept
-      def_delegators :@member,    :==, :score, :to_json, :read, :save,
-                                  :update, :delete, :undelete, :destroy
+      def_delegators :@member,    *Tinto::Member::INTERFACE
 
-      alias_method :to_hash, :attributes
-
-      def initialize(attrs={}, retrieve=true)
+      def initialize(attrs={})
         super(attrs)
-        @member  = Tinto::Member.new self, retrieve
-        self.id  ||= Tinto::Utils.generate_token
+        @member  = Tinto::Member.new self
 
         @fsm = Statemachine.build do
           state :pending
@@ -77,7 +70,7 @@ module Belinkr
       end
 
       def storage_key
-        "invitations"
+        'invitations'
       end
 
       private
@@ -88,3 +81,4 @@ module Belinkr
     end # Member
   end # Invitation
 end # Belinkr
+

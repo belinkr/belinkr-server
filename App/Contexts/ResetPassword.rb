@@ -1,22 +1,27 @@
 # encoding: utf-8
 require_relative '../Reset/Collection'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class ResetPassword
-    def initialize(actor, reset, user_changes)
+    include Tinto::Context
+
+    def initialize(actor, user_changes, reset, resets=Reset::Collection.new)
       @actor        = actor
-      @reset        = reset
       @user_changes = user_changes
-      @resets       = Reset::Collection.new
-    end
+      @reset        = reset
+      @resets       = resets
+    end #initialize
 
     def call
-      $redis.multi do
-        @actor.update(@user_changes)
-        @reset.delete
-        @resets.remove @reset
-      end
+      @actor.update(@user_changes)
+      @actor.verify
+      @reset.delete
+      @resets.delete @reset
+
+      @to_sync = [@actor, @reset, @resets]
       @reset
-    end
+    end #call
   end # ResetPassword
 end # Belinkr
+

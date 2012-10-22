@@ -14,23 +14,20 @@ module Belinkr
       MODEL_NAME  = 'entity'
       WHITELIST   = %w{ name }
  
-      attribute :id,              Integer
+      attribute :id,              String
       attribute :name,            String
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
 
-      validates_presence_of       :name
+      validates_presence_of       :id, :name
       validates_length_of         :name, min: 2, max: 150
 
-      def_delegators :@member,    :==, :score, :to_json, :read, :save, :update,
-                                  :sanitize, :delete, :undelete, :destroy
+      def_delegators :@member,    *Tinto::Member::INTERFACE
 
-      alias_method :to_hash, :attributes
-
-      def initialize(attrs={}, retrieve=true)
+      def initialize(attrs={})
         super attrs
-        @member = Tinto::Member.new self, retrieve
+        @member = Tinto::Member.new self
       end
 
       def storage_key
@@ -42,3 +39,4 @@ module Belinkr
     end # Member
   end # Entity
 end # Belinkr
+

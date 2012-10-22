@@ -1,21 +1,22 @@
 # encoding: utf-8
-require_relative '../Invitation/Collection'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class DeleteInvitation
-    def initialize(actor, invitation, entity)
+    include Tinto::Context
+
+    def initialize(actor, invitation, invitations, entity)
       @actor        = actor
-      @invitation   = invitation
       @entity       = entity
-      @invitations  = Invitation::Collection.new(entity_id: @entity.id)
+      @invitation   = invitation
+      @invitations  = invitations
     end # initialize
 
     def call
-      $redis.multi do
-        @invitation.delete
-        @invitations.remove @invitation
-      end
+      @invitation.delete
+      @invitations.delete @invitation
 
+      @to_sync = [@invitation, @invitations]
       @invitation
     end # call
   end # DeleteInvitation

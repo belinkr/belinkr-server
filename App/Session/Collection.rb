@@ -1,25 +1,24 @@
 # encoding: utf-8
+require 'forwardable'
 require 'aequitas'
-require_relative 'Member'
-require_relative '../../Tinto/SortedSet'
+require_relative './Member'
+require_relative '../../Tinto/Set'
 
 module Belinkr
   module Session
     class Collection
       extend Forwardable
-      include Enumerable
       include Aequitas
 
-      def_delegators :@zset,  :each, :size, :length, :include?, :empty?,
-                              :exists?, :all, :page, :<<, :add, :remove,
-                              :delete, :merge, :score
+      def_delegators :@set, *Tinto::Set::INTERFACE
 
-      def initialize(*args)
-        super *args
-        @zset = Tinto::SortedSet.new(self, Session::Member, storage_key)
+      def initialize
+        @set = Tinto::Set.new self
       end
 
-      private
+      def instantiate_member(attributes={})
+        Member.new attributes
+      end
 
       def storage_key
         'sessions'
@@ -27,3 +26,4 @@ module Belinkr
     end # Collection
   end # Session
 end # Belinkr
+

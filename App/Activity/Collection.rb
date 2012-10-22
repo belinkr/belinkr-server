@@ -2,7 +2,7 @@
 require 'forwardable'
 require 'virtus'
 require 'aequitas'
-require_relative 'Member'
+require_relative './Member'
 require_relative '../../Tinto/SortedSet'
 
 module Belinkr
@@ -11,29 +11,22 @@ module Belinkr
       extend Forwardable
       include Virtus
       include Aequitas
-      include Enumerable
 
       MODEL_NAME = 'activity'
 
-      attribute :entity_id,         Integer
+      attribute :entity_id,   String
+      validates_presence_of   :entity_id
 
-      validates_presence_of         :entity_id
-      validates_numericalness_of    :entity_id
-
-      def_delegators :@zset,        :each, :size, :length, :include?, :empty?,
-                                    :exists?, :all, :page, :<<, :add, :remove, 
-                                    :delete, :merge, :score
+      def_delegators :@zset,  *Tinto::SortedSet::INTERFACE
 
       def initialize(*args)
         super *args
-        @zset = Tinto::SortedSet.new(self, Activity::Member, storage_key)
+        @zset = Tinto::SortedSet.new self
       end
 
-      def member_init_params
-        { entity_id: entity_id }
+      def instantiate_member(attributes={})
+        Member.new attributes.merge(entity_id: entity_id)
       end
-
-      private
 
       def storage_key
         "entities:#{entity_id}:activities"
@@ -41,3 +34,4 @@ module Belinkr
     end # Collection
   end # Activity
 end # Belinkr
+

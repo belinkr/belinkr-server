@@ -14,13 +14,6 @@ describe Activity::Collection do
 
         collection.errors[:entity_id].must_include 'entity must not be blank'
       end
-
-      it 'must be a number' do
-        collection = Activity::Collection.new
-        collection.valid?.must_equal false
-
-        collection.errors[:entity_id].must_include 'entity must be a number'
-      end
     end #entity_id
   end # validations
 end # Activity::Collection

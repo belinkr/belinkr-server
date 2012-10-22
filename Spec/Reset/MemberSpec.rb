@@ -14,12 +14,6 @@ describe Reset::Member do
         reset.valid?.must_equal false
         reset.errors[:id].must_include 'id must not be blank'
       end
-
-      it 'must be a SHA256 hash' do
-        reset = Reset::Member.new({ id: 'a' }, false)
-        reset.valid?.must_equal false
-        reset.errors[:id].must_include 'id must be a SHA256 hash'
-      end
     end #id
 
     describe '#email' do

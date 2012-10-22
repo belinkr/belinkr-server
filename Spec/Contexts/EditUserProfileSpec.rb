@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'redis'
 require_relative '../../App/Contexts/CreateProfileInEntity'
 require_relative '../../App/Contexts/EditUserProfile'
 require_relative '../Factories/User'
@@ -15,15 +16,17 @@ include Belinkr
 describe 'edit profile' do
   before do
     $redis.flushdb
-
     @entity           = Factory.entity
-    @user             = Factory.user(profile_ids: [])
-    @user_changes     = Factory.user(@user.attributes.merge!(first: 'changed'))
+    @user             = Factory.user(profiles: [])
+    @user_changes     = @user.dup
     @profile          = Factory.profile
-    @profile_changes  = Factory.profile(
-                          @profile.attributes.merge!(mobile: 'changed'))
+    @profile_changes  = @profile.dup
     @profiles         = Profile::Collection.new(entity_id: @entity.id)
-    CreateProfileInEntity.new(@user, @profile, @entity).call
+
+    @user_changes.first     = 'changed'
+    @profile_changes.mobile = 'changed'
+
+    CreateProfileInEntity.new(@user, @profile, @profiles, @entity).call
   end
 
   it 'updates user details' do
@@ -44,6 +47,18 @@ describe 'edit profile' do
     @profile.updated_at.wont_equal previous_updated_at
   end
 
+  it 'keeps the profile updated within the profiles field of the user' do
+    user, profile = @user.dup, @profile.dup
+    user.profiles = [profile]
+    previous_updated_at = @profile.updated_at
+    EditUserProfile.new(user, user, @user_changes, @profile, @profile_changes)
+      .call
+
+    user.profiles.length.must_equal 1
+    user.profiles.first.mobile.must_equal 'changed'
+    user.profiles.first.updated_at.wont_equal previous_updated_at
+  end
+
   it 'updates the password if changed' do
     previous_hash           = @user.password
     @user_changes.password  = 'changed'
@@ -53,34 +68,6 @@ describe 'edit profile' do
     @user.encrypted?  .must_equal true
     @user.password    .wont_equal 'changed'
     @user.password    .wont_equal previous_hash
-  end
-
-  it 'rolls back changes to user and profile if the user is invalid' do
-    user_first          = @user.first
-    profile_mobile      = @profile.mobile
-    @user_changes.first = 'a' * 51
-    
-    lambda {
-      EditUserProfile
-        .new(@user, @user, @user_changes, @profile, @profile_changes).call
-    }.must_raise Tinto::Exceptions::InvalidResource
-    
-    @user.read.first      .must_equal user_first
-    @profile.read.mobile  .must_equal profile_mobile
-  end
-
-  it 'rolls back changes to user and profile if the profile is invalid' do
-    user_first                = @user.first
-    profile_user_id           = @profile.user_id
-    @profile_changes.mobile   = 'a' * 51
-    
-    lambda {
-      EditUserProfile
-        .new(@user, @user, @user_changes, @profile, @profile_changes).call
-    }.must_raise Tinto::Exceptions::InvalidResource
-    
-    @user.read.first       .must_equal user_first
-    @profile.read.user_id  .must_equal profile_user_id
   end
 
   it 'raises NotAllowed if actor is not the same as the user being edited' do

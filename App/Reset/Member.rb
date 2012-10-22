@@ -15,7 +15,7 @@ module Belinkr
       MODEL_NAME = 'reset'
 
       attribute :id,              String
-      attribute :user_id,         Integer
+      attribute :user_id,         String
       attribute :email,           String
       attribute :locale,          String, default: 'en'
       attribute :created_at,      Time
@@ -24,18 +24,12 @@ module Belinkr
 
       validates_presence_of       :id, :email
       validates_format_of         :email, as: :email_address
-      validates_with_block        :id do Tinto::Utils.is_sha256?(@id) end
-      validates_numericalness_of  :user_id, allow_nil: true
 
-      def_delegators :@member,    :==, :score, :to_json, :read, :save, :update, 
-                                  :delete, :undelete, :sanitize
+      def_delegators :@member,    *Tinto::Member::INTERFACE
 
-      alias_method :to_hash, :attributes
-
-      def initialize(attrs={}, retrieve=true)
+      def initialize(attrs={})
         super attrs
-        @member = Tinto::Member.new self, retrieve
-        self.id ||= Tinto::Utils.generate_token
+        @member = Tinto::Member.new self
       end
 
       def storage_key
@@ -44,3 +38,4 @@ module Belinkr
     end # Member
   end # Reset
 end # Belinkr
+

@@ -2,48 +2,38 @@
 require_relative '../Profile/Collection'
 require_relative '../User/Locator'
 require_relative '../../Tinto/Exceptions'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class CreateProfileInEntity
-    # Preconditions: an entity must be created and persisted
+    include Tinto::Context
+    # Preconditions: an entity must be created
     #
-    def initialize(actor, profile, entity)
-      @actor     = actor
-      @entity   = entity
+    def initialize(actor, profile, profiles, entity)
+      @actor    = actor
       @profile  = profile
-      @profiles = Profile::Collection.new(entity_id: @entity.id)
+      @profiles = profiles
+      @entity   = entity
     end # initialize
 
     def call
       unless User::Locator.registered?(@actor.id)
-        @actor.save
         User::Locator.add(@actor.email, @actor.id) 
       end
 
+      @actor.verify
+
       @profile.user_id    = @actor.id
       @profile.entity_id  = @entity.id
-      @profile.save
+      @profile.verify
 
-      @actor.profile_ids.push(@profile.id)
-      @actor.entity_ids.push(@entity.id)
+      @actor.profiles.push @profile
+      @actor.verify
 
-      $redis.multi do
-        @actor.save
-        @profiles.add @profile
-      end
+      @profiles.add @profile
 
+      @to_sync = [@actor, @profile, @profiles]
       @profile
-    rescue Tinto::Exceptions::InvalidResource => exception
-      if @profile.id 
-        @actor.profile_ids.delete(@profile.id)
-        @actor.entity_ids.delete(@entity.id)
-        @profiles.remove @profile             
-        @profile.destroy                     
-      end
-
-      @actor.destroy if @actor.profile_ids.empty? && @actor.entity_ids.empty?
-
-      raise exception
     end # call
   end # CreateProfileInEntity
 end # Belinkr

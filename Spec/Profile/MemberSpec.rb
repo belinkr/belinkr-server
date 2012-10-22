@@ -13,12 +13,6 @@ describe Profile::Member do
         profile.valid?.must_equal false
         profile.errors[:entity_id].must_include 'entity must not be blank'
       end
-
-      it 'must be a number' do
-        profile = Profile::Member.new(entity_id: 'a')
-        profile.valid?.must_equal false
-        profile.errors[:entity_id].must_include 'entity must be a number'
-      end
     end # entity_id
 
     describe 'user_id' do
@@ -26,12 +20,6 @@ describe Profile::Member do
         profile = Profile::Member.new
         profile.valid?.must_equal false
         profile.errors[:user_id].must_include 'user must not be blank'
-      end
-
-      it 'must be a number' do
-        profile = Profile::Member.new(user_id: 'a')
-        profile.valid?.must_equal false
-        profile.errors[:user_id].must_include 'user must be a number'
       end
     end # user_id
 

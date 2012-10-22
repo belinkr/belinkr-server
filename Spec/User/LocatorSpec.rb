@@ -14,7 +14,8 @@ include Tinto::Exceptions
 describe Locator do
   before do
     $redis.flushdb
-    @user1 = Belinkr::Factory.user.save
+    @user1 = Belinkr::Factory.user
+    @user1.sync
   end
 
   describe '#add' do
@@ -28,15 +29,15 @@ describe Locator do
   describe '#user_from' do
     it 'retrieves a user from a key' do
       Locator.add 'user1@belinkr.com', @user1.id
-      Locator.user_from('user1@belinkr.com').to_json.must_equal @user1.to_json
+      Locator.user_from('user1@belinkr.com').id.must_equal @user1.id
     end
 
     it 'retrieves the same user if it is referenced by two different keys' do
       Locator.add 'user1@belinkr.com', @user1.id
       Locator.add 'user1', @user1.id
       
-      Locator.user_from('user1@belinkr.com').to_json
-        .must_equal Locator.user_from('user1').to_json
+      Locator.user_from('user1@belinkr.com').id
+        .must_equal Locator.user_from('user1').id
 
       $redis.hlen(Locator::KEYS_MAP).must_equal 2
       $redis.hlen(Locator::IDS_MAP).must_equal 1

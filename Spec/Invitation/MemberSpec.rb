@@ -7,7 +7,7 @@ include Belinkr
 
 describe Invitation::Member do
   before do
-    @invitation = Invitation::Member.new({}, false)
+    @invitation = Invitation::Member.new
   end
 
   describe '#initialize' do
@@ -23,12 +23,6 @@ describe Invitation::Member do
         @invitation.valid?.must_equal false
         @invitation.errors[:entity_id].must_include 'entity must not be blank'
       end
-
-      it 'must be a number' do
-        @invitation.entity_id = 'a'
-        @invitation.valid?.must_equal false
-        @invitation.errors[:entity_id].must_include 'entity must be a number'
-      end
     end #entity_id
 
     describe 'inviter_id' do
@@ -36,12 +30,6 @@ describe Invitation::Member do
         @invitation.valid?.must_equal false
         @invitation.errors[:inviter_id]
           .must_include 'inviter must not be blank'
-      end
-
-      it 'must be a number' do
-        @invitation.inviter_id = 'a'
-        @invitation.valid?.must_equal false
-        @invitation.errors[:inviter_id].must_include 'inviter must be a number'
       end
     end #inviter_id
 
@@ -84,7 +72,7 @@ describe Invitation::Member do
 
     describe 'locale' do
       it 'must be present' do
-        skip
+        @invitation.locale = nil
         @invitation.valid?.must_equal false
         @invitation.errors[:locale].must_include 'locale must not be blank'
       end
@@ -101,12 +89,6 @@ describe Invitation::Member do
         @invitation.id = nil
         @invitation.valid?.must_equal false
         @invitation.errors[:id].must_include 'id must not be blank'
-      end
-
-      it 'must be a SHA2 hash' do
-        @invitation.id = 'a'
-        @invitation.valid?.must_equal false
-        @invitation.errors[:id].must_include 'id must be a SHA256 hash'
       end
     end
   end # validations

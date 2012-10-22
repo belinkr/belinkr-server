@@ -19,7 +19,7 @@ module Belinkr
       def self.user_from(key)
         user_id = $redis.hget(KEYS_MAP, key)
         raise Tinto::Exceptions::NotFound unless user_id
-        User::Member.new(id: user_id)
+        User::Member.new(id: user_id).fetch
       end
 
       def self.keys_for(user_id)

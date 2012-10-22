@@ -1,27 +1,34 @@
 # encoding: utf-8
 require_relative '../../Tinto/Exceptions'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class EditUserProfile
-    include Tinto
+    include Tinto::Exceptions
+    include Tinto::Context
 
     def initialize(actor, user, user_changes, profile, profile_changes)
       @actor            = actor
       @user             = user
-      @user_changes     = user_changes.sanitize
+      @user_changes     = user_changes#.sanitize
       @profile          = profile
-      @profile_changes  = profile_changes.sanitize
-    end
+      @profile_changes  = profile_changes#.sanitize
+    end #initialize
 
     def call
-      raise Tinto::Exceptions::NotAllowed unless @actor.id == @user.id
-      $redis.multi do
-        @user.update(@user_changes)
-        @profile.update(@profile_changes)
-      end
+      raise NotAllowed unless @actor.id == @user.id
+      @user.update(@user_changes)
 
+      @user.profiles.delete @profile
+      @profile.update(@profile_changes)
+      @user.profiles.push @profile
+
+      @user.verify
+      @profile.verify
+
+      @to_sync = [@user, @profile]
       @profile
-    end
+    end # call
   end
 end # Belinkr
 
