@@ -43,6 +43,7 @@ module Belinkr
       'openstruct'                  => 'OpenStruct',
       'array'                       => 'Array',
       'user'                        => 'Belinkr::User::Member', 
+      'profile'                     => 'Belinkr::Profile::Member', 
       'status'                      => 'Belinkr::Status::Member',
       'status::reply'               => 'Belinkr::Reply::Member',
       'invitation'                  => 'Belinkr::Invitation::Member',
