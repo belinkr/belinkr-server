@@ -9,7 +9,7 @@ module Tinto
 
     PER_PAGE  = 20
     INTERFACE = %w{ verify sync synced? page fetch reset each size length
-                    empty? exists? include? add merge delete clear }
+                    empty? exists? include? add merge delete clear first }
 
     def initialize(collection)
       @collection = collection
@@ -31,7 +31,7 @@ module Tinto
 
     def page(page_number=0)
       verify
-      from = page_number * PER_PAGE
+      from = page_number.to_i * PER_PAGE
       to   = from + PER_PAGE - 1
 
       fetch
@@ -128,6 +128,10 @@ module Tinto
       @member_ids.clear
       @collection
     end #clear
+
+    def first
+      @collection.instantiate_member id: @member_ids.first
+    end
 
     private
 

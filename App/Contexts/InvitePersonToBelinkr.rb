@@ -4,9 +4,11 @@ require_relative '../../Locales/Loader'
 require_relative '../../Config'
 require_relative '../../Workers/Mailer/Message'
 require_relative './RegisterActivity'
+require_relative '../../Tinto/Context'
 
 module Belinkr
   class InvitePersonToBelinkr
+    include Tinto::Context
     BASE_PATH = "https://#{Belinkr::Config::HOSTNAME}/invitations"
 
     def initialize(actor, invitation, invitations, entity)
@@ -33,9 +35,9 @@ module Belinkr
         # we use the invited_name
         object:     @invitation.invited_name,
         entity_id:  @entity.id
-      ).call
+      )
+      @activity_context.call
 
-      
       @to_sync = [@invitation, @invitations, @activity_context]
       @invitation
     end #call

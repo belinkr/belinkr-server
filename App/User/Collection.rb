@@ -9,6 +9,7 @@ module Belinkr
     class Collection
       extend Forwardable
       include Aequitas
+      include Enumerable
 
       MODEL_NAME  = 'user'
 

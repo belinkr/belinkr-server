@@ -15,8 +15,7 @@ describe 'reset password' do
   before do
     $redis.flushdb
     @actor        = Factory.user
-    @user_changes = @actor.dup
-    @user_changes.password = 'changed'
+    @user_changes = { password: 'changed' }
     @reset        = Reset::Member.new
     @resets       = Reset::Collection.new
     RequestPasswordReset.new(@actor, @reset, @resets).call

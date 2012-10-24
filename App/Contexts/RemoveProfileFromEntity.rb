@@ -4,6 +4,7 @@ require_relative '../../Tinto/Context'
 
 module Belinkr
   class RemoveProfileFromEntity
+    include Tinto::Context
     # Preconditions:
     # - An entity must be present
     # - A user in that entity must be present

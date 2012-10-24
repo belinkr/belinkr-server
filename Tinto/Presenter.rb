@@ -43,9 +43,9 @@ module Tinto
 
     def self.errors_for(resource)
       return  {} if resource.errors.empty?
-      return  { errors:  resource.errors.map { |set| 
-                          set.map { |error| error.to_s } 
-                        }.flatten
+      return  { errors: resource.errors.flat_map { |set| 
+                          set.map { |error| error.to_s }
+                        } 
               }
     end
 
@@ -57,6 +57,7 @@ module Tinto
 
       def as_poro
         @collection.map { |member|
+          member.fetch
           unless member.deleted_at
             member_presenter.new(member, @actor).as_poro 
           end

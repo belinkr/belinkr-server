@@ -13,18 +13,23 @@ module Belinkr
           return @http_session if @http_session
           session = Session::Member.new(
             user_id:      profile.user_id, 
-            profile_id:  profile.id,
+            profile_id:   profile.id,
             entity_id:    profile.entity_id 
-          ).save
+          ).sync
 
           @http_session = { "rack.session" => { auth_token: session.id } }
         end
 
-        def create_user_and_profile
-          user    = Factory.user
-          profile = Factory.profile
-          entity  = Factory.entity(id: 1).save
-          CreateProfileInEntity.new(user, profile, entity).call
+        def create_user_and_profile(entity_id=nil)
+          user      = Factory.user
+          profile   = Factory.profile
+          entity    = Factory.entity(id: entity_id)
+          profiles  = Profile::Collection.new(entity_id: entity.id)
+
+          context   = CreateProfileInEntity.new(user, profile, profiles, entity)
+          context.call
+          context.sync
+          entity.sync
           profile
         end
 

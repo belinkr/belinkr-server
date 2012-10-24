@@ -11,42 +11,52 @@ module Belinkr
   class API < Sinatra::Base
     get '/users' do
       dispatch :collection do
-        Profile::Collection.new(entity_id: current_entity.id)
+        collection = Profile::Collection.new(entity_id: current_entity.id)
           .page(params[:page])
+        collection
       end
     end # get /users
 
     get '/users/:id' do
       dispatch :read do
-        profile = Profile::Member
-                    .new(id: params[:id], entity_id: current_entity.id)
+        profile = Profile::Member.new(
+                    id: params[:id], entity_id: current_entity.id
+                  ).fetch
         raise Tinto::Exceptions::NotFound if profile.deleted_at
         profile
       end
     end # get /users/:id
 
     put '/users/:id' do
-      payload.delete("id")
-      profile         = Profile::Member
-                          .new(id: params[:id], entity_id: current_entity.id)
-      profile_changes = Profile::Member.new(payload)
-      user            = User::Member.new(id: profile.user_id)
-      user_changes    = User::Member.new(payload)
+      profile = Profile::Member.new(
+                  id: params[:id], entity_id: current_entity.id
+                ).fetch
+      user    = profile.user
+      user.fetch
+      changes = payload
 
-      dispatch :update, user do
-        EditUserProfile
-          .new(current_user, user, user_changes, profile, profile_changes).call
+      dispatch :update, profile do
+        context = EditUserProfile
+                    .new(current_user, user, changes, profile, changes)
+        context.call
+        context.sync
+        profile
       end
     end # put /users/:id
 
     delete '/users/:id' do
+      profile   = Profile::Member
+                    .new(id: params[:id], entity_id: current_entity.id).fetch
+      profiles  = Profile::Collection.new(entity_id: current_entity.id)
+      user      = profile.user
+      user.fetch
+
       dispatch :delete do
-        profile = Profile::Member
-                    .new(id: params[:id], entity_id: current_entity.id)
-        user    = User::Member.new(id: profile.user_id)
-        RemoveProfileFromEntity
-          .new(current_user, user, profile, current_entity)
-          .call
+        context   = RemoveProfileFromEntity
+          .new(current_user, user, profile, profiles, current_entity)
+        context.call
+        context.sync
+        profile
       end
     end # delete /users/:id
 

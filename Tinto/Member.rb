@@ -60,10 +60,8 @@ module Tinto
       @resource
     end
 
-    def update(changed_resource)
-      verify
-      whitelist(changed_resource.attributes)
-        .each   { |k, v| @resource.send :"#{k}=", v }
+    def update(attributes={})
+      whitelist(attributes).each { |k, v| @resource.send :"#{k}=", v }
       @resource.updated_at = Time.now
       @resource
     end

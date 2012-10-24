@@ -10,9 +10,9 @@ module Belinkr
     def initialize(actor, user, user_changes, profile, profile_changes)
       @actor            = actor
       @user             = user
-      @user_changes     = user_changes#.sanitize
+      @user_changes     = user_changes
       @profile          = profile
-      @profile_changes  = profile_changes#.sanitize
+      @profile_changes  = profile_changes
     end #initialize
 
     def call

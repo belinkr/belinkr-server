@@ -48,7 +48,7 @@ module Belinkr
       end
 
       def user
-        @user ||= User::Member.new(id: user_id)
+        @user ||= User::Member.new(id: user_id).fetch
       end
     end # Member
   end # Profile

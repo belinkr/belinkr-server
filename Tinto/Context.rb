@@ -3,7 +3,8 @@
 module Tinto
   module Context
     def sync
-      $redis.multi { @to_sync.each { |resource| resource.sync } }
+      to_sync = @to_sync || []
+      $redis.multi { to_sync.each { |resource| resource.sync } }
     end # sync
   end # Context
 end # Tinto

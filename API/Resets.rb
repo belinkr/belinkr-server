@@ -10,10 +10,14 @@ module Belinkr
   class API < Sinatra::Base
     post '/resets' do
       begin
-        email = payload.fetch('email')
-        user  = User::Locator.user_from(email)
-        reset = Reset::Member.new
-        RequestPasswordReset.new(user, reset).call
+        email   = payload.fetch('email')
+        user    = User::Locator.user_from(email)
+        reset   = Reset::Member.new
+        resets  = Reset::Collection.new
+
+        context = RequestPasswordReset.new(user, reset, resets)
+        context.call
+        context.sync
       rescue Tinto::Exceptions::NotFound
       ensure return 201
       end
@@ -27,12 +31,14 @@ module Belinkr
     end # get /resets/:id
 
     put '/resets/:id' do
-      reset         = Reset::Member.new(id: params[:id])
+      reset         = Reset::Member.new(id: params[:id]).fetch
       user          = User::Locator.user_from(reset.email)
-      user_changes  = User::Member.new(password: payload.fetch('password'))
+      user_changes  = payload
 
       dispatch :update, reset do
-        ResetPassword.new(user, reset, user_changes).call
+        context = ResetPassword.new(user, user_changes, reset)
+        context.call
+        context.sync
         return 200
       end
     end # put /resets/:id

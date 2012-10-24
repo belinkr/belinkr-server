@@ -27,20 +27,13 @@ describe 'create follow relationship' do
     @followers  = Follower::Collection.new(
                     entity_id: @entity.id, user_id: @actor.user_id
                   ).reset
-    @actor_timeline = Status::Collection.new(
-      entity_id:  @entity.id,
-      user_id:    @actor.id,
-      kind:       'general'
-    )
+    @actor_timeline = Status::Collection.new(kind: 'general', context: @actor)
     @actor_timeline.reset
+
     statuses = (1..40).map { 
       Factory.status(user_id: @followed.id, entity_id: @entity.id) 
     }
-    @latest_statuses = Status::Collection.new(
-      entity_id:  @entity.id,
-      user_id:    @followed.id,
-      kind:       'own'
-    )
+    @latest_statuses = Status::Collection.new(kind: 'own', context: @followed)
     @latest_statuses.reset(statuses).sync.page
     @options = {
       actor:            @actor,

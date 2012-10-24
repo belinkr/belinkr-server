@@ -9,6 +9,7 @@ module Belinkr
     class Collection
       extend Forwardable
       include Aequitas
+      include Enumerable
 
       def_delegators :@set, *Tinto::Set::INTERFACE
 

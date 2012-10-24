@@ -126,10 +126,13 @@ describe API do
   end
 
   def create_account
-    entity    = Factory.entity.save
-    user      = Factory.user(profile_ids: [], entity_ids: [], password: 'test')
+    entity    = Factory.entity
+    user      = Factory.user(password: 'test')
     profile   = Factory.profile
-    CreateProfileInEntity.new(user, profile, entity).call
+    profiles  = Profile::Collection.new(entity_id: entity.id)
+    context   = CreateProfileInEntity.new(user, profile, profiles, entity)
+    context.call
+    context.sync
     [user, 'test']
   end
 

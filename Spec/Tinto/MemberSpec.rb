@@ -187,25 +187,23 @@ describe Tinto::Member do
   describe '#update' do
     it 'updates a member with the whitelisted attributes of another' do
       OpenStruct.const_set 'WHITELIST', %w{ name }
-      changed_resource  = factory(name: 'test', entity_id: 5)
-      changed_member    = Tinto::Member.new(changed_resource)
-      resource          = factory()
-      member            = Tinto::Member.new resource
+      changes   = { name: 'test', entity_id: 5 }
+      resource  = factory()
+      member    = Tinto::Member.new resource
 
-      member.update(changed_resource)
+      member.update(changes)
       member.attributes.fetch(:name).must_equal 'test'
       member.attributes.fetch(:entity_id, 'unchanged').must_equal 'unchanged'
       OpenStruct.send :remove_const, :'WHITELIST'
     end
 
     it 'refreshes the updated_at timestap' do
-      changed_resource  = factory(name: 'test', entity_id: 5)
-      changed_member    = Tinto::Member.new(changed_resource)
-      resource          = factory()
-      member            = Tinto::Member.new resource
+      changes   = factory(name: 'test', entity_id: 5)
+      resource  = factory()
+      member    = Tinto::Member.new resource
 
       previous_updated_at = resource.updated_at
-      member.update(changed_resource)
+      member.update(changes)
       resource.updated_at.wont_equal previous_updated_at
     end
   end #update

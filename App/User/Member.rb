@@ -17,7 +17,8 @@ module Belinkr
 
       MODEL_NAME  = 'user'
       NAME_ORDERS = %w{ first-last last-first }
-      WHITELIST   = %w{ avatar first last name_order password locale timezone }
+      WHITELIST   = %w{ avatar first last name_order email password locale 
+                        timezone }
 
       attribute :id,              String
       attribute :avatar,          String
@@ -56,10 +57,10 @@ module Belinkr
       end
 
       def password=(plaintext)
-        super BCrypt::Password.create(plaintext)
+        super password_hash_for(plaintext)
       end
 
-      def encrypted?
+      def encrypted?(password=@password)
         Tinto::Utils.bcrypted?(password)
       end
 
@@ -73,6 +74,13 @@ module Belinkr
       def index_path
         "#{MODEL_NAME}/#{id}"
       end
+
+      private
+
+      def password_hash_for(plaintext)
+        return plaintext if encrypted?(plaintext)
+        BCrypt::Password.create(plaintext)
+      end #encrypted_password_for
     end # Member
   end # User
 end # Belinkr

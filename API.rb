@@ -17,6 +17,7 @@ require_relative 'API/Users'
 
 require_relative 'App/Session/Member'
 require_relative 'App/User/Member'
+require_relative 'App/Entity/Member'
 
 $redis ||= Redis.new
 
@@ -63,16 +64,17 @@ module Belinkr
         session[:auth_token] ||= auth_token_cookie    if auth_token_cookie
         session[:auth_token] ||= remember_cookie      if remember_cookie
 
-        @current_session = Session::Member.new(id: session[:auth_token])
+        @current_session = Session::Member.new(id: session[:auth_token]).fetch
       end
 
       def current_entity
-        Entity::Member.new(id: current_session.entity_id)
+        @current_entity ||= Entity::Member.new(id: current_session.entity_id).fetch
+        @current_entity
       end
 
       def current_user
         return false unless current_session
-        User::Member.new(id: current_session.user_id)
+        @current_user ||= User::Member.new(id: current_session.user_id).fetch
       end
       
       def auth_token_cookie

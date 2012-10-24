@@ -11,6 +11,7 @@ module Belinkr
       extend Forwardable
       include Virtus
       include Aequitas
+      include Enumerable
 
       MODEL_NAME = 'activity'
 

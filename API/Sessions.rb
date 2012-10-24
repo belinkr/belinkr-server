@@ -14,7 +14,9 @@ module Belinkr
 
       dispatch :create do
         user          = Belinkr::User::Locator.user_from(email)
-        auth_session  = LogIntoEntity.new(user, plaintext).call
+        context       = LogIntoEntity.new(user, plaintext)
+        auth_session  = context.call
+        context.sync
 
         session['auth_token'] = auth_session.id
 
@@ -34,7 +36,7 @@ module Belinkr
 
     delete '/sessions/:id' do
       dispatch :delete do
-        auth_session = Session::Member.new(id: session['auth_token'])
+        auth_session = Session::Member.new(id: session['auth_token']).fetch
         LogOut.new(auth_session).call
         session[:auth_token] = nil
 

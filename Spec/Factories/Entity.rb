@@ -6,7 +6,8 @@ module Belinkr
   class Factory
     def self.entity(attrs={})
       Entity::Member.new(
-        name:     attrs[:name]    || random_string * 3,
+        id:       attrs[:id]      || random_uuid,
+        name:     attrs[:name]    || random_string * 3
       )
     end
   end # Factory

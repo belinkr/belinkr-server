@@ -18,13 +18,10 @@ describe 'edit profile' do
     $redis.flushdb
     @entity           = Factory.entity
     @user             = Factory.user(profiles: [])
-    @user_changes     = @user.dup
+    @user_changes     = {first: 'changed' }
     @profile          = Factory.profile
-    @profile_changes  = @profile.dup
+    @profile_changes  = { mobile: 'changed' }
     @profiles         = Profile::Collection.new(entity_id: @entity.id)
-
-    @user_changes.first     = 'changed'
-    @profile_changes.mobile = 'changed'
 
     CreateProfileInEntity.new(@user, @profile, @profiles, @entity).call
   end
@@ -60,8 +57,8 @@ describe 'edit profile' do
   end
 
   it 'updates the password if changed' do
-    previous_hash           = @user.password
-    @user_changes.password  = 'changed'
+    @user_changes = { password: 'changed' }
+    previous_hash = @user.password
     EditUserProfile.new(@user, @user, @user_changes, @profile, @profile_changes)
       .call
 

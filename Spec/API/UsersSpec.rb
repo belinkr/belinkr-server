@@ -17,17 +17,16 @@ describe API do
   before { $redis.flushdb }
 
   describe 'GET /users' do
-    it 'returns the a page of users sorted from newest' do
-      actor = create_user_and_profile
-      users = (1..30).map { create_user_and_profile }
+    it 'returns a page of users' do
+      entity_id = UUIDTools::UUID.timestamp_create.to_s
+      actor = create_user_and_profile(entity_id)
+      users = (1..30).map { create_user_and_profile(entity_id) }
 
       get '/users', {}, session_for(actor)
-      dump
       last_response.status.must_equal 200
 
       json_users = JSON.parse(last_response.body)
       json_users.length .must_equal 20
-      users.last.id     .must_equal json_users[0]['id']
     end
   end # GET /users
 
@@ -54,16 +53,14 @@ describe API do
       get "/users/#{actor.id}", {}, session_for(actor)
       last_response.status.must_equal 200
       changes = JSON.parse(last_response.body)
-      changes["first"]  = "Updated"
-      changes["id"]     = "1"
+      changes = { first: 'updated' }
 
       put "/users/#{actor.id}", changes.to_json, session_for(actor)
-      dump
       last_response.status.must_equal 200
 
       json_user = JSON.parse(last_response.body)
       json_user["id"]         .must_equal actor.id
-      json_user["first"]      .must_equal changes["first"]
+      json_user["first"]      .must_equal changes[:first]
       json_user["created_at"] .must_equal actor.created_at.iso8601.to_s
     end
   end # PUT /users/:id

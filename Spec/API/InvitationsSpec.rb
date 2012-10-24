@@ -22,7 +22,6 @@ describe API do
     it 'creates an invitation' do
       profile, invitation = generate_invitation
       post '/invitations', invitation.to_json, session_for(profile)
-
       last_response.status.must_equal 201
       json_invitation = JSON.parse(last_response.body)
       json_invitation['id'].wont_be_nil
@@ -33,6 +32,7 @@ describe API do
     it 'retrieves a page of invitations' do
       profile, invitation = generate_invitation
       post '/invitations', invitation.to_json, session_for(profile)
+      last_response.status.must_equal 201
 
       get '/invitations', {}, session_for(profile)
       last_response.status.must_equal 200
@@ -45,13 +45,13 @@ describe API do
     it 'retrieves an invitations' do
       profile, invitation = generate_invitation
       post '/invitations', invitation.to_json, session_for(profile)
-
+      last_response.status.must_equal 201
       json_invitation = JSON.parse(last_response.body)
       get "/invitations/#{json_invitation['id']}"
 
       last_response.status.must_equal 200
-      json_invitation = JSON.parse(last_response.body)
-      json_invitation['id'].wont_be_nil
+      #json_invitation = JSON.parse(last_response.body)
+      #json_invitation['id'].wont_be_nil
     end
   end # GET /invitations/:id
 
@@ -59,16 +59,16 @@ describe API do
     it 'marks an invitation as accepted' do
       profile, invitation = generate_invitation
       post '/invitations', invitation.to_json, session_for(profile)
-
-      account = {
-                  first:    "User",
-                  last:     "111",
-                  email:    "foo@foo.com",
-                  password: "changeme"
-                }
-
       json_invitation = JSON.parse(last_response.body)
-      put "/invitations/#{json_invitation['id']}", account.to_json
+
+      user  = {
+                first:    "User",
+                last:     "111",
+                email:    "foo@foo.com",
+                password: "changeme"
+              }
+
+      put "/invitations/#{json_invitation['id']}", user.to_json
       last_response.status.must_equal 200
       json_invitation = JSON.parse(last_response.body)
       json_invitation["state"].must_equal "accepted"
@@ -82,7 +82,6 @@ describe API do
 
       json_invitation = JSON.parse(last_response.body)
       delete "/invitations/#{json_invitation['id']}", {}, session_for(profile)
-      dump
       last_response.status.must_equal 204
     end
   end # DELETE /invitations/:id
