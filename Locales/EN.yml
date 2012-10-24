@@ -34,12 +34,12 @@ en:
 
   follower:
     attributes:
-      user_id:      user
+      profile_id:   profile
       entity_id:    entity
 
   following:
     attributes:
-      user_id:      user
+      profile_id:   profile
       entity_id:    entity
 
   reply:

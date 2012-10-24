@@ -1,67 +1,91 @@
 # encoding: utf-8
-require_relative '../api'
-require_relative '../app/follower/orchestrator'
-require_relative '../app/follower/collection'
-require_relative '../app/following/collection'
-require_relative '../app/user/presenter'
+require_relative '../API'
+require_relative '../App/Follower/Collection'
+require_relative '../App/Following/Collection'
+require_relative '../App/Profile/Presenter'
+require_relative '../App/Contexts/FollowUserInEntity'
+require_relative '../App/Contexts/UnfollowUserInEntity'
 
 module Belinkr
   class API < Sinatra::Base
     get '/followers' do
       dispatch :collection do
-        Follower::Collection.new(
-          user_id:    current_user.id,
-          entity_id:  current_user.entity_id,
+        collection = Follower::Collection.new(
+          profile_id: current_profile.id,
+          entity_id:  current_entity.id
         ).page(params[:page])
+        collection
       end
     end # get /followers
 
     get '/following' do
       dispatch :collection do
         Following::Collection.new(
-          user_id:    current_user.id,
-          entity_id:  current_user.entity_id,
+          profile_id: current_profile.id,
+          entity_id:  current_entity.id
         ).page(params[:page])
       end
     end # get /following
 
     get '/users/:id/followers' do
-      dispatch :collection do
-        user = User::Member
-          .new(id: params[:id], entity_id: current_user.entity_id)
-
+      dispatch :collection do 
         Follower::Collection
-          .new(user_id: user.id, entity_id: user.entity_id)
+          .new(profile_id: params[:id], entity_id: current_entity.id)
           .page(params[:page])
       end
     end # get /users/:id/followers
 
     get '/users/:id/following' do
       dispatch :collection do
-        user = User::Member
-          .new(id: params[:id], entity_id: current_user.entity_id)
-
         Following::Collection
-          .new( user_id: user.id, entity_id: user.entity_id)
+          .new(profile_id: params[:id], entity_id: current_entity.id)
           .page(params[:page])
       end
     end # get /users/:id/following
 
     post '/users/:id/followers' do
-      followed = User::Member
-        .new(id: params[:id], entity_id: current_user.entity_id)
-
+      followed = Profile::Member.new(id: params[:id], 
+                      entity_id: current_entity.id).fetch
+      options = {
+        actor:      current_profile,
+        followed:   followed,
+        followers:  Follower::Collection.new(profile_id: params[:id],
+                      entity_id: current_entity.id),
+        following:  Following::Collection.new(profile_id: current_profile.id,
+                      entity_id: current_entity.id),
+        entity:     current_entity,
+        actor_timeline:   Status::Collection.new(context: current_profile, 
+                            kind: 'general'),
+        latest_statuses:  Status::Collection.new(context: followed,
+                            kind: 'own')
+      }
+      
       dispatch :create, followed do
-        Follower::Orchestrator.new(current_user).create(followed)
+        context = FollowUserInEntity.new(options)
+        context.call
+        context.sync
+        options.fetch(:actor)
       end
     end # post /users/:id/followers
 
     delete '/users/:id/followers/:follower_id' do
-      followed = User::Member
-        .new(id: params[:id], entity_id: current_user.entity_id)
-
+      followed = Profile::Member.new(id: params[:id], 
+                      entity_id: current_entity.id).fetch
+      options = {
+        actor:      current_profile,
+        followed:   followed,
+        followers:  Follower::Collection.new(profile_id: params[:id],
+                      entity_id: current_entity.id),
+        following:  Following::Collection.new(profile_id: current_profile.id,
+                      entity_id: current_entity.id),
+        entity:     current_entity,
+      }
+      
       dispatch :delete, followed do
-        Follower::Orchestrator.new(current_user).delete(followed)
+        context = UnfollowUserInEntity.new(options)
+        context.call
+        context.sync
+        options.fetch(:actor)
       end
     end # delete /users/:id/followers/:follower_id
 

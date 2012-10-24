@@ -15,10 +15,10 @@ module Belinkr
 
       MODEL_NAME  = 'follower'
 
-      attribute :user_id,     String
+      attribute :profile_id,  String
       attribute :entity_id,   String
 
-      validates_presence_of   :user_id, :entity_id
+      validates_presence_of   :profile_id, :entity_id
 
       def_delegators :@set,   *Tinto::Set::INTERFACE
 
@@ -28,12 +28,13 @@ module Belinkr
       end
 
       def instantiate_member(attributes={})
-        Profile::Member.new(attributes)
-          .merge(entity_id: entity_id, user_id: user_id)
+        Profile::Member.new(
+          attributes.merge(entity_id: entity_id, profile_id: profile_id)
+        )
       end
 
       def storage_key
-        "entities:#{entity_id}:users:#{user_id}:followers"
+        "entities:#{entity_id}:profiles:#{profile_id}:followers"
       end
     end # Collection
   end # Follower

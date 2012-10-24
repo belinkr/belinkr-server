@@ -1,15 +1,15 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require_relative '../../Locales/Loader'
-require_relative '../../App/Following/Collection'
+require_relative '../../App/Follower/Collection'
 
 include Belinkr
 
-describe Following::Collection do
+describe Follower::Collection do
   describe 'validations' do
     describe '#profile_id' do
       it 'must be present' do
-        collection = Following::Collection.new
+        collection = Follower::Collection.new
         collection.valid?.must_equal false
 
         collection.errors[:profile_id].must_include 'profile must not be blank'
@@ -18,11 +18,11 @@ describe Following::Collection do
 
     describe '#entity_id' do
       it 'must be present' do
-        collection = Following::Collection.new
+        collection = Follower::Collection.new
         collection.valid?.must_equal false
 
         collection.errors[:entity_id].must_include 'entity must not be blank'
       end
     end #entity_id
   end # validations
-end # Following::Collection
+end # Follower::Collection

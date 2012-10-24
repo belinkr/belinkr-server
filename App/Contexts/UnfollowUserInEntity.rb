@@ -4,7 +4,7 @@ require_relative '../../Tinto/Context'
 require_relative '../../Tinto/Exceptions'
 
 module Belinkr
-  class FollowUserInEntity
+  class UnfollowUserInEntity
     include Tinto::Context
 
     def initialize(options={})
@@ -13,15 +13,12 @@ module Belinkr
       @followers        = options.fetch(:followers)
       @following        = options.fetch(:following)
       @entity           = options.fetch(:entity)
-      @actor_timeline   = options.fetch(:actor_timeline)
-      @latest_statuses  = options.fetch(:latest_statuses)
     end
 
     def call
       raise Tinto::Exceptions::InvalidMember if @actor.id == @followed.id
-      @followers.add @actor
-      @following.add @followed
-      @actor_timeline.merge @latest_statuses
+      @followers.delete @actor
+      @following.delete @followed
 
       @activity_context = RegisterActivity.new(
         actor:  @actor,
@@ -31,7 +28,7 @@ module Belinkr
       )
       @activity_context.call
 
-      @to_sync = [@followers, @following, @actor_timeline, @activity_context]
+      @to_sync = [@followers, @following, @activity_context]
       @followed
     end
   end # FollowUserInEntity

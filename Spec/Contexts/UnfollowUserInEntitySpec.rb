@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'redis'
+require_relative '../../App/Contexts/UnfollowUserInEntity'
 require_relative '../../App/Contexts/FollowUserInEntity'
 require_relative '../Factories/Entity'
 require_relative '../Factories/Profile'
@@ -44,27 +45,21 @@ describe 'create follow relationship' do
       actor_timeline:   @actor_timeline,
       latest_statuses:  @latest_statuses
     }
+    FollowUserInEntity.new(@options).call
   end
 
-  it 'adds the followed user to the following collection of the follower' do
-    @following.wont_include @followed
-    FollowUserInEntity.new(@options).call
+  it 'removes the followed user 
+  from the following collection of the follower' do
     @following.must_include @followed
+    UnfollowUserInEntity.new(@options).call
+    @following.wont_include @followed
   end
 
-  it 'adds the follower user to the followers collection of the followed' do
-    @followers.wont_include @actor
-    FollowUserInEntity.new(@options).call
+  it 'removes the follower user 
+  from the followers collection of the followed' do
     @followers.must_include @actor
-  end
-
-  it 'adds a the latest page of statuses from the followed to the
-    timeline of the follower' do
-    @latest_statuses.each { |status| @actor_timeline.wont_include status }
-    FollowUserInEntity.new(@options).call
-    @latest_statuses.each { |status| @actor_timeline.must_include status }
-
-    @actor_timeline.length.must_equal 20
+    UnfollowUserInEntity.new(@options).call
+    @followers.wont_include @actor
   end
 
   it 'raises if the actor and followed are the same' do
@@ -72,7 +67,7 @@ describe 'create follow relationship' do
     actor.id          = @options.fetch(:followed).id
     @options[:actor]  = actor
 
-    lambda { FollowUserInEntity.new(@options).call }
+    lambda { UnfollowUserInEntity.new(@options).call }
       .must_raise Tinto::Exceptions::InvalidMember
   end
 end
