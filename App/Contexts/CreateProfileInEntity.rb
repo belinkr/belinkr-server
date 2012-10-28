@@ -9,19 +9,18 @@ module Belinkr
     include Tinto::Context
     # Preconditions: an entity must be created
     #
-    def initialize(actor, profile, profiles, entity)
-      @actor    = actor
-      @profile  = profile
-      @profiles = profiles
-      @entity   = entity
+    def initialize(actor, profile, profiles, entity, 
+    user_locator=User::Locator.new)
+      @actor        = actor
+      @profile      = profile
+      @profiles     = profiles
+      @entity       = entity
+      @user_locator = user_locator
     end # initialize
 
     def call
-      unless User::Locator.registered?(@actor.id)
-        User::Locator.add(@actor.email, @actor.id) 
-      end
-
       @actor.verify
+      @user_locator.add(@actor.email, @actor.id) 
 
       @profile.user_id    = @actor.id
       @profile.entity_id  = @entity.id
@@ -32,7 +31,7 @@ module Belinkr
 
       @profiles.add @profile
 
-      @to_sync = [@actor, @profile, @profiles]
+      @to_sync = [@actor, @profile, @profiles, @user_locator]
       @profile
     end # call
   end # CreateProfileInEntity

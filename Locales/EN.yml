@@ -70,6 +70,7 @@ en:
     attributes:
       name:           name
       kind:           kind
+      user_id:        user
 
   scrap:
     attributes:
@@ -94,13 +95,15 @@ en:
       first:          first name
       last:           last name
       name:           name
-      workspace_id:   workspace
       profile_ids:    profile_ids
       timezone:       timezone
       locale:         locale
       password:       password
       name_order:     name order
       request_id:     request
+      workspace_id:   workspace
+      entity_id:      entity
+      kind:           kind
 
   profile:
     attributes:

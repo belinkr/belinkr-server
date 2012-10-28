@@ -9,6 +9,7 @@ require_relative '../../API/Sessions'
 require_relative '../Factories/User'
 require_relative '../Factories/Profile'
 require_relative '../Factories/Entity'
+require_relative '../Support/Helpers'
 require_relative '../../App/Contexts/CreateProfileInEntity'
 require_relative '../../App/Session/Member'
 
@@ -19,6 +20,7 @@ $redis.select 8
 describe API do
   def app; API.use Rack::Session::Redis; API.new; end
   include Rack::Test::Methods
+  include Spec::API::Helpers
 
   before { $redis.flushdb }
 

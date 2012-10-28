@@ -15,7 +15,7 @@ module Belinkr
 
     def call
       timelines = timelines_for(@context) + follower_timelines_for(@followers)
-      timelines.each { |timeline| yield timeline if block_given? }
+      timelines.each { |timeline| yield timeline } if block_given?
 
       @to_sync = [*timelines]
     end #call
@@ -24,7 +24,7 @@ module Belinkr
 
     def timelines_for(context)
       context.class.const_get('TIMELINES')
-        .delete_if { |kind| kind == 'files' && @status.files.empty? }
+        .delete_if { |kind| not_applicable(kind) }
         .map { |kind| Status::Collection.new(kind: kind, context: @context) }
     end
 
@@ -33,6 +33,10 @@ module Belinkr
         context.class.const_get('FOLLOWER_TIMELINES')
           .map { |kind| Status::Collection.new(kind: kind, context: context) }
       end
+    end
+
+    def not_applicable(kind)
+      kind == 'files' && @status.files.empty?
     end
   end # UpdateTimelines
 end # Belinkr

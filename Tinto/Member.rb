@@ -83,7 +83,7 @@ module Tinto
       $redis.multi do
         $redis.del storage_key
         master_collection.delete(@resource).sync
-      end
+      end if $redis
       @resource.attributes.keys.each { |k| @resource.send :"#{k}=", nil }
       @resource
     end

@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
 require_relative '../../App/Contexts/CreateProfileInEntity'
 require_relative '../../App/Profile/Collection'
 require_relative '../../App/User/Locator'
@@ -8,19 +7,14 @@ require_relative '../Factories/User'
 require_relative '../Factories/Entity'
 require_relative '../Factories/Profile'
 
-$redis ||= Redis.new
-$redis.select 8
-
 include Belinkr
 
 describe 'create profile in entity' do
   before do
-    $redis.flushdb
-
     @user     = Factory.user(profiles: [])
     @entity   = Factory.entity
     @profile  = Factory.profile
-    @profiles = Profile::Collection.new(entity_id: @entity.id)
+    @profiles = Profile::Collection.new(entity_id: @entity.id).reset
   end
 
   it 'links the user to the profile and the entity' do
@@ -42,11 +36,10 @@ describe 'create profile in entity' do
   end
 
   it 'updates data on the user locator' do
-    lambda { User::Locator.user_from(@user.email) }
-      .must_raise Tinto::Exceptions::NotFound
-    CreateProfileInEntity.new(@user, @profile, @profiles, @entity).call
-    @user.sync
-    User::Locator.user_from(@user.email).id.must_equal @user.id
+    locator = User::Locator.new.reset
+    lambda { locator.id_for(@user.email) }.must_raise KeyError
+    CreateProfileInEntity.new(@user, @profile, @profiles, @entity, locator).call
+    locator.id_for(@user.email).must_equal @user.id
   end
 
   it 'adds the profile to the profiles collection of this entity' do

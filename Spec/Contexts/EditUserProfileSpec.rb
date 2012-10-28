@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
 require_relative '../../App/Contexts/CreateProfileInEntity'
 require_relative '../../App/Contexts/EditUserProfile'
 require_relative '../Factories/User'
@@ -8,22 +7,20 @@ require_relative '../Factories/Entity'
 require_relative '../Factories/Profile'
 require_relative '../../App/Profile/Collection'
 
-$redis ||= Redis.new
-$redis.select 8
-
 include Belinkr
 
 describe 'edit profile' do
   before do
-    $redis.flushdb
     @entity           = Factory.entity
     @user             = Factory.user(profiles: [])
-    @user_changes     = {first: 'changed' }
+    @user_changes     = { first: 'changed' }
     @profile          = Factory.profile
     @profile_changes  = { mobile: 'changed' }
-    @profiles         = Profile::Collection.new(entity_id: @entity.id)
+    @profiles         = Profile::Collection.new(entity_id: @entity.id).reset
+    @locator          = User::Locator.new.reset
 
-    CreateProfileInEntity.new(@user, @profile, @profiles, @entity).call
+    CreateProfileInEntity.new(@user, @profile, @profiles, @entity, @locator)
+      .call
   end
 
   it 'updates user details' do

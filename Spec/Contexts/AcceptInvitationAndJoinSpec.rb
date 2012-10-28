@@ -9,17 +9,16 @@ require_relative '../Factories/Invitation'
 require_relative '../Factories/User'
 require_relative '../Factories/Entity'
 
+include Belinkr
 $redis ||= Redis.new
 $redis.select 8
-
-include Belinkr
 
 describe 'accept invitation and join' do
   before do
     @entity       = Factory.entity
     @inviter      = Factory.user(entity_id: @entity.id)
     @invitation   = Factory.invitation(entity_id: @entity.id)
-    @invitations  = Invitation::Collection.new(entity_id: @entity.id)
+    @invitations  = Invitation::Collection.new(entity_id: @entity.id).reset
     @actor        = Factory.user(profiles: [])
 
     InvitePersonToBelinkr.new(@inviter, @invitation, @invitations, @entity).call

@@ -6,6 +6,7 @@ require_relative '../../Tinto/Exceptions'
 module Belinkr
   class FollowUserInEntity
     include Tinto::Context
+    include Tinto::Exceptions
 
     def initialize(options={})
       @actor            = options.fetch(:actor)
@@ -18,7 +19,7 @@ module Belinkr
     end
 
     def call
-      raise Tinto::Exceptions::InvalidMember if @actor.id == @followed.id
+      raise InvalidMember if @actor.id == @followed.id
       @followers.add @actor
       @following.add @followed
       @actor_timeline.merge @latest_statuses
@@ -36,3 +37,4 @@ module Belinkr
     end
   end # FollowUserInEntity
 end # Belinkr
+

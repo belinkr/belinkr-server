@@ -8,7 +8,7 @@ module Belinkr
     end
 
     def self.random_uuid
-      UUIDTools::UUID.timestamp_create.to_s
+      UUIDTools::UUID.random_create.to_s
     end
 
     def self.random_string

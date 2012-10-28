@@ -1,39 +1,64 @@
 # encoding: utf-8
-require_relative './Member'
-require_relative '../../Tinto/Exceptions'
+require_relative './Locator/Buffer'
+require_relative './Locator/RedisBackend'
 
 module Belinkr
   module User
     class Locator
-      IDS_MAP   = 'users:locator:ids_map'
-      KEYS_MAP  = 'users:locator:keys_map'
+      def initialize(options={})
+        @buffer           = options.fetch(:buffer, Buffer.new)
+        @persisted        = options.fetch(:backend, RedisBackend.new)
+        @backlog          = []
+        @current_backend  = @persisted
+      end #initialize
 
-      def self.add(key, user_id)
-        keys = keys_for(user_id)
-        $redis.multi do
-          $redis.hset KEYS_MAP, key, user_id
-          $redis.hset IDS_MAP, user_id, keys.push(key).to_json
-        end
-      end
+      def add(*args)
+        @buffer.add *args
+        @backlog.push(lambda { @persisted.add *args })
+      end #add
 
-      def self.user_from(key)
-        user_id = $redis.hget(KEYS_MAP, key)
-        raise Tinto::Exceptions::NotFound unless user_id
-        User::Member.new(id: user_id).fetch
-      end
+      def delete(*args)
+        @buffer.delete *args
+        @backlog.push(lambda { @persisted.delete *args })
+      end #delete
 
-      def self.keys_for(user_id)
-        JSON.parse($redis.hget(IDS_MAP, user_id) || '[]')
-      end
+      def id_for(*args)
+        @current_backend.id_for *args
+      end #id_for
 
-      def self.remove(user_id)
-        keys_for(user_id).each { |key| $redis.hdel KEYS_MAP, key }
-        $redis.hdel IDS_MAP, user_id
-      end
+      def keys_for(*args)
+        @current_backend.keys_for *args
+      end #keys_for
 
-      def self.registered?(user_id)
-        !!$redis.hget(IDS_MAP, user_id)
-      end
+      def registered?(*args)
+        @current_backend.registered? *args
+      end #registered?
+
+      def synced?
+        @backlog.empty?
+      end #synced?
+
+      def sync
+        @backlog.each { |command| command.call }
+        @backlog.clear
+        self
+      end #sync
+
+      def fetched?
+        @current_backend.eql? @buffer
+      end #fetched?
+
+      def fetch
+        @persisted.fetch.each { |key, value| @buffer.add key, value }
+        @current_backend = @buffer
+        self
+      end #fetch
+
+      def reset(records=[])
+        records.each { |key, value| add key, value }
+        @current_backend = @buffer
+        self
+      end #reset
     end # Locator
   end # User
 end # Belinkr

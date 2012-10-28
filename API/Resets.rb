@@ -2,6 +2,7 @@
 require_relative '../API'
 require_relative '../App/Reset/Member'
 require_relative '../App/Reset/Presenter'
+require_relative '../App/User/Member'
 require_relative '../App/User/Locator'
 require_relative '../App/Contexts/RequestPasswordReset'
 require_relative '../App/Contexts/ResetPassword'
@@ -11,7 +12,7 @@ module Belinkr
     post '/resets' do
       begin
         email   = payload.fetch('email')
-        user    = User::Locator.user_from(email)
+        user    = User::Member.new(id: User::Locator.new.id_for(email)).fetch
         reset   = Reset::Member.new
         resets  = Reset::Collection.new
 
@@ -32,7 +33,9 @@ module Belinkr
 
     put '/resets/:id' do
       reset         = Reset::Member.new(id: params[:id]).fetch
-      user          = User::Locator.user_from(reset.email)
+      user          = User::Member.new(
+                        id: User::Locator.new.id_for(reset.email)
+                      ).fetch
       user_changes  = payload
 
       dispatch :update, reset do

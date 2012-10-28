@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
 require_relative '../../App/Contexts/RemoveProfileFromEntity'
 require_relative '../../App/Contexts/CreateProfileInEntity'
 require_relative '../Factories/User'
@@ -9,9 +8,6 @@ require_relative '../Factories/Profile'
 require_relative '../../App/Profile/Collection'
 require_relative '../../Tinto/Exceptions'
 
-$redis ||= Redis.new
-$redis.select 8
-
 include Belinkr
 
 describe 'remove user from entity' do
@@ -19,8 +15,10 @@ describe 'remove user from entity' do
     @user     = Factory.user(profiles: [])
     @profile  = Factory.profile
     @entity   = Factory.entity
-    @profiles = Profile::Collection.new(entity_id: @entity.id)
-    CreateProfileInEntity.new(@user, @profile, @profiles, @entity).call
+    @profiles = Profile::Collection.new(entity_id: @entity.id).reset
+    locator   = User::Locator.new.reset
+    CreateProfileInEntity.new(@user, @profile, @profiles, @entity, locator)
+      .call
   end
 
   it 'unlinks the user from the profile' do

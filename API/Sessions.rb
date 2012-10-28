@@ -1,5 +1,6 @@
 # encoding: utf-8
 require_relative '../Config'
+require_relative '../App/User/Member'
 require_relative '../App/User/Locator'
 require_relative '../App/Session/Presenter'
 require_relative '../App/Contexts/LogIntoEntity'
@@ -13,7 +14,8 @@ module Belinkr
       remember  = payload['remember']
 
       dispatch :create do
-        user          = Belinkr::User::Locator.user_from(email)
+        user          = User::Member.new(id: User::Locator.new.id_for(email))
+                          .fetch
         context       = LogIntoEntity.new(user, plaintext)
         auth_session  = context.call
         context.sync
