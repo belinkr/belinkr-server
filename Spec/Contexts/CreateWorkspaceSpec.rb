@@ -19,6 +19,7 @@ describe 'create workspace' do
     @workspaces = Workspace::Collection.new(entity_id: @entity.id, kind: 'all')
     @tracker    = Workspace::Membership::Tracker.new(@entity.id, @workspace.id)
     @workspaces.reset
+    @tracker.reset
   end
 
   it 'adds the workspace to the workspace collection of the entity' do

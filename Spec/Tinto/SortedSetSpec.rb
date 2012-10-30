@@ -117,7 +117,8 @@ describe Tinto::SortedSet do
   describe '#reset' do
     it 'populates the set with the passed members' do
       zset = Tinto::SortedSet.new(@collection)
-      zset.reset([factory(id: 3)])
+      zset.reset [factory(id: 3)]
+      zset.map.to_a.first.must_be_instance_of OpenStruct
       zset.map.to_a.first.id.must_equal '3'
     end
 
@@ -144,7 +145,7 @@ describe Tinto::SortedSet do
 
     it 'raises unless passed an Enumerable' do
       zset = Tinto::SortedSet.new(@collection)
-      lambda { zset.reset(OpenStruct.new) }.must_raise ArgumentError
+      lambda { zset.reset(OpenStruct.new) }.must_raise NoMethodError
     end
   end #reset
 
@@ -175,11 +176,13 @@ describe Tinto::SortedSet do
   describe '#empty?' do
     it 'is true if the collection has no elements' do
       zset = Tinto::SortedSet.new(@collection)
+      zset.reset
       zset.add factory(id: 1)
       zset.empty?.must_equal false
 
       empty_zset = Tinto::SortedSet.new(@collection)
-      empty_zset.reset([factory(id: 1)])
+      empty_zset.reset
+      empty_zset.add factory(id: 1)
       empty_zset.delete factory(id: 1)
       empty_zset.empty?.must_equal true
       empty_zset.sync
@@ -189,25 +192,11 @@ describe Tinto::SortedSet do
     end
   end #empty?
 
-  describe '#exists?' do
-    it 'returns true if there is some element in the collection' do
-      zset = Tinto::SortedSet.new(@collection)
-      zset.reset([factory(id: 1)])
-      zset.exists?.must_equal true
-
-      collection = factory(storage_key: 'key:test:1')
-      def collection.valid?; true; end
-      empty_zset = Tinto::SortedSet.new(collection)
-      empty_zset.reset([factory(id: 1)])
-      empty_zset.delete factory(id: 1)
-      empty_zset.exists?.must_equal false
-    end
-  end #exists?
-
   describe '#include?' do
     it 'returns true if the set includes the id of the passed object' do
       zset = Tinto::SortedSet.new(@collection)
-      zset.reset([factory(id: 1)])
+      zset.reset
+      zset.add factory(id: 1)
       zset.include?(factory(id: 1)).must_equal true
       zset.include?(factory(id: 2)).must_equal false
     end
@@ -226,7 +215,7 @@ describe Tinto::SortedSet do
 
     it 'sets the score as the updated_at field of the passed member' do
       zset    = Tinto::SortedSet.new(@collection)
-      zset.reset([factory(id: 1)])
+      zset.reset
       element = factory(id: 1)
       zset.add element
       zset.score(element).must_equal element.updated_at.to_f
@@ -269,7 +258,8 @@ describe Tinto::SortedSet do
     it 'removes an element from the collection' do
       element = factory(id: 1)
       zset    = Tinto::SortedSet.new(@collection)
-      zset.reset([element])
+      zset.reset
+      zset.add element
       4.times { zset.delete(factory(id: 5)) }
       zset.size.must_equal 1
 
@@ -302,7 +292,8 @@ describe Tinto::SortedSet do
     it 'gets the score of an element' do
       element = factory(id: 1)
       zset    = Tinto::SortedSet.new(@collection)
-      zset.reset([element])
+      zset.reset
+      zset.add element
       zset.score(element).must_equal element.updated_at.to_f
     end
   end

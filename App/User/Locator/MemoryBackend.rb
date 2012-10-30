@@ -3,7 +3,7 @@ require 'set'
 module Belinkr
   module User
     class Locator
-      class Buffer
+      class MemoryBackend
         attr_reader :keys, :ids
 
         def initialize
@@ -32,7 +32,7 @@ module Belinkr
         def registered?(user_id)
           @ids.has_key?(user_id)
         end #registered?
-      end # Buffer
+      end # MemoryBackend
     end # Locator
   end # User
 end # Belinkr

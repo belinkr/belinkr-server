@@ -1,19 +1,21 @@
 # encoding: utf-8
 require_relative '../../Locales/Loader'
 require_relative '../Reset/Collection'
-require_relative '../../Workers/Mailer/Message'
 require_relative '../../Tinto/Context'
+require_relative '../../Tinto/Exceptions'
 
 module Belinkr
   class RequestPasswordReset
     include Tinto::Context
+    include Tinto::Exceptions
 
     BASE_PATH = "https://#{Belinkr::Config::HOSTNAME}/resets"
 
-    def initialize(actor, reset, resets=Reset::Collection.new)
-      @actor  = actor
-      @reset  = reset
-      @resets = resets
+    def initialize(actor, reset, resets, message)
+      @actor    = actor
+      @reset    = reset
+      @resets   = resets
+      @message  = message
     end
 
     def call
@@ -22,9 +24,10 @@ module Belinkr
 
       @reset.verify
       @resets.add @reset
-      Mailer::Message.new(message_for @actor, @reset).queue
+      @message.attributes = message_for(@actor, @reset)
+      raise InvalidResource unless @message.valid?
 
-      @to_sync = [@reset, @resets]
+      @to_sync = [@reset, @resets, @message]
       @reset
     end #call
 

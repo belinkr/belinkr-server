@@ -1,21 +1,33 @@
 # encoding: utf-8
-require 'set'
 require_relative './Exceptions'
+require_relative './Set/MemoryBackend'
+require_relative './Set/RedisBackend'
 
 module Tinto
   class Set
     include Enumerable
     include Tinto::Exceptions
 
-    PER_PAGE  = 20
-    INTERFACE = %w{ verify sync synced? page fetch reset each size length
-                    empty? exists? include? add merge delete clear first }
+    INTERFACE = %w{ verify in_memory? sync synced? page fetch reset each size
+                    length empty? exists? include? first add merge delete
+                    clear first }
 
     def initialize(collection)
-      @collection = collection
-      @page       = @member_ids = ::Set.new
-      @backlog    = []
+      @collection       = collection
+      @buffered_set     = MemoryBackend.new
+      @persisted_set    = RedisBackend.new @collection.storage_key
+      @current_backend  = @persisted_set
+      @backlog          = []
     end #initialize
+
+    def verify
+      raise InvalidCollection unless @collection.valid?
+    end #verify
+
+    def in_memory?
+      verify
+      @current_backend == @buffered_set
+    end #in_memory?
 
     def sync
       verify
@@ -29,114 +41,103 @@ module Tinto
       @backlog.empty?
     end #synced?
 
-    def page(page_number=0)
+    def page(page_number=0, per_page=20)
       verify
-      from = page_number.to_i * PER_PAGE
-      to   = from + PER_PAGE - 1
-
       fetch
-      @page = @member_ids.to_a.slice(from..to)
+
+      page_number, per_page = page_number.to_i, per_page.to_i
+      from = page_number * per_page
+      to   = from + per_page - 1
+
+      elements          = @buffered_set.to_a.slice(from..to)
+      @buffered_set     = MemoryBackend.new
+      @buffered_set.merge elements
+      @current_backend  = @buffered_set
       @collection
     end #page
 
     def fetch
       verify
-      @member_ids = ::Set.new($redis.smembers @collection.storage_key)
-      @fetched = true
+      @backlog.clear
+      @buffered_set     = MemoryBackend.new
+      @buffered_set.merge @persisted_set.fetch
+      @current_backend  = @buffered_set
       @collection
     end #fetch
 
     def reset(members=[])
       verify
-      raise ArgumentError unless members.respond_to? :each
-      member_ids = members.map { |m| m.id.to_s }
-
-      @backlog.push(
-        lambda { $redis.sadd @collection.storage_key, member_ids }
-      ) unless member_ids.empty?
-
-      @page = @member_ids = ::Set.new(member_ids)
-      @fetched = true
+      @backlog.clear
+      @current_backend  = @buffered_set
+      clear
+      merge members
       @collection
     end #reset
 
     def each
       verify
-      fetch unless @fetched
-      return @page.each unless block_given?
-      @page.each { |id| yield @collection.instantiate_member(id: id) }
+      fetch unless in_memory?
+      return Enumerator.new(self, :each) unless block_given?
+      @buffered_set.each do |id| 
+        yield @collection.instantiate_member(id: id)
+      end
     end #each
 
     def size
       verify
-      sync if !@fetched && !synced?
-
-      return @member_ids.size if @fetched
-      $redis.scard @collection.storage_key
+      @current_backend.size
     end #size
 
     alias_method :length, :size
 
     def empty?
-      verify
       !(size.to_i > 0)
     end #empty?
 
-    def exists?
-      !empty?
-    end #exists?
-
     def include?(member)
       verify
-      sync if !@fetched && !synced?
+      @current_backend.include? member.id.to_s
+    end
 
-      member_id = member.id.to_s
-      return @member_ids.include?(member_id) if @fetched
-      $redis.sismember @collection.storage_key, member_id
-    end #include?
+    def first
+      verify
+      @collection.instantiate_member(id: @current_backend.first)
+    end
 
     def add(member)
       verify
       member.verify
-
       member_id = member.id.to_s
-      @backlog.push(lambda { $redis.sadd @collection.storage_key, member_id })
-      @member_ids.add member_id
+      @buffered_set.add member_id
+      @backlog.push(lambda { @persisted_set.add member_id })
       @collection
     end #add
 
-    def merge(enumerable)
-      member_ids = enumerable.map { |member| member.id }
-      @backlog.push(lambda { $redis.sadd @collection.storage_key, member_ids })
-      @member_ids.merge member_ids
+    def merge(members)
+      verify
+      member_ids = members.map { |member|
+        member.verify
+        member.id.to_s
+      }
+      @buffered_set.merge member_ids
+      @backlog.push(lambda { @persisted_set.merge member_ids })
       @collection
     end #merge
 
     def delete(member)
       verify
       member.verify
-
       member_id = member.id.to_s
-      @backlog.push(lambda { $redis.srem @collection.storage_key, member_id })
-      @member_ids.delete member_id
+      @buffered_set.delete member_id
+      @backlog.push(lambda { @persisted_set.delete member_id })
       @collection
     end #delete
 
     def clear
       verify
-      @backlog.push(lambda { $redis.del @collection.storage_key })
-      @member_ids.clear
+      @buffered_set.clear
+      @backlog.push(lambda { @persisted_set.clear })
       @collection
     end #clear
-
-    def first
-      @collection.instantiate_member id: @member_ids.first
-    end
-
-    private
-
-    def verify
-      raise InvalidCollection unless @collection.valid?
-    end #verify
   end # Set
 end # Tinto

@@ -1,23 +1,34 @@
 # encoding: utf-8
-require 'set'
 require_relative './Exceptions'
+require_relative './SortedSet/MemoryBackend'
+require_relative './SortedSet/RedisBackend'
 
 module Tinto
   class SortedSet
     include Tinto::Exceptions
     include Enumerable
 
-    PER_PAGE          = 20
     NOT_IN_SET_SCORE  = -1.0
     INTERFACE         = %w{ verify sync synced? page fetch reset each size
                             length empty? exists? include? add merge delete 
                             clear score } 
+
     def initialize(collection)
-      @collection = collection
-      @member_ids = ::Set.new
-      @scores     = {}
-      @backlog    = []
+      @collection       = collection
+      @buffered_zset    = MemoryBackend.new
+      @persisted_zset   = RedisBackend.new @collection.storage_key
+      @current_backend  = @persisted_zset
+      @backlog          = []
     end #initialize
+
+    def verify
+      raise InvalidCollection unless @collection.valid?
+    end #verify
+
+    def in_memory?
+      verify
+      @current_backend == @buffered_zset
+    end #in_memory?
 
     def sync
       verify
@@ -31,145 +42,117 @@ module Tinto
       @backlog.empty?
     end #synced?
 
-    def page(page_number=0)
+    def page(page_number=0, per_page=20)
       verify
-      from = page_number * PER_PAGE
-      to   = from + PER_PAGE - 1
 
-      @member_ids = ::Set.new
-      @scores     = {}
+      page_number, per_page = page_number.to_i, per_page.to_i
+      from = page_number * per_page
+      to   = from + per_page - 1
 
-      ($redis.zrevrange @collection.storage_key, from, to, with_scores: true )
-      .each do |tuple|
-        @member_ids.add tuple.first
-        @scores[tuple.first] = tuple.last.to_f
-      end
-      @fetched = true
+      fetch(from, to)
+
+      elements          = @buffered_zset.to_a
+      @buffered_zset    = MemoryBackend.new
+      @buffered_zset.merge elements
+      @current_backend  = @buffered_zset
       @collection
     end #page
 
-    def fetch
+    def fetch(from=0, to=-1)
       verify
-      @member_ids = ::Set.new
-      @scores     = {}
-      ($redis.zrange @collection.storage_key, 0, -1, with_scores: true ).each do |tuple|
-        @member_ids.add tuple.first
-        @scores[tuple.first] = tuple.last.to_f
-      end
-      @fetched = true
+      @backlog.clear
+      @buffered_zset    = MemoryBackend.new
+      @buffered_zset.merge @persisted_zset.fetch(from, to)
+      @current_backend  = @buffered_zset
       @collection
     end #fetch
 
     def reset(members=[])
-      raise ArgumentError unless members.respond_to? :each
       verify
-
-      @backlog.push(lambda { 
-        $redis.zadd @collection.storage_key, scores_for(members) 
-      }) unless members.empty?
-
-      members.each { |member| @scores[member.id.to_s] = score_for(member) }
-      @member_ids = ::Set.new(members.map { |member| member.id.to_s })
-
-      @fetched = true
+      @backlog.clear
+      @current_backend  = @buffered_zset
+      clear
+      merge members
       @collection
     end #reset
 
+    def score(member)
+      @current_backend.score(member.id.to_s) || NOT_IN_SET_SCORE
+    end #score
+
     def each
       verify
-      page unless @fetched
-      return @member_ids.each unless block_given?
-      @member_ids.each { |id| yield @collection.instantiate_member(id: id) }
+      fetch unless in_memory?
+      return Enumerator.new(self, :each) unless block_given?
+      @buffered_zset.each do |score, id| 
+        yield @collection.instantiate_member(id: id)
+      end
     end #each
 
     def size
       verify
-      sync if !@fetched && !synced?
-
-      return @member_ids.size if @fetched
-      $redis.zcard @collection.storage_key
+      @current_backend.size
     end #size
 
     alias_method :length, :size
 
     def empty?
-      verify
       !(size.to_i > 0)
     end #empty?
 
-    def exists?
-      !empty?
-    end #exists?
-
     def include?(member)
       verify
-      sync if !@fetched && !synced?
+      @current_backend.include? member.id.to_s
+    end
 
-      member_id = member.id.to_s
-      return @member_ids.include?(member_id) if @fetched
-      $redis.sismember @collection.storage_key, member_id
-    end #include?
+    def first
+      verify
+      @collection.instantiate_member(id: @current_backend.first)
+    end
 
     def add(member)
       verify
       member.verify
-
-      @backlog.push(lambda { 
-        $redis.zadd @collection.storage_key, score_for(member), member.id
-      })
-      @scores[member.id.to_s] = score_for(member)
-      @member_ids.add member.id.to_s
+      member_id = member.id.to_s
+      score     = score_for(member)
+      @buffered_zset.add score, member_id
+      @backlog.push(lambda { @persisted_zset.add score, member_id })
       @collection
     end #add
 
-    def merge(enumerable)
-      enumerable.each do |member|
-        @scores[member.id.to_s] = score_for(member)
-        @member_ids.add member.id.to_s
-      end
-
-      members_scores = enumerable.map { |member| [member.id, member.score] }
-      @backlog.push(
-        lambda { $redis.zadd @collection.storage_key, members_scores }
-      )
+    def merge(members)
+      verify
+      scores_and_member_ids = scores_and_member_ids_for(members)
+      @buffered_zset.merge scores_and_member_ids
+      @backlog.push(lambda { @persisted_zset.merge scores_and_member_ids })
       @collection
     end #merge
 
     def delete(member)
       verify
       member.verify
-
       member_id = member.id.to_s
-      @backlog.push(lambda { $redis.zrem @collection.storage_key, member_id })
-      @member_ids.delete member_id
-      @scores.delete member_id
+      @buffered_zset.delete member_id
+      @backlog.push(lambda { @persisted_zset.delete member_id })
       @collection
     end #delete
 
     def clear
       verify
-      @backlog.push(lambda { $redis.del @collection.storage_key })
-      @member_ids.clear
-      @scores.clear
+      @buffered_zset.clear
+      @backlog.push(lambda { @persisted_zset.clear })
       @collection
     end #clear
-
-    def score(member)
-      @scores.fetch(member.id.to_s, NOT_IN_SET_SCORE)
-    end
-
-    private
-
-    def verify
-      raise InvalidCollection unless @collection.valid?
-    end #verify
-
-    def scores_for(members)
-      members.flat_map { |member| [score_for(member), member.id.to_s ] }
-    end #scores_for
 
     def score_for(member)
       member.updated_at.to_f
     end #score_for
+
+    def scores_and_member_ids_for(members)
+      members.map do |member|
+        member.verify
+        [score_for(member), member.id.to_s]
+      end
+    end #scores_and_member_ids_for
   end # SortedSet
 end # Tinto

@@ -1,12 +1,12 @@
 # encoding: utf-8
-require_relative './Locator/Buffer'
+require_relative './Locator/MemoryBackend'
 require_relative './Locator/RedisBackend'
 
 module Belinkr
   module User
     class Locator
       def initialize(options={})
-        @buffer           = options.fetch(:buffer, Buffer.new)
+        @buffer           = options.fetch(:buffer, MemoryBackend.new)
         @persisted        = options.fetch(:backend, RedisBackend.new)
         @backlog          = []
         @current_backend  = @persisted

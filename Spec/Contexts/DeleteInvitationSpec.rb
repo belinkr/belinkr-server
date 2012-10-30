@@ -1,25 +1,24 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
 require_relative '../../App/Contexts/InvitePersonToBelinkr'
 require_relative '../../App/Contexts/DeleteInvitation'
 require_relative '../../App/Invitation/Collection'
+require_relative '../../Workers/Mailer/Message'
 require_relative '../Factories/Invitation'
 require_relative '../Factories/Entity'
 require_relative '../Factories/User'
 
 include Belinkr
 
-$redis ||= Redis.new
-$redis.select 8
-
 describe 'delete invitation' do
   before do
     @entity       = Factory.entity
     @invitation   = Factory.invitation(entity_id: @entity.id)
     @actor        = Factory.user(entity_id: @entity.id)
-    @invitations  = Invitation::Collection.new(entity_id: @entity.id)
-    InvitePersonToBelinkr.new(@actor, @invitation, @invitations, @entity).call
+    @invitations  = Invitation::Collection.new(entity_id: @entity.id).reset
+    @message      = Mailer::Message.new
+    InvitePersonToBelinkr
+      .new(@actor, @invitation, @invitations, @entity, @message).call
   end
 
   it 'marks the invitation as deleted' do

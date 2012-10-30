@@ -12,14 +12,15 @@ include Belinkr
 describe User::Locator::RedisBackend do
   before do
     $redis.flushdb
-    @user    = OpenStruct.new(id: 1)
+    @user     = OpenStruct.new(id: 1)
     @locator  = User::Locator::RedisBackend.new
   end
 
   describe '#add' do
     it 'adds a key and user_id pair to the locator service' do
-      skip
       @locator.add 'user@belinkr.com', @user.id
+      @locator.id_for('user@belinkr.com').must_equal @user.id.to_s
+      @locator.keys_for(@user.id).must_include 'user@belinkr.com'
     end
   end # add
 

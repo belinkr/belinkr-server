@@ -1,24 +1,22 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
 require_relative '../../App/Contexts/ResetPassword'
 require_relative '../../App/Contexts/RequestPasswordReset'
+require_relative '../../Workers/Mailer/Message'
 require_relative '../Factories/User'
 require_relative '../Factories/Reset'
 require_relative '../../App/Reset/Collection'
 
 include Belinkr
-$redis ||= Redis.new
-$redis.select 8
 
 describe 'reset password' do
   before do
-    $redis.flushdb
     @actor        = Factory.user
     @user_changes = { password: 'changed' }
     @reset        = Reset::Member.new
-    @resets       = Reset::Collection.new
-    RequestPasswordReset.new(@actor, @reset, @resets).call
+    @resets       = Reset::Collection.new.reset
+    @message      = Mailer::Message.new
+    RequestPasswordReset.new(@actor, @reset, @resets, @message).call
   end
 
   it 'marks the reset as deleted' do

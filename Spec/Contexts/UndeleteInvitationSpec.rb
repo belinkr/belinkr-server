@@ -1,16 +1,13 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
 require_relative '../../App/Contexts/InvitePersonToBelinkr'
 require_relative '../../App/Contexts/DeleteInvitation'
 require_relative '../../App/Contexts/UndeleteInvitation'
 require_relative '../../App/Invitation/Collection'
+require_relative '../../Workers/Mailer/Message'
 require_relative '../Factories/Invitation'
 require_relative '../Factories/Entity'
 require_relative '../Factories/User'
-
-$redis ||= Redis.new
-$redis.select 8
 
 include Belinkr
 
@@ -18,9 +15,11 @@ describe 'delete invitation' do
   before do
     @entity       = Factory.entity
     @invitation   = Factory.invitation(entity_id: @entity.id)
-    @invitations  = Invitation::Collection.new(entity_id: @entity.id)
+    @invitations  = Invitation::Collection.new(entity_id: @entity.id).reset
     @actor        = Factory.user(entity_id: @entity.id)
-    InvitePersonToBelinkr.new(@actor, @invitation, @invitations, @entity).call
+    @message      = Mailer::Message.new
+    InvitePersonToBelinkr.new(@actor, @invitation, @invitations, @entity,
+      @message).call
     DeleteInvitation.new(@actor, @invitation, @invitations, @entity).call
   end
 

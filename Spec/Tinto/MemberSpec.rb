@@ -13,9 +13,7 @@ describe Tinto::Member do
   $redis ||= Redis.new
   $redis.select 8
 
-  before do
-    $redis.flushdb
-  end
+  before { $redis.flushdb }
 
   describe '#initialize' do
     it 'requires a member resource' do
@@ -278,7 +276,9 @@ describe Tinto::Member do
       member    = Tinto::Member.new resource
 
       master.add resource
+      master.sync
       master.size.must_equal 1
+
       member.destroy
       master.empty?.must_equal true
     end

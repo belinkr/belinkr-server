@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
 require_relative '../../App/Contexts/AcceptInvitationAndJoinEntity'
 require_relative '../../App/Contexts/InvitePersonToBelinkr'
 require_relative '../../Workers/Mailer/Message'
@@ -8,20 +7,22 @@ require_relative '../../App/Invitation/Collection'
 require_relative '../Factories/Invitation'
 require_relative '../Factories/User'
 require_relative '../Factories/Entity'
+require_relative '../../Workers/Mailer/Message'
 
 include Belinkr
-$redis ||= Redis.new
-$redis.select 8
 
 describe 'accept invitation and join' do
   before do
     @entity       = Factory.entity
+    @actor        = Factory.user(profiles: [])
     @inviter      = Factory.user(entity_id: @entity.id)
     @invitation   = Factory.invitation(entity_id: @entity.id)
     @invitations  = Invitation::Collection.new(entity_id: @entity.id).reset
-    @actor        = Factory.user(profiles: [])
+    @message      = Mailer::Message.new
 
-    InvitePersonToBelinkr.new(@inviter, @invitation, @invitations, @entity).call
+
+    InvitePersonToBelinkr.new(@inviter, @invitation, @invitations, @entity,
+      @message).call
   end
 
   it 'marks the invitation as accepted' do

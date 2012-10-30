@@ -1,7 +1,6 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'ostruct'
-require 'redis'
 require_relative '../../App/Contexts/CreateWorkspace'
 require_relative '../../App/Contexts/DeleteWorkspace'
 require_relative '../../App/Workspace/Collection'
@@ -22,6 +21,7 @@ describe 'delete workspace' do
     @workspaces = Workspace::Collection.new(entity_id: @entity.id, kind: 'all')
     @workspaces.reset
     @tracker    = Workspace::Membership::Tracker.new(@entity.id, @workspace.id)
+                    .reset
     CreateWorkspace.new(@actor, @workspace, @workspaces, @entity, @tracker).call
   end
 
@@ -35,55 +35,51 @@ describe 'delete workspace' do
   end
 
   it 'deletes the workspace from the memberships of all collaborators' do
-    skip
     (1..5).map { |user_id| @tracker.add 'collaborator', user_id }
-    @tracker.map { |membership| membership.reset.add(@workspace) }
-    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, @tracker)
+    memberships = @tracker.map { |m| m.reset.add(@workspace) }
+    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, memberships)
     context.administrators.reset
     context.administrators.add @actor
 
-    @tracker.to_a.first.must_include @workspace
+    memberships.first.must_include @workspace
     context.call
-    @tracker.to_a.first.wont_include @workspace
+    memberships.first.wont_include @workspace
   end
 
   it 'deletes the workspace from the memberships of all administrators' do
-    skip
     (1..5).map { |user_id| @tracker.add 'administrator', user_id }
-    @tracker.map { |membership| membership.reset.add(@workspace) }
-    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, @tracker)
+    memberships = @tracker.map { |m| m.reset.add(@workspace) }
+    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, memberships)
     context.administrators.reset
     context.administrators.add @actor
 
-    @tracker.to_a.first.must_include @workspace
+    memberships.to_a.first.must_include @workspace
     context.call
-    @tracker.to_a.first.wont_include @workspace
+    memberships.to_a.first.wont_include @workspace
   end
 
   it 'deletes the workspace from the memberships of all invited' do
-    skip
     (1..5).map { |user_id| @tracker.add 'invited', user_id }
-    @tracker.map { |membership| membership.reset.add(@workspace) }
-    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, @tracker)
+    memberships = @tracker.map { |m| m.reset.add(@workspace) }
+    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, memberships)
     context.administrators.reset
     context.administrators.add @actor
 
-    @tracker.to_a.first.must_include @workspace
+    memberships.to_a.first.must_include @workspace
     context.call
-    @tracker.to_a.first.wont_include @workspace
+    memberships.to_a.first.wont_include @workspace
   end
 
   it 'deletes the workspace from the memberships of all autoinvited' do
-    skip
     (1..5).map { |user_id| @tracker.add 'autoinvited', user_id }
-    @tracker.map { |membership| membership.reset.add(@workspace) }
-    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, @tracker)
+    memberships = @tracker.map { |m| m.reset.add(@workspace) }
+    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, memberships)
     context.administrators.reset
     context.administrators.add @actor
 
-    @tracker.to_a.first.must_include @workspace
+    memberships.to_a.first.must_include @workspace
     context.call
-    @tracker.to_a.first.wont_include @workspace
+    memberships.to_a.first.wont_include @workspace
   end
 end # delete workspace
 

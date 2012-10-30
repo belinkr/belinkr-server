@@ -37,6 +37,8 @@ module Belinkr
         raise Tinto::Exceptions::InvalidResource unless valid?
         $redis.rpush QUEUE_KEY, self.attributes.to_json
       end
+
+      alias_method :sync, :queue
     end # Message
   end # Mailer
 end # Belinkr

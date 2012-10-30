@@ -27,8 +27,8 @@ module Belinkr
       attribute :updated_at,        Time 
       attribute :deleted_at,        Time
 
-      validates_presence_of         :id, :text, :author
-      validates_length_of           :text, min: 1, max: 10000
+      #validates_presence_of         :author, :text
+      #validates_length_of           :text, min: 1, max: 10000
 
       def_delegators :@member,      *Tinto::Member::INTERFACE
 

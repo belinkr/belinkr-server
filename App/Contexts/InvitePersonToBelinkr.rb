@@ -2,20 +2,23 @@
 require 'i18n'
 require_relative '../../Locales/Loader'
 require_relative '../../Config'
-require_relative '../../Workers/Mailer/Message'
 require_relative './RegisterActivity'
 require_relative '../../Tinto/Context'
+require_relative '../../Tinto/Exceptions'
 
 module Belinkr
   class InvitePersonToBelinkr
     include Tinto::Context
+    include Tinto::Exceptions
+
     BASE_PATH = "https://#{Belinkr::Config::HOSTNAME}/invitations"
 
-    def initialize(actor, invitation, invitations, entity)
+    def initialize(actor, invitation, invitations, entity, message)
       @actor        = actor
       @invitation   = invitation
       @invitations  = invitations
       @entity       = entity
+      @message      = message
     end # initialize
 
     def call
@@ -25,8 +28,8 @@ module Belinkr
       @invitation.verify
       @invitations.add @invitation
 
-      message = message_for(@actor, @invitation, @entity)
-      Mailer::Message.new(message).queue
+      @message.attributes = message_for(@actor, @invitation, @entity)
+      raise InvalidResource unless @message.valid?
 
       @activity_context = RegisterActivity.new(
         actor:      @actor, 
@@ -38,7 +41,7 @@ module Belinkr
       )
       @activity_context.call
 
-      @to_sync = [@invitation, @invitations, @activity_context]
+      @to_sync = [@invitation, @invitations, @activity_context, @message]
       @invitation
     end #call
 

@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
 require_relative '../../App/Contexts/UnfollowUserInEntity'
 require_relative '../../App/Contexts/FollowUserInEntity'
 require_relative '../Factories/Entity'
@@ -13,12 +12,8 @@ require_relative '../../Tinto/Exceptions'
 
 include Belinkr
 
-$redis ||= Redis.new
-$redis.select 8
-
-describe 'create follow relationship' do
+describe 'unfollow user in entity' do
   before do
-    $redis.flushdb
     @entity     = Factory.entity
     @actor      = Factory.profile(entity_id: @entity.id)
     @followed   = Factory.profile(entity_id: @entity.id)
@@ -31,11 +26,11 @@ describe 'create follow relationship' do
     @actor_timeline = Status::Collection.new(kind: 'general', context: @actor)
     @actor_timeline.reset
 
-    statuses = (1..40).map { 
+    statuses = (1..20).map { 
       Factory.status(user_id: @followed.id, entity_id: @entity.id) 
     }
     @latest_statuses = Status::Collection.new(kind: 'own', context: @followed)
-    @latest_statuses.reset(statuses).sync.page
+    @latest_statuses.reset(statuses)
     @options = {
       actor:            @actor,
       followed:         @followed,
@@ -70,4 +65,4 @@ describe 'create follow relationship' do
     lambda { UnfollowUserInEntity.new(@options).call }
       .must_raise Tinto::Exceptions::InvalidMember
   end
-end
+end # unfollow user in entity

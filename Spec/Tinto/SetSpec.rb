@@ -12,7 +12,7 @@ describe Tinto::Set do
 
   before do
     $redis.flushdb
-    @collection = OpenStruct.new(storage_key: 'test:key')
+    @collection = OpenStruct.new(storage_key: 'test')
     def @collection.valid?; true; end
     def @collection.instantiate_member(attrs={}); OpenStruct.new(attrs); end
   end
@@ -36,7 +36,6 @@ describe Tinto::Set do
       lambda { set.each                           }.must_raise InvalidCollection
       lambda { set.include? factory(id: 1)        }.must_raise InvalidCollection
       lambda { set.empty?                         }.must_raise InvalidCollection
-      lambda { set.exists?                        }.must_raise InvalidCollection
       lambda { set.add factory(id: 2)             }.must_raise InvalidCollection
       lambda { set.delete factory(id: 1)          }.must_raise InvalidCollection
       lambda { set.clear                          }.must_raise InvalidCollection
@@ -113,7 +112,7 @@ describe Tinto::Set do
   describe '#reset' do
     it 'populates the set with the passed members' do
       set = Tinto::Set.new(@collection)
-      set.reset([factory(id: 3)])
+      set.reset [factory(id: 3)]
       set.map.to_a.first.id.must_equal '3'
     end
 
@@ -140,7 +139,7 @@ describe Tinto::Set do
 
     it 'raises unless passed an Enumerable' do
       set = Tinto::Set.new(@collection)
-      lambda { set.reset(OpenStruct.new) }.must_raise ArgumentError
+      lambda { set.reset(OpenStruct.new) }.must_raise NoMethodError
     end
   end #reset
 
@@ -171,7 +170,7 @@ describe Tinto::Set do
   describe '#empty?' do
     it 'is true if the collection has no elements' do
       set = Tinto::Set.new(@collection)
-      set.add factory(id: 1)
+      set.reset [factory(id: 1)]
       set.empty?.must_equal false
 
       empty_set = Tinto::Set.new(@collection)
@@ -184,21 +183,6 @@ describe Tinto::Set do
       empty_set.empty?.must_equal true
     end
   end #empty?
-
-  describe '#exists?' do
-    it 'returns true if there is some element in the collection' do
-      set = Tinto::Set.new(@collection)
-      set.reset([factory(id: 1)])
-      set.exists?.must_equal true
-
-      collection = factory(storage_key: 'key:test:1')
-      def collection.valid?; true; end
-      empty_set = Tinto::Set.new(collection)
-      empty_set.reset([factory(id: 1)])
-      empty_set.delete factory(id: 1)
-      empty_set.exists?.must_equal false
-    end
-  end #exists?
 
   describe '#include?' do
     it 'returns true if the set includes the id of the passed object' do

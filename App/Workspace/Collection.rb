@@ -28,8 +28,6 @@ module Belinkr
         Member.new attributes.merge(entity_id: entity_id)
       end
 
-      private
-
       def storage_key
         "entities:#{entity_id}:workspaces"
       end

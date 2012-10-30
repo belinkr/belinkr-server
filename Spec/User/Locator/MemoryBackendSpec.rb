@@ -1,12 +1,12 @@
 require 'minitest/autorun'
 require 'ostruct'
-require_relative '../../../App/User/Locator/Buffer'
+require_relative '../../../App/User/Locator/MemoryBackend'
 
 include Belinkr
 
-describe User::Locator::Buffer do
+describe User::Locator::MemoryBackend do
   before do 
-    @locator  = User::Locator::Buffer.new
+    @locator = User::Locator::MemoryBackend.new
     @user    = OpenStruct.new(id: 1)
   end
 
@@ -67,4 +67,5 @@ describe User::Locator::Buffer do
       @locator.registered?(@user.id).must_equal true
     end
   end #registered?
-end # Locator::Buffer
+end # Locator::MemoryBackend
+

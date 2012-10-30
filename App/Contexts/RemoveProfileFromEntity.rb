@@ -5,6 +5,7 @@ require_relative '../../Tinto/Context'
 module Belinkr
   class RemoveProfileFromEntity
     include Tinto::Context
+    include Tinto::Exceptions
     # Preconditions:
     # - An entity must be present
     # - A user in that entity must be present
@@ -20,7 +21,7 @@ module Belinkr
     end # initialize
 
     def call
-      raise Tinto::Exceptions::NotAllowed unless @actor.id == @user.id
+      raise NotAllowed unless @actor.id == @user.id
       @user.profiles.delete @profile
       @user.delete if @user.profiles.empty?
 

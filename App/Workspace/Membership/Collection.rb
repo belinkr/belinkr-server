@@ -36,8 +36,6 @@ module Belinkr
           Profile::Member.new attributes.merge(entity_id: entity_id)
         end
 
-        private
-
         def storage_key
           "entities:#{entity_id}:users:#{user_id}:workspaces:#{kind}"
         end
