@@ -112,6 +112,27 @@ describe Tinto::Set::RedisBackend do
     end
   end #clear
 
+  describe '#union' do
+    it 'returns a new set built by merging the set and the elements 
+    of the given object, an enumerable or RedisBackend set' do
+      set1 = Tinto::Set::RedisBackend.new 'test1'
+      set1.add factory(id: 1)
+
+      enumerable = ['2']
+      (set1 | enumerable).size.must_equal 2
+      enumerable = ['1']
+      (set1 | enumerable).size.must_equal 1
+      enumerable = []
+      (set1 | enumerable).size.must_equal 1
+
+      set2 = Tinto::Set::RedisBackend.new 'test2'
+      set2.add factory(id: 1)
+      (set1 | set2).size.must_equal 1
+      set2.add factory(id: 2)
+      (set1 | set2).size.must_equal 2
+    end
+  end
+
   def factory(attributes={})
     attributes.fetch :id
   end

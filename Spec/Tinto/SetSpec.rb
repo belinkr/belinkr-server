@@ -15,6 +15,10 @@ describe Tinto::Set do
     @collection = OpenStruct.new(storage_key: 'test')
     def @collection.valid?; true; end
     def @collection.instantiate_member(attrs={}); OpenStruct.new(attrs); end
+
+    @collection2 = OpenStruct.new(storage_key: 'test2')
+    def @collection2.valid?; true; end
+    def @collection2.instantiate_member(attrs={}); OpenStruct.new(attrs); end
   end
   
   describe '#initialize' do
@@ -253,6 +257,20 @@ describe Tinto::Set do
       set.size.must_equal 0
     end
   end #clear
+
+  describe '#union' do
+    it 'returns a new set built by merging the set and the elements 
+    of the given object, an enumerable or RedisBackend set' do
+      set1 = Tinto::Set.new @collection
+      set2 = Tinto::Set.new @collection2
+      set1.add(factory(id: 1))
+      set1.sync
+      set2.add(factory(id: 2))
+      set2.sync
+
+      (set1 | set2).size.must_equal 2
+    end
+  end #union
 
   def factory(attrs={})
     member = OpenStruct.new(attrs)

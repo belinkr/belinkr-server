@@ -20,6 +20,10 @@ module Tinto
       @backlog          = []
     end #initialize
 
+    def storage_key
+      @persisted_set.storage_key
+    end #storage_key
+
     def verify
       raise InvalidCollection unless @collection.valid?
     end #verify
@@ -50,8 +54,7 @@ module Tinto
       to   = from + per_page - 1
 
       elements          = @buffered_set.to_a.slice(from..to)
-      @buffered_set     = MemoryBackend.new
-      @buffered_set.merge elements
+      @buffered_set.clear.merge elements
       @current_backend  = @buffered_set
       @collection
     end #page
@@ -59,7 +62,7 @@ module Tinto
     def fetch
       verify
       @backlog.clear
-      @buffered_set     = MemoryBackend.new
+      @buffered_set.clear
       @buffered_set.merge @persisted_set.fetch
       @current_backend  = @buffered_set
       @collection
@@ -139,5 +142,12 @@ module Tinto
       @backlog.push(lambda { @persisted_set.clear })
       @collection
     end #clear
+
+    def |(enumerable_or_redis_backed_set)
+      @current_backend | enumerable_or_redis_backed_set
+    end
+
+    alias_method :union, :|
+
   end # Set
 end # Tinto

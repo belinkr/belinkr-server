@@ -106,7 +106,7 @@ describe Tinto::SortedSet do
 
       zset      = Tinto::SortedSet.new(@collection)
       zset.page
-      last_score_in_first_page    = zset.score(zset.to_a[19])
+      last_score_in_first_page  = zset.score(zset.to_a[19])
 
       zset.page(1)
       first_score_in_second_page  = zset.score(zset.to_a[0])

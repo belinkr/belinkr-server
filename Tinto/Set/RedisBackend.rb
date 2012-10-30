@@ -1,8 +1,12 @@
 # encoding: utf-8
+require 'set'
+
 module Tinto
   class Set
     class RedisBackend
       include Enumerable
+
+      attr_reader :storage_key
 
       def initialize(storage_key)
         @storage_key = storage_key
@@ -44,6 +48,17 @@ module Tinto
       def clear
         $redis.del @storage_key
       end #clear
+
+      def |(set_or_enumerable)
+        if set_or_enumerable.respond_to? :storage_key
+          ::Set.new($redis.sunion @storage_key, set_or_enumerable.storage_key)
+        else
+          ::Set.new(fetch + set_or_enumerable)
+        end
+      end
+
+      alias_method :union, :|
+
     end # RedisBackend
   end # Set
 end # Tinto

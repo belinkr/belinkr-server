@@ -74,6 +74,23 @@ describe Tinto::Set::MemoryBackend do
     end
   end #delete
 
+  describe '#|' do
+    it 'returns a new set built by merging the set and the elements 
+    of the given enumerable object' do
+      set = Tinto::Set::MemoryBackend.new
+      set.add factory(id: 1)
+      enumerable = ['2']
+
+      (set | enumerable).size.must_equal 2
+
+      enumerable = ['1']
+      (set | enumerable).size.must_equal 1
+
+      enumerable = []
+      (set | enumerable).size.must_equal 1
+    end
+  end #union
+
   def factory(attributes)
     attributes.fetch :id
   end

@@ -30,6 +30,13 @@ module Tinto
       def delete(element)
         @elements.delete(element.to_s)
       end #delete
+
+      def |(enumerable)
+        ::Set.new.merge(@elements + enumerable)
+      end
+
+      alias_method :union, :|
+
     end # MemoryBackend
   end # Set
 end # Tinto

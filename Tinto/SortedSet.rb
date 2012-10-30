@@ -44,24 +44,18 @@ module Tinto
 
     def page(page_number=0, per_page=20)
       verify
-
       page_number, per_page = page_number.to_i, per_page.to_i
       from = page_number * per_page
       to   = from + per_page - 1
 
       fetch(from, to)
-
-      elements          = @buffered_zset.to_a
-      @buffered_zset    = MemoryBackend.new
-      @buffered_zset.merge elements
-      @current_backend  = @buffered_zset
       @collection
     end #page
 
     def fetch(from=0, to=-1)
       verify
       @backlog.clear
-      @buffered_zset    = MemoryBackend.new
+      @buffered_zset.clear
       @buffered_zset.merge @persisted_zset.fetch(from, to)
       @current_backend  = @buffered_zset
       @collection
