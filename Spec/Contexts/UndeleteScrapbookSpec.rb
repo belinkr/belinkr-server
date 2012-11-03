@@ -1,38 +1,42 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
 require_relative '../../App/Contexts/UndeleteScrapbook'
-require_relative '../../App/Contexts/CreateScrapbook'
-require_relative '../../App/Contexts/DeleteScrapbook'
-require_relative '../../App/Scrapbook/Collection'
-require_relative '../Factories/Scrapbook'
-require_relative '../Factories/User'
+require_relative '../Doubles/Collection/Double'
+require_relative '../Doubles/Scrapbook/Double'
 
 include Belinkr
 
 describe 'undelete scrapbook' do
   before do
-    @actor      = Factory.user
-    @scrapbook  = Scrapbook::Member.new(name: 'scrapbook 1')
-    @scrapbooks = Scrapbook::Collection.new(user_id: @actor.id, kind: 'own')
-    @scrapbooks.reset
-    CreateScrapbook.new(@actor, @scrapbook, @scrapbooks).call
-    DeleteScrapbook.new(@actor, @scrapbook, @scrapbooks).call
+    @actor      = OpenStruct.new
+    @scrapbook  = Scrapbook::Double.new
+    @scrapbooks = Collection::Double.new
   end
 
   it 'marks the scrapbook as not deleted' do
-    @scrapbook.deleted_at.wont_be_nil
-    UndeleteScrapbook.new(@actor, @scrapbook, @scrapbooks).call
-    @scrapbook.deleted_at.must_be_nil
+    scrapbook = Minitest::Mock.new
+    context   = UndeleteScrapbook.new(
+      actor:      @actor,
+      scrapbook:  scrapbook, 
+      scrapbooks: @scrapbooks
+    )
+    scrapbook.expect :authorize, scrapbook, [@actor, :undelete]
+    scrapbook.expect :undelete, scrapbook
+    context.call
+    scrapbook.verify
   end
 
   it 'adds the scrapbook to own the scrapbooks collection of the actor' do
-    @scrapbooks.wont_include @scrapbook
-    UndeleteScrapbook.new(@actor, @scrapbook, @scrapbooks).call
-    @scrapbooks.must_include @scrapbook
-  end
-
-  it 'raises NotAllowed if user is not the owner of the scrapbook' do
-    lambda { UndeleteScrapbook.new(Factory.user, @scrapbook, @changes).call }
-      .must_raise Tinto::Exceptions::NotAllowed
+    scrapbooks  = Minitest::Mock.new
+    context     = UndeleteScrapbook.new(
+      actor:      @actor,
+      scrapbook:  @scrapbook,
+      scrapbooks: scrapbooks
+    )
+    scrapbooks.expect :add, scrapbooks, [@scrapbook]
+    context.call
+    scrapbooks.verify
   end
 end # undelete scrapbook
+

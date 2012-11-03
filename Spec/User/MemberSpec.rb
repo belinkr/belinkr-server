@@ -2,8 +2,10 @@
 require 'minitest/autorun'
 require_relative '../../Locales/Loader'
 require_relative '../../App/User/Member'
+require_relative '../../Tinto/Exceptions'
 
 include Belinkr
+include Tinto::Exceptions
 
 describe User::Member do
   describe '#validations' do
@@ -83,14 +85,41 @@ describe User::Member do
 
   describe '#name' do
     it 'is initialized to the localized name according to the name order' do
-      user =  User::Member.new(first: 'John', last: 'Doe')
+      user = User::Member.new(first: 'John', last: 'Doe')
       user.name.must_equal 'John Doe'
 
-      user =  User::Member.new(first: 'John', last: 'Doe', name_order: 'first-last')
+      user = User::Member
+              .new(first: 'John', last: 'Doe', name_order: 'first-last')
       user.name.must_equal 'John Doe'
 
-      user =  User::Member.new(first: 'John', last: 'Doe', name_order: 'last-first')
+      user = User::Member
+              .new(first: 'John', last: 'Doe', name_order: 'last-first')
       user.name.must_equal 'Doe John'
     end
-  end
+  end #name
+ 
+  describe '#register_in' do
+    it 'registers the email and id in the locator service' do
+      user = User::Member.new(
+        first:    'John',
+        last:     'Doe', 
+        email:    'jdoe@foo.com',
+        password: 'changeme'
+      )
+
+      user_locator = Minitest::Mock.new
+
+      user_locator.expect :add, user_locator, [user.email, user.id]
+      user.register_in(user_locator)
+      user_locator.verify
+    end
+
+    it 'raises if user invaid' do
+      user          = User::Member.new
+      user_locator  = Minitest::Mock.new
+
+      user_locator.expect :add, user_locator, [user.email, user.id]
+      lambda { user.register_in(user_locator) }.must_raise InvalidMember
+    end 
+  end #register_in
 end # User::Member

@@ -1,21 +1,19 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
 require_relative '../../App/Contexts/CreateEntity'
-require_relative '../../App/Entity/Collection'
-require_relative '../Factories/Entity'
 
 include Belinkr
 
 describe 'create entity' do
-  before do
-    @entity   = Factory.entity
-    @entities = Entity::Collection.new.reset
-  end
-
   it 'adds an entity to the entities collection' do
-    @entities.wont_include @entity
-    CreateEntity.new(@entity, @entities).call
-    @entities.must_include @entity
+    entity    = OpenStruct.new
+    entities  = Minitest::Mock.new
+    context   = CreateEntity.new(entity: entity, entities: entities)
+
+    entities.expect :add, entity, [entity]
+    context.call
+    entities.verify
   end
 end # create entity
 

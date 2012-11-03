@@ -9,43 +9,25 @@ module Belinkr
     include Tinto::Context
     include Tinto::Exceptions
 
-    BASE_PATH = "https://#{Belinkr::Config::HOSTNAME}/resets"
-
-    def initialize(actor, reset, resets, message)
-      @actor    = actor
-      @reset    = reset
-      @resets   = resets
-      @message  = message
+    def initialize(arguments)
+      @actor    = arguments.fetch(:actor)
+      @reset    = arguments.fetch(:reset)
+      @resets   = arguments.fetch(:resets)
+      @message  = arguments.fetch(:message)
     end
 
     def call
-      @reset.email    = @actor.email
-      @reset.user_id  = @actor.id
+      reset.link_to(actor)
+      resets.add(reset)
+      message.prepare(:reset_for, actor, reset)
 
-      @reset.verify
-      @resets.add @reset
-      @message.attributes = message_for(@actor, @reset)
-      raise InvalidResource unless @message.valid?
-
-      @to_sync = [@reset, @resets, @message]
-      @reset
+      will_sync reset, resets, message
     end #call
 
     private
 
-    def message_for(actor, reset)
-      {
-        from:           'belinkr <help@belinkr.com>',
-        to:             "#{actor.name} <#{reset.email}>",
-        subject:        I18n::t('mailer.reset.subject'),
-        template:       'reset',
-        locale:         reset.locale,
-        substitutions:  {
-                          user_name:  actor.name,
-                          reset_link: "#{BASE_PATH}/#{reset.id}"
-                        }
-      }
-    end
+    attr_reader :actor, :reset, :resets, :message
+
   end # RequestPasswordReset
 end # Belinkr
 

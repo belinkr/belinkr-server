@@ -1,43 +1,45 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
 require_relative '../../App/Contexts/LogIntoEntity'
-require_relative '../../App/Session/Collection'
-require_relative '../../Tinto/Exceptions'
-require_relative '../Factories/User'
+require_relative '../Doubles/Collection/Double'
+require_relative '../Doubles/User/Double'
 
 include Belinkr
 
 describe 'log into entity' do
-  before do
-    @user     = Factory.user(password: 'test')
-    @session  = Session::Member.new 
-    @sessions = Session::Collection.new.reset
-  end
-  
-  it 'saves a new session if password matches' do
-    session = LogIntoEntity.new(@user, 'test', @session, @sessions).call
+  it 'validates user and password' do
+    actor     = Minitest::Mock.new
+    session   = OpenStruct.new
+    sessions  = Collection::Double.new
+    plaintext = 'secret'
 
-    session.id          .wont_be_nil
-    session.user_id     .must_equal @user.id
-    session.profile_id  .must_equal @user.profiles.first.id
-    session.entity_id   .must_equal @user.profiles.first.entity_id
+    context   = LogIntoEntity.new(
+      actor:      actor, 
+      plaintext:  plaintext, 
+      session:    session, 
+      sessions:   sessions
+    )
+    actor.expect :authenticate, session, [session, plaintext]
+    context.call
+    actor.verify
   end
 
   it 'adds the session to the sessions collection' do
-    session = LogIntoEntity.new(@user, 'test', @session, @sessions).call
-    @sessions.must_include session
-  end
+    actor     = User::Double.new
+    session   = OpenStruct.new
+    sessions  = Minitest::Mock.new
+    plaintext = 'secret'
 
-  it 'raises NotAllowed if password does not match' do
-    lambda { LogIntoEntity.new(@user, 'fake', @session, @sessions).call }
-      .must_raise Tinto::Exceptions::NotAllowed
-    @sessions.must_be_empty
-  end
-
-  it 'raises not allowed if user is deleted' do
-    @user.delete
-    lambda { LogIntoEntity.new(@user, 'test', @session, @sessions).call }
-      .must_raise Tinto::Exceptions::NotAllowed
-    @sessions.must_be_empty
+    context   = LogIntoEntity.new(
+      actor:      actor, 
+      plaintext:  plaintext, 
+      session:    session, 
+      sessions:   sessions
+    )
+    sessions.expect :add, sessions, [session]
+    context.call
+    sessions.verify
   end
 end # log into entity
+

@@ -1,29 +1,61 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
 require_relative '../../App/Contexts/RequestPasswordReset'
-require_relative '../Factories/User'
-require_relative '../Factories/Reset'
-require_relative '../../App/Reset/Collection'
-require_relative '../../Workers/Mailer/Message'
+require_relative '../Doubles/Collection/Double'
+require_relative '../Doubles/Reset/Double'
+require_relative '../Doubles/Message/Double'
 
 include Belinkr
 
 describe 'request password reset' do
   before do
-    @actor    = Factory.user
-    @reset    = Factory.reset
-    @resets   = Reset::Collection.new.reset
-    @message  = Mailer::Message.new
+    @actor    = OpenStruct.new
+    @reset    = Reset::Double.new
+    @resets   = Collection::Double.new
+    @message  = Message::Double.new
   end
-  
-  it 'adds the reset to the resets collection' do
-    @resets.wont_include @reset
-    RequestPasswordReset.new(@actor, @reset, @resets, @message).call
-    @resets.must_include @reset
+ 
+  it 'links the reset to the actor' do
+    reset = Minitest::Mock.new
+    context = RequestPasswordReset.new(
+      actor:    @actor,
+      reset:    reset,
+      resets:   @resets,
+      message:  @message
+    )
+    
+    reset.expect :link_to, reset, [@actor]
+    context.call
+    reset.verify
   end
 
-  it 'sends a password reset e-mail' do
-    RequestPasswordReset.new(@actor, @reset, @resets, @message).call
-    @message.substitutions.fetch(:user_name).must_equal @actor.name
+  it 'adds the reset to the resets collection' do
+    resets = Minitest::Mock.new
+    context = RequestPasswordReset.new(
+      actor:    @actor,
+      reset:    @reset,
+      resets:   resets,
+      message:  @message
+    )
+
+    resets.expect :add, resets, [@reset]
+    context.call
+    resets.verify
   end
-end
+
+  it 'prepares a password reset e-mail' do
+    message = Minitest::Mock.new
+    context = RequestPasswordReset.new(
+      actor:    @actor,
+      reset:    @reset,
+      resets:   @resets,
+      message:  message
+    )
+
+    message.expect :prepare, message, [:reset_for, @actor, @reset]
+    context.call
+    message.verify
+  end
+end # request password reset
+

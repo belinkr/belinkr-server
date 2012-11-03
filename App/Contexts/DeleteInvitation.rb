@@ -5,20 +5,23 @@ module Belinkr
   class DeleteInvitation
     include Tinto::Context
 
-    def initialize(actor, invitation, invitations, entity)
-      @actor        = actor
-      @entity       = entity
-      @invitation   = invitation
-      @invitations  = invitations
+    def initialize(arguments)
+      @actor        = arguments.fetch(:actor)
+      @invitation   = arguments.fetch(:invitation)
+      @invitations  = arguments.fetch(:invitations)
     end # initialize
 
     def call
-      @invitation.delete
-      @invitations.delete @invitation
+      invitation.authorize(actor, :delete)
+      invitation.delete
+      invitations.delete invitation
 
-      @to_sync = [@invitation, @invitations]
-      @invitation
+      will_sync invitation, invitations
     end # call
+
+    private
+
+    attr_reader :actor, :invitation, :invitations
   end # DeleteInvitation
 end # Belinkr
 

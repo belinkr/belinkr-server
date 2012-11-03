@@ -6,21 +6,21 @@ module Belinkr
   class ResetPassword
     include Tinto::Context
 
-    def initialize(actor, user_changes, reset, resets=Reset::Collection.new)
-      @actor        = actor
-      @user_changes = user_changes
-      @reset        = reset
-      @resets       = resets
+    attr_reader :actor, :user_changes, :reset, :resets
+
+    def initialize(arguments)
+      @actor        = arguments.fetch(:actor)
+      @user_changes = arguments.fetch(:user_changes)
+      @reset        = arguments.fetch(:reset)
+      @resets       = arguments.fetch(:resets) || Reset::Collection.new
     end #initialize
 
     def call
-      @actor.update(@user_changes)
-      @actor.verify
-      @reset.delete
-      @resets.delete @reset
+      actor.update(user_changes)
+      reset.delete
+      resets.delete reset
 
-      @to_sync = [@actor, @reset, @resets]
-      @reset
+      will_sync actor, reset, resets
     end #call
   end # ResetPassword
 end # Belinkr

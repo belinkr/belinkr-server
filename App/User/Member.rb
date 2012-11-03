@@ -75,6 +75,35 @@ module Belinkr
         "#{MODEL_NAME}/#{id}"
       end
 
+      def register_in(user_locator)
+        validate!
+        user_locator.add(email, id) 
+        self
+      end #register_in
+
+      def add_profile(profile)
+        profile.user_id   = self.id
+        profile.entity_id = self.entity_id
+
+        profile.validate!
+        self.validate!
+        self.profiles.push profile
+      end #add_profile
+
+
+      def authenticate(session, plaintext)
+        raise NotAllowed unless password_matches?(actor.password, plaintext)
+        raise NotAllowed if actor.deleted?
+        session.user_id    = id
+        session.profile_id = profiles.first.id
+        session.entity_id  = profiles.first.entity_id
+        session
+      end
+
+      def password_matches?(plaintext)
+        BCrypt::Password.new(password).is_password?(plaintext)
+      end # password_matches?
+
       private
 
       def password_hash_for(plaintext)

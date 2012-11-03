@@ -1,28 +1,30 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
 require_relative '../../App/Contexts/DeleteEntity'
-require_relative '../../App/Contexts/CreateEntity'
-require_relative '../../App/Entity/Collection'
-require_relative '../Factories/Entity'
+require_relative '../Doubles/Collection/Double'
 
 include Belinkr
 
 describe 'delete entity' do 
-  before do
-    @entity   = Factory.entity
-    @entities = Entity::Collection.new.reset
-    CreateEntity.new(@entity, @entities).call
-  end
   it 'marks the entity as deleted' do
-    @entity.deleted_at.must_be_nil
-    DeleteEntity.new(@entity, @entities).call
-    @entity.deleted_at.wont_be_nil
+    entity    = Minitest::Mock.new
+    entities  = Collection::Double.new
+    context   = DeleteEntity.new(entity: entity, entities: entities)
+
+    entity.expect :delete, entity
+    context.call
+    entity.verify
   end
 
   it 'removes it from the entities collection' do
-    @entities.must_include @entity
-    DeleteEntity.new(@entity, @entities).call
-    @entities.wont_include @entity
+    entity    = OpenStruct.new
+    entities  = Minitest::Mock.new
+    context   = DeleteEntity.new(entity: entity, entities: entities)
+
+    entities.expect :delete, entities, [entity]
+    context.call
+    entities.verify
   end
 end # delete entity
 

@@ -1,57 +1,73 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'ostruct'
-require_relative '../../App/Contexts/CreateWorkspace'
-require_relative '../../App/Contexts/DeleteWorkspace'
+require 'set'
 require_relative '../../App/Contexts/UndeleteWorkspace'
-require_relative '../../App/Workspace/Collection'
-require_relative '../../App/Workspace/Util'
-require_relative '../../App/Workspace/Membership/Tracker'
-require_relative '../Factories/Workspace'
-require_relative '../Factories/Entity'
-require_relative '../Factories/User'
+require_relative '../Doubles/Collection/Double'
+require_relative '../Doubles/Workspace/Double'
+require_relative '../Doubles/Workspace/TrackerDouble'
 
 include Belinkr
-include Workspace::Util
 
-describe 'undelete workspace' do
+describe 'delete workspace' do
   before do
-    @entity     = Factory.entity
-    @actor      = Factory.user(entity_id: @entity.id)
-    @workspace  = Workspace::Member.new(name: 'workspace 1')
-    @workspaces = Workspace::Collection.new(entity_id: @entity.id, kind: 'all')
-    @workspaces.reset
-    @tracker    = Workspace::Membership::Tracker.new(@entity.id, @workspace.id)
-                    .reset
-    (1..5).map { |user_id| @tracker.add 'collaborator', user_id }
+    @actor      = OpenStruct.new
+    @workspace  = Workspace::Double.new
+    @workspaces = Collection::Double.new
+    @tracker    = Workspace::TrackerDouble.new
+  end
 
-    CreateWorkspace.new(@actor, @workspace, @workspaces, @entity, @tracker).call
-
-    @memberships = @tracker.map { |m| m.reset.add(@workspace) }
-    context = DeleteWorkspace.new(@actor, @workspace, @workspaces, @memberships)
-    context.administrators.reset
-    context.administrators.add @actor
+  it 'checks privileges for this actor' do
+    workspace = Minitest::Mock.new
+    context   = UndeleteWorkspace.new(
+      workspace:  workspace,
+      actor:      @actor,
+      workspaces: @workspaces,
+      tracker:    @tracker
+    )
+    workspace.expect :authorize, true, [@actor, :undelete]
     context.call
+    workspace.verify
   end
 
   it 'adds the workspace to the workspace collection of the entity' do
-    @workspaces.wont_include @workspace
-    context = UndeleteWorkspace.new(@actor, @workspace, @workspaces, @tracker)
-    context.administrators.reset
-    context.administrators.add @actor
+    workspaces  = Minitest::Mock.new
+    context     = UndeleteWorkspace.new(
+      workspace:  @workspace,
+      actor:      @actor,
+      workspaces: workspaces,
+      tracker:    @tracker
+    )
+    workspaces.expect :add, true, [@workspace]
     context.call
-    @workspaces.must_include @workspace
+    workspaces.verify
   end
 
-  it 'adds the workspace to the memberships of all collaborators' do
-    context = UndeleteWorkspace
-              .new(@actor, @workspace, @workspaces, @memberships)
-    context.administrators.reset
-    context.administrators.add @actor
+  it 'adds the workspace to the memberships of all users involved' do
+    tracker = Minitest::Mock.new
+    context = UndeleteWorkspace.new(
+      workspace:  @workspace,
+      actor:      @actor,
+      workspaces: @workspaces,
+      tracker:    tracker
+    )
 
-    @memberships.first.wont_include @workspace
+    tracker.expect :link_to_all, true, [@workspace]
     context.call
-    @memberships.first.must_include @workspace
+    tracker.verify
   end
-end # undelete workspace
+
+  it 'will sync the workspace, workspaces and tracker' do
+    context = UndeleteWorkspace.new(
+      workspace:  @workspace,
+      actor:      @actor,
+      workspaces: @workspaces,
+      tracker:    @tracker
+    )
+    context.call
+    context.syncables.must_include @workspace
+    context.syncables.must_include @workspaces
+    context.syncables.must_include @tracker
+  end
+end # delete workspace
 

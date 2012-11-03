@@ -3,23 +3,24 @@ require 'minitest/autorun'
 require 'redis'
 require_relative '../../../App/Workspace/Membership/Tracker'
 
-include Belinkr::Workspace
+include Belinkr
 
 $redis ||= Redis.new
 $redis.select 8
 
-describe Membership::Tracker do
+describe Workspace::Membership::Tracker do
   before do
     $redis.flushdb
     @entity_id    = 1
     @workspace_id = 2
-    @tracker      = Membership::Tracker.new(@entity_id, @workspace_id)
+    @tracker      = Workspace::Membership::Tracker
+                      .new(@entity_id, @workspace_id)
   end
 
   describe '#initialize' do
     it 'requires an entity id and a workspace id' do
-      lambda { Membership::Tracker.new }.must_raise ArgumentError
-      lambda { Membership::Tracker.new 1 }.must_raise ArgumentError
+      lambda { Workspace::Membership::Tracker.new }.must_raise ArgumentError
+      lambda { Workspace::Membership::Tracker.new 1 }.must_raise ArgumentError
     end
   end #initialize
 
@@ -151,7 +152,7 @@ describe Membership::Tracker do
       @tracker.reset
       @tracker.add 'administrator', 5
       memberships = @tracker.map.first
-      memberships.must_be_instance_of Membership::Collection
+      memberships.must_be_instance_of Workspace::Membership::Collection
       memberships.must_be :valid?
       memberships.kind      .must_equal 'administrator'
       memberships.user_id   .must_equal '5'

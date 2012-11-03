@@ -212,7 +212,7 @@ describe Tinto::Set do
       set     = Tinto::Set.new(@collection)
       element = factory(id: 5)
 
-      def element.verify; raise InvalidMember; end
+      def element.validate!; raise InvalidMember; end
       lambda { set.add(element) }.must_raise InvalidMember
     end
   end #add
@@ -244,7 +244,7 @@ describe Tinto::Set do
       set     = Tinto::Set.new(@collection)
       element = factory(id: 5)
 
-      def element.verify; raise InvalidMember; end
+      def element.validate!; raise InvalidMember; end
       lambda { set.delete(element) }.must_raise InvalidMember
     end
   end #delete
@@ -274,7 +274,7 @@ describe Tinto::Set do
 
   def factory(attrs={})
     member = OpenStruct.new(attrs)
-    def member.verify; true; end
+    def member.validate!; true; end
     member
   end
 end # Tinto::Set

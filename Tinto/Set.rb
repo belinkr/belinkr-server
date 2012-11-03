@@ -8,7 +8,7 @@ module Tinto
     include Enumerable
     include Tinto::Exceptions
 
-    INTERFACE = %w{ verify in_memory? sync synced? page fetch reset each size
+    INTERFACE = %w{ validate! in_memory? sync synced? page fetch reset each size
                     length empty? exists? include? first add merge delete
                     clear first }
 
@@ -24,29 +24,29 @@ module Tinto
       @persisted_set.storage_key
     end #storage_key
 
-    def verify
+    def validate!
       raise InvalidCollection unless @collection.valid?
-    end #verify
+    end #validate!
 
     def in_memory?
-      verify
+      validate!
       @current_backend == @buffered_set
     end #in_memory?
 
     def sync
-      verify
+      validate!
       $redis.pipelined { @backlog.each { |command| command.call } }
       @backlog.clear
       @collection
     end #sync
 
     def synced?
-      verify
+      validate!
       @backlog.empty?
     end #synced?
 
     def page(page_number=0, per_page=20)
-      verify
+      validate!
       fetch
 
       page_number, per_page = page_number.to_i, per_page.to_i
@@ -60,7 +60,7 @@ module Tinto
     end #page
 
     def fetch
-      verify
+      validate!
       @backlog.clear
       @buffered_set.clear
       @buffered_set.merge @persisted_set.fetch
@@ -69,7 +69,7 @@ module Tinto
     end #fetch
 
     def reset(members=[])
-      verify
+      validate!
       @backlog.clear
       @current_backend  = @buffered_set
       clear
@@ -78,7 +78,7 @@ module Tinto
     end #reset
 
     def each
-      verify
+      validate!
       fetch unless in_memory?
       return Enumerator.new(self, :each) unless block_given?
       @buffered_set.each do |id| 
@@ -87,7 +87,7 @@ module Tinto
     end #each
 
     def size
-      verify
+      validate!
       @current_backend.size
     end #size
 
@@ -98,18 +98,18 @@ module Tinto
     end #empty?
 
     def include?(member)
-      verify
+      validate!
       @current_backend.include? member.id.to_s
     end
 
     def first
-      verify
+      validate!
       @collection.instantiate_member(id: @current_backend.first)
     end
 
     def add(member)
-      verify
-      member.verify
+      validate!
+      member.validate!
       member_id = member.id.to_s
       @buffered_set.add member_id
       @backlog.push(lambda { @persisted_set.add member_id })
@@ -117,9 +117,9 @@ module Tinto
     end #add
 
     def merge(members)
-      verify
+      validate!
       member_ids = members.map { |member|
-        member.verify
+        member.validate!
         member.id.to_s
       }
       @buffered_set.merge member_ids
@@ -128,8 +128,8 @@ module Tinto
     end #merge
 
     def delete(member)
-      verify
-      member.verify
+      validate!
+      member.validate!
       member_id = member.id.to_s
       @buffered_set.delete member_id
       @backlog.push(lambda { @persisted_set.delete member_id })
@@ -137,7 +137,7 @@ module Tinto
     end #delete
 
     def clear
-      verify
+      validate!
       @buffered_set.clear
       @backlog.push(lambda { @persisted_set.clear })
       @collection

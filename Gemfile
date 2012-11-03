@@ -26,4 +26,7 @@ group :test do
   gem 'guard'
   gem 'guard-minitest'
   gem 'libnotify'
+  gem 'rb-inotify', require: false
+  gem 'rb-fsevent', require: false
+  gem 'rb-fchange', require: false
 end

@@ -1,30 +1,30 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
 require_relative '../../App/Contexts/LogOut'
-require_relative '../../App/Contexts/LogIntoEntity'
-require_relative '../../App/Session/Collection'
-require_relative '../Factories/User'
+require_relative '../Doubles/Collection/Double'
 
 include Belinkr
 
 describe 'log out' do
-  before do
-    @user     = Factory.user(password: 'test')
-    @session  = Session::Member.new
-    @sessions = Session::Collection.new.reset
-    LogIntoEntity.new(@user, 'test', @session, @sessions).call
-  end
+  it 'expires the session' do
+    session   = Minitest::Mock.new
+    sessions  = Collection::Double.new
+    context   = LogOut.new(session: session, sessions: sessions)
 
-  it 'destroys the session' do
-    @session.id.wont_be_nil
-    LogOut.new(@session, @sessions).call
-    @session.id.must_be_nil
+    session.expect :expire, session
+    context.call
+    session.verify
   end
 
   it 'removes the session from the session collection' do
-    @sessions.must_include @session
-    LogOut.new(@session, @sessions).call
-    @sessions.wont_include @session
+    session   = OpenStruct.new
+    sessions  = Minitest::Mock.new
+    context   = LogOut.new(session: session, sessions: sessions)
+
+    sessions.expect :delete, sessions, [session]
+    context.call
+    sessions.verify
   end
-end
+end # log out
 

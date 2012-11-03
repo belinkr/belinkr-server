@@ -33,6 +33,15 @@ module Belinkr
       def storage_key
         "entities:#{entity_id}:workspaces"
       end
+
+      def authorize(actor, action)
+        action = :delete
+        #raise NotAllowed unless @administrators.include? @actor
+      end #authorize
+
+      def link_to(entity)
+        self.entity_id = entity
+      end #link_to
     end # Member
   end # Workspace
 end # Belinkr

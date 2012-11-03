@@ -6,19 +6,21 @@ module Belinkr
   class LogOut
     include Tinto::Context
 
-    def initialize(session, sessions=Session::Collection.new)
-      @session  = session
-      @sessions = sessions
+    def initialize(arguments)
+      @session  = arguments.fetch(:session)
+      @sessions = arguments.fetch(:sessions)
     end # initialize
 
     def call
-      @sessions.delete @session
-      @session.delete
-      @session.destroy
+      sessions.delete session
+      session.expire
 
-      @to_sync = [@sessions]
-      @session
+      will_sync sessions
     end # call
+    
+    private
+
+    attr_reader :session, :sessions
   end # LogOut
 end # Belinkr
 

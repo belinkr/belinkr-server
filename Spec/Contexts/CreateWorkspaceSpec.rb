@@ -1,65 +1,102 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
 require_relative '../../App/Contexts/CreateWorkspace'
-require_relative '../../App/Workspace/Collection'
-require_relative '../../App/Workspace/Util'
-require_relative '../../App/Workspace/Membership/Tracker'
-require_relative '../Factories/Workspace'
-require_relative '../Factories/Entity'
-require_relative '../Factories/User'
+require_relative '../Doubles/Collection/Double'
+require_relative '../Doubles/Workspace/Double'
+require_relative '../Doubles/Workspace/TrackerDouble'
 
 include Belinkr
-include Workspace::Util
 
 describe 'create workspace' do
   before do
-    @entity     = Factory.entity
-    @actor      = Factory.user(entity_id: @entity.id)
-    @workspace  = Workspace::Member.new(name: 'workspace 1')
-    @workspaces = Workspace::Collection.new(entity_id: @entity.id, kind: 'all')
-    @tracker    = Workspace::Membership::Tracker.new(@entity.id, @workspace.id)
-    @workspaces.reset
-    @tracker.reset
+    @actor                      = OpenStruct.new
+    @entity                     = OpenStruct.new
+    @workspace                  = Workspace::Double.new
+    @workspaces                 = Collection::Double.new
+    @administrators             = Collection::Double.new
+    @administrator_memberships  = Collection::Double.new
+    @tracker                    = Workspace::TrackerDouble.new
+  end
+
+  it 'links the workspace to the entity' do
+    workspace = Minitest::Mock.new
+    context   = CreateWorkspace.new(
+      actor:                      @actor,
+      workspace:                  workspace,
+      workspaces:                 @workspaces,
+      entity:                     @entity,
+      tracker:                    @tracker,
+      administrators:             @administrators,
+      administrator_memberships:  @administrator_memberships
+    )
+    workspace.expect :link_to, workspace, [@entity]  
+    context.call
+    workspace.verify
   end
 
   it 'adds the workspace to the workspace collection of the entity' do
-    @workspaces.wont_include @workspace
-    CreateWorkspace.new(@actor, @workspace, @workspaces, @entity, @tracker)
-      .call
-    @workspaces.must_include @workspace
+    workspaces  = Minitest::Mock.new
+    context     = CreateWorkspace.new(
+      actor:                      @actor,
+      workspace:                  @workspace,
+      workspaces:                 workspaces,
+      entity:                     @entity,
+      tracker:                    @tracker,
+      administrators:             @administrators,
+      administrator_memberships:  @administrator_memberships
+    )
+    workspaces.expect :add, workspaces, [@workspace]
+    context.call
+    workspaces.verify
   end
 
   it 'adds the actor to the administrators collection' do
-    @workspace.entity_id = @entity.id
-    administrators = administrators_for(@workspace)
-    administrators.reset
-
-    context =
-      CreateWorkspace.new(@actor, @workspace, @workspaces, @entity, @tracker)
-    context.administrators.reset
+    administrators  = Minitest::Mock.new
+    context         = CreateWorkspace.new(
+      actor:                      @actor,
+      workspace:                  @workspace,
+      workspaces:                 @workspaces,
+      entity:                     @entity,
+      tracker:                    @tracker,
+      administrators:             administrators,
+      administrator_memberships:  @administrator_memberships
+    )
+    administrators.expect :add, administrators, [@actor]
     context.call
-    context.administrators.must_include @actor
+    administrators.verify
   end
 
   it 'adds the workspace to the administrator memberships of the actor' do
-    administrator_memberships = memberships_for(@actor, @entity, 'administrator')
-    administrator_memberships.reset
-
-    context = 
-      CreateWorkspace.new(@actor, @workspace, @workspaces, @entity, @tracker)
-    context.administrator_memberships.reset
+    administrator_memberships = Minitest::Mock.new
+    context   = CreateWorkspace.new(
+      actor:                      @actor,
+      workspace:                  @workspace,
+      workspaces:                 @workspaces,
+      entity:                     @entity,
+      tracker:                    @tracker,
+      administrators:             @administrators,
+      administrator_memberships:  administrator_memberships
+    )
+    administrator_memberships.expect :add, nil, [@workspace]
     context.call
-    context.administrator_memberships.must_include @workspace
+    administrator_memberships.verify
   end
 
   it 'tracks the membership of the administrator' do
-    @tracker.to_a.must_be_empty
-    context = 
-      CreateWorkspace.new(@actor, @workspace, @workspaces, @entity, @tracker)
-    context.administrator_memberships.reset
+    tracker   = Minitest::Mock.new
+    context   = CreateWorkspace.new(
+      actor:                      @actor,
+      workspace:                  @workspace,
+      workspaces:                 @workspaces,
+      entity:                     @entity,
+      tracker:                    tracker,
+      administrators:             @administrators,
+      administrator_memberships:  @administrator_memberships
+    )
+    tracker.expect :add, tracker, ['administrator', @actor.id]
     context.call
-    context.administrator_memberships.must_include @workspace
-    @tracker.map.first.user_id.must_equal @actor.id
+    tracker.verify
   end
 end # create workspace
 

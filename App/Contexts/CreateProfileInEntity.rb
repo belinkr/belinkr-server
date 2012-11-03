@@ -1,39 +1,30 @@
 # encoding: utf-8
-require_relative '../Profile/Collection'
 require_relative '../User/Locator'
-require_relative '../../Tinto/Exceptions'
 require_relative '../../Tinto/Context'
 
 module Belinkr
   class CreateProfileInEntity
     include Tinto::Context
-    # Preconditions: an entity must be created
-    #
-    def initialize(actor, profile, profiles, entity, 
-    user_locator=User::Locator.new)
-      @actor        = actor
-      @profile      = profile
-      @profiles     = profiles
-      @entity       = entity
-      @user_locator = user_locator
+
+    def initialize(arguments)
+      @actor        = arguments.fetch(:actor)
+      @profile      = arguments.fetch(:profile)
+      @profiles     = arguments.fetch(:profiles)
+      @entity       = arguments.fetch(:entity)
+      @user_locator = arguments.fetch(:user_locator, User::Locator.new)
     end # initialize
 
     def call
-      @actor.verify
-      @user_locator.add(@actor.email, @actor.id) 
+      actor.register_in(user_locator)
+      profile.link_to(actor)
+      profiles.add(profile)
 
-      @profile.user_id    = @actor.id
-      @profile.entity_id  = @entity.id
-      @profile.verify
-
-      @actor.profiles.push @profile
-      @actor.verify
-
-      @profiles.add @profile
-
-      @to_sync = [@actor, @profile, @profiles, @user_locator]
-      @profile
+      will_sync actor, profile, profiles, user_locator
     end # call
+
+    private
+
+    attr_reader :actor, :profile, :profiles, :entity, :user_locator
   end # CreateProfileInEntity
 end # Belinkr
 

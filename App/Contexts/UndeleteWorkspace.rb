@@ -1,34 +1,29 @@
 # encoding: utf-8
 require_relative '../../Tinto/Context'
-require_relative '../../Tinto/Exceptions'
-require_relative '../Workspace/Util'
-require_relative '../Workspace/Membership/Collection'
 
 module Belinkr
   class UndeleteWorkspace
     include Tinto::Context
-    include Tinto::Exceptions
-    include Workspace::Util
 
-    attr_accessor :administrators
-
-    def initialize(actor, workspace, workspaces, tracker)
-      @actor          = actor
-      @workspace      = workspace
-      @workspaces     = workspaces
-      @administrators = administrators_for(@workspace)
-      @tracker        = tracker
+    def initialize(arguments)
+      @actor      = arguments.fetch(:actor)
+      @workspace  = arguments.fetch(:workspace)
+      @workspaces = arguments.fetch(:workspaces)
+      @tracker    = arguments.fetch(:tracker)
     end # initialize
 
     def call
-      raise NotAllowed unless @administrators.include? @actor
-      @workspace.verify
-      @workspaces.add @workspace
-      @tracker.each { |memberships| memberships.add @workspace }
+      workspace.authorize(actor, :undelete)
+      workspaces.add(workspace)
+      tracker.link_to_all(workspace)
+      #each { |memberships| memberships.add @workspace }
 
-      @to_sync = [@workspace, @workspaces, @tracker].flatten
-      @workspace
+      will_sync workspace, workspaces, tracker
     end # call
+
+    private
+
+    attr_reader :actor, :workspace, :workspaces, :tracker
   end # UndeleteWorkspace
 end # Belinkr
 

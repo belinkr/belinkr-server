@@ -29,11 +29,16 @@ module Belinkr
       def initialize(attributes={})
         super attributes
         @member = Tinto::Member.new self
-      end
+      end #initialize
 
       def storage_key
         'sessions'
-      end
+      end #storage_key
+
+      def expire
+        delete
+        destroy
+      end #expire
     end # Member
   end # Session
 end # Belinkr

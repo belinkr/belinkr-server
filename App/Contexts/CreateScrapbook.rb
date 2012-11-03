@@ -5,20 +5,21 @@ module Belinkr
   class CreateScrapbook
     include Tinto::Context
 
-    def initialize(actor, scrapbook, scrapbooks)
-      @actor          = actor
-      @scrapbook      = scrapbook
-      @scrapbooks     = scrapbooks
+    attr_reader :actor, :scrapbook, :scrapbooks
+
+    def initialize(arguments)
+      @actor      = arguments.fetch(:actor)
+      @scrapbook  = arguments.fetch(:scrapbook)
+      @scrapbooks = arguments.fetch(:scrapbooks)
     end
 
     def call
-      @scrapbook.user_id = @actor.id
-      @scrapbook.verify
-      @scrapbooks.add @scrapbook
+      scrapbook.user_id = actor.id
+      scrapbook.verify
+      scrapbooks.add scrapbook
 
-      @to_sync = [@scrapbook, @scrapbooks]
-      @scrapbook
-    end #to_sync
+      will_sync scrapbook, scrapbooks
+    end #call
   end # CreateScrapbook
 end # Belinkr
 

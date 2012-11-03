@@ -7,20 +7,23 @@ module Belinkr
     include Tinto::Context
     include Tinto::Exceptions
 
-    def initialize(actor, scrapbook, scrapbooks)
-      @actor      = actor
-      @scrapbook  = scrapbook
-      @scrapbooks = scrapbooks
+    def initialize(arguments)
+      @actor      = arguments.fetch(:actor)
+      @scrapbook  = arguments.fetch(:scrapbook)
+      @scrapbooks = arguments.fetch(:scrapbooks)
     end # initialize
 
     def call
-      raise NotAllowed unless @actor.id == @scrapbook.user_id
-      @scrapbook.delete
-      @scrapbooks.delete @scrapbook
+      scrapbook.authorize(actor, 'delete')
+      scrapbook.delete
+      scrapbooks.delete scrapbook
 
-      @to_sync = [@scrapbook, @scrapbooks]
-      @scrapbook
+      will_sync scrapbook, scrapbooks
     end # call
+
+    private
+
+    attr_reader :actor, :scrapbook, :scrapbooks
   end # DeleteScrapbook
 end # Belinkr
 

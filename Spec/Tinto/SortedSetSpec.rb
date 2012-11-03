@@ -236,7 +236,7 @@ describe Tinto::SortedSet do
       zset     = Tinto::SortedSet.new(@collection)
       element = factory(id: 5)
 
-      def element.verify; raise InvalidMember; end
+      def element.validate!; raise InvalidMember; end
       lambda { zset.add(element) }.must_raise InvalidMember
     end
   end #add
@@ -272,7 +272,7 @@ describe Tinto::SortedSet do
       zset     = Tinto::SortedSet.new(@collection)
       element = factory(id: 5)
 
-      def element.verify; raise InvalidMember; end
+      def element.validate!; raise InvalidMember; end
       lambda { zset.delete(element) }.must_raise InvalidMember
     end
   end #delete

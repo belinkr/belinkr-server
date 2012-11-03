@@ -7,20 +7,22 @@ module Belinkr
     include Tinto::Exceptions
     include Tinto::Context
 
-    def initialize(actor, scrapbook, scrapbook_changes)
-      @actor              = actor
-      @scrapbook          = scrapbook
-      @scrapbook_changes  = scrapbook_changes
+    def initialize(arguments)
+      @actor              = arguments.fetch(:actor)
+      @scrapbook          = arguments.fetch(:scrapbook)
+      @scrapbook_changes  = arguments.fetch(:scrapbook_changes)
     end #initialize
 
     def call
-      raise NotAllowed unless @actor.id == @scrapbook.user_id
-      @scrapbook.update(@scrapbook_changes)
-      @scrapbook.verify
+      scrapbook.authorize(actor, 'update')
+      scrapbook.update(scrapbook_changes)
 
-      @to_sync = [@scrapbook]
-      @scrapbook
+      will_sync scrapbook
     end # call
+
+    private
+
+    attr_reader :actor, :scrapbook, :scrapbook_changes
   end # EditScrapbook
 end # Belinkr
 

@@ -9,7 +9,7 @@ module Tinto
     include Enumerable
 
     NOT_IN_SET_SCORE  = -1.0
-    INTERFACE         = %w{ verify sync synced? page fetch reset each size
+    INTERFACE         = %w{ validate! sync synced? page fetch reset each size
                             length empty? exists? include? add merge delete 
                             clear score } 
 
@@ -21,29 +21,29 @@ module Tinto
       @backlog          = []
     end #initialize
 
-    def verify
+    def validate!
       raise InvalidCollection unless @collection.valid?
-    end #verify
+    end #validate!
 
     def in_memory?
-      verify
+      validate!
       @current_backend == @buffered_zset
     end #in_memory?
 
     def sync
-      verify
+      validate!
       $redis.pipelined { @backlog.each { |command| command.call } }
       @backlog.clear
       @collection
     end #sync
 
     def synced?
-      verify
+      validate!
       @backlog.empty?
     end #synced?
 
     def page(page_number=0, per_page=20)
-      verify
+      validate!
       page_number, per_page = page_number.to_i, per_page.to_i
       from = page_number * per_page
       to   = from + per_page - 1
@@ -53,7 +53,7 @@ module Tinto
     end #page
 
     def fetch(from=0, to=-1)
-      verify
+      validate!
       @backlog.clear
       @buffered_zset.clear
       @buffered_zset.merge @persisted_zset.fetch(from, to)
@@ -62,7 +62,7 @@ module Tinto
     end #fetch
 
     def reset(members=[])
-      verify
+      validate!
       @backlog.clear
       @current_backend  = @buffered_zset
       clear
@@ -75,7 +75,7 @@ module Tinto
     end #score
 
     def each
-      verify
+      validate!
       fetch unless in_memory?
       return Enumerator.new(self, :each) unless block_given?
       @buffered_zset.each do |score, id| 
@@ -84,7 +84,7 @@ module Tinto
     end #each
 
     def size
-      verify
+      validate!
       @current_backend.size
     end #size
 
@@ -95,18 +95,18 @@ module Tinto
     end #empty?
 
     def include?(member)
-      verify
+      validate!
       @current_backend.include? member.id.to_s
     end
 
     def first
-      verify
+      validate!
       @collection.instantiate_member(id: @current_backend.first)
     end
 
     def add(member)
-      verify
-      member.verify
+      validate!
+      member.validate!
       member_id = member.id.to_s
       score     = score_for(member)
       @buffered_zset.add score, member_id
@@ -115,7 +115,7 @@ module Tinto
     end #add
 
     def merge(members)
-      verify
+      validate!
       scores_and_member_ids = scores_and_member_ids_for(members)
       @buffered_zset.merge scores_and_member_ids
       @backlog.push(lambda { @persisted_zset.merge scores_and_member_ids })
@@ -123,8 +123,8 @@ module Tinto
     end #merge
 
     def delete(member)
-      verify
-      member.verify
+      validate!
+      member.validate!
       member_id = member.id.to_s
       @buffered_zset.delete member_id
       @backlog.push(lambda { @persisted_zset.delete member_id })
@@ -132,7 +132,7 @@ module Tinto
     end #delete
 
     def clear
-      verify
+      validate!
       @buffered_zset.clear
       @backlog.push(lambda { @persisted_zset.clear })
       @collection
@@ -144,7 +144,7 @@ module Tinto
 
     def scores_and_member_ids_for(members)
       members.map do |member|
-        member.verify
+        member.validate!
         [score_for(member), member.id.to_s]
       end
     end #scores_and_member_ids_for

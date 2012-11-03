@@ -1,37 +1,42 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require_relative '../../App/Contexts/InvitePersonToBelinkr'
-require_relative '../../App/Contexts/DeleteInvitation'
+require 'ostruct'
 require_relative '../../App/Contexts/UndeleteInvitation'
-require_relative '../../App/Invitation/Collection'
-require_relative '../../Workers/Mailer/Message'
-require_relative '../Factories/Invitation'
-require_relative '../Factories/Entity'
-require_relative '../Factories/User'
+require_relative '../Doubles/Invitation/Double'
+require_relative '../Doubles/Collection/Double'
 
 include Belinkr
 
-describe 'delete invitation' do
-  before do
-    @entity       = Factory.entity
-    @invitation   = Factory.invitation(entity_id: @entity.id)
-    @invitations  = Invitation::Collection.new(entity_id: @entity.id).reset
-    @actor        = Factory.user(entity_id: @entity.id)
-    @message      = Mailer::Message.new
-    InvitePersonToBelinkr.new(@actor, @invitation, @invitations, @entity,
-      @message).call
-    DeleteInvitation.new(@actor, @invitation, @invitations, @entity).call
-  end
-
+describe 'undelete invitation' do
   it 'marks the invitation as not deleted' do
-    @invitation.deleted_at.wont_be_nil
-    UndeleteInvitation.new(@actor, @invitation, @invitations, @entity).call
-    @invitation.deleted_at.must_be_nil
+    actor       = OpenStruct.new
+    invitation  = Minitest::Mock.new
+    invitations = Collection::Double.new
+    context     = UndeleteInvitation.new(
+      actor:        actor,
+      invitation:   invitation,
+      invitations:  invitations
+    )
+
+    invitation.expect :authorize, invitation, [actor, :undelete]
+    invitation.expect :undelete, invitation
+    context.call
+    invitation.verify
   end
 
   it 'adds the invitation to the invitations collection of the entity' do
-    UndeleteInvitation.new(@actor, @invitation, @invitations, @entity).call
-    @invitations.must_include @invitation
+    actor       = OpenStruct.new
+    invitation  = Invitation::Double.new
+    invitations = Minitest::Mock.new
+    context     = UndeleteInvitation.new(
+      actor:        actor,
+      invitation:   invitation,
+      invitations:  invitations
+    )
+
+    invitations.expect :add, invitations, [invitation]
+    context.call
+    invitations.verify
   end
-end
+end # undelete invitation
 

@@ -66,6 +66,14 @@ module Belinkr
           @buffered_set.delete element
           self
         end #delete
+        
+        def link_to_all(workspaces)
+          each { |memberships| memberships.add workspace }
+        end
+
+        def unlink_from_all(workspace)
+          each { |memberships| memberships.delete workspace }
+        end #unlink_from_all
 
         def each
           fetch unless fetched?

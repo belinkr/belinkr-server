@@ -1,25 +1,27 @@
 # encoding: utf-8
-require_relative '../Invitation/Collection'
 require_relative '../../Tinto/Context'
 
 module Belinkr
   class UndeleteInvitation
     include Tinto::Context
 
-    def initialize(actor, invitation, invitations, entity)
-      @actor        = actor
-      @entity       = entity
-      @invitation   = invitation
-      @invitations  = invitations
+    def initialize(arguments)
+      @actor        = arguments.fetch(:actor)
+      @invitation   = arguments.fetch(:invitation)
+      @invitations  = arguments.fetch(:invitations)
     end #initialize
 
     def call
-      @invitation.undelete
-      @invitations.add @invitation
+      invitation.authorize(actor, :undelete)
+      invitation.undelete
+      invitations.add(invitation)
 
-      @to_sync = [@invitation, @invitations]
-      @invitation
+      will_sync invitation, invitations
     end #call
+
+    private
+
+    attr_reader :actor, :invitation, :invitations, :entity
   end # UndeleteInvitation
 end # Belinkr
 

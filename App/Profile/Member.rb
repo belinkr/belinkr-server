@@ -50,6 +50,11 @@ module Belinkr
       def user
         @user ||= User::Member.new(id: user_id).fetch
       end
+
+      def link_to(user)
+        user.add_profile(self)
+        self
+      end
     end # Member
   end # Profile
 end # Belinkr

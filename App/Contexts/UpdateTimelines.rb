@@ -16,8 +16,8 @@ module Belinkr
     def call
       timelines = timelines_for(@context) + follower_timelines_for(@followers)
       timelines.each { |timeline| yield timeline } if block_given?
+      will_sync timelines
 
-      @to_sync = [*timelines]
     end #call
 
     private

@@ -73,6 +73,9 @@ module Belinkr
         'invitations'
       end
 
+      def authorize(*args)
+      end
+
       private
 
       def sync_state

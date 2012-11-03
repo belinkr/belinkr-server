@@ -44,23 +44,23 @@ describe Tinto::Member do
       def resource.valid?(context=nil); context == 'workspace'; end
 
       member    = Tinto::Member.new resource, 'foo'
-      lambda { member.verify }.must_raise InvalidMember
+      lambda { member.validate! }.must_raise InvalidMember
 
       member    = Tinto::Member.new resource, 'workspace'
-      member.verify
+      member.validate!
     end
   end #initialize
 
-  describe '#verify' do
+  describe '#validate!' do
     it 'raises if resource invalid' do
       resource  = OpenStruct.new
       member    = Tinto::Member.new resource, 'foo'
 
       def resource.valid?(*args); false; end
-      lambda { member.verify }.must_raise InvalidMember
+      lambda { member.validate! }.must_raise InvalidMember
 
       def resource.valid?(*args); true; end
-      member.verify
+      member.validate!
     end
 
     it 'validates in context if passed at initialization' do
@@ -68,12 +68,12 @@ describe Tinto::Member do
       def resource.valid?(context=nil); context =='workspace'; end
 
       member    = Tinto::Member.new resource, 'foo'
-      lambda { member.verify }.must_raise InvalidMember
+      lambda { member.validate! }.must_raise InvalidMember
 
       member    = Tinto::Member.new resource, 'workspace'
-      member.verify
+      member.validate!
     end
-  end #verify
+  end #validate!
 
   describe '#attributes' do
     it 'delegates to the member resource attributes' do

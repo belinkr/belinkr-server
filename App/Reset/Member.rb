@@ -35,6 +35,12 @@ module Belinkr
       def storage_key
         'resets'
       end
+
+      def link_to(actor)
+        self.email    = actor.email
+        self.user_id  = actor.id
+        reset
+      end #link_to
     end # Member
   end # Reset
 end # Belinkr

@@ -74,7 +74,7 @@ describe Activity::Member do
       activity.actor.kind           .must_equal 'user'
       activity.actor.resource.first .must_equal user.first
 
-      activity.verify
+      activity.validate!
       serialized  = activity.to_json
       activity    = Activity::Member.new(JSON.parse(serialized))
 

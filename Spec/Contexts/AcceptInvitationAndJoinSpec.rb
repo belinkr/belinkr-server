@@ -1,48 +1,70 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
+require 'set'
 require_relative '../../App/Contexts/AcceptInvitationAndJoinEntity'
-require_relative '../../App/Contexts/InvitePersonToBelinkr'
-require_relative '../../Workers/Mailer/Message'
-require_relative '../../App/Invitation/Collection'
-require_relative '../Factories/Invitation'
-require_relative '../Factories/User'
-require_relative '../Factories/Entity'
-require_relative '../../Workers/Mailer/Message'
 
 include Belinkr
 
 describe 'accept invitation and join' do
   before do
-    @entity       = Factory.entity
-    @actor        = Factory.user(profiles: [])
-    @inviter      = Factory.user(entity_id: @entity.id)
-    @invitation   = Factory.invitation(entity_id: @entity.id)
-    @invitations  = Invitation::Collection.new(entity_id: @entity.id).reset
-    @message      = Mailer::Message.new
-
-
-    InvitePersonToBelinkr.new(@inviter, @invitation, @invitations, @entity,
-      @message).call
+    @entity       = OpenStruct.new
+    @actor        = OpenStruct.new
+    @profile      = OpenStruct.new
+    @inviter      = OpenStruct.new
+    @invitation   = OpenStruct.new
+    @invitations  = Set.new
+    @profiles     = Set.new
   end
 
   it 'marks the invitation as accepted' do
-    @invitation.accepted?.must_equal false
-    AcceptInvitationAndJoinEntity.new(@actor, @invitation, @entity).call
-    @invitation.accepted?.must_equal true
+    @invitation = MiniTest::Mock.new
+
+    context = AcceptInvitationAndJoinEntity.new(
+      actor:      @actor,
+      invitation: @invitation,
+      entity:     @entity,
+      profile:    @profile,
+      profiles:   @profiles
+    )
+    context.create_profile_context    = OpenStruct.new
+    context.register_activity_context = OpenStruct.new
+
+    @invitation.expect :accept, @invitation
+    context.call
+    @invitation.verify
   end
 
-  it 'generates a profile for the actor' do
-    @actor.profiles.must_be_empty
-    AcceptInvitationAndJoinEntity.new(@actor, @invitation, @entity).call
-    @actor.profiles.wont_be_empty
+  it 'creates a profile for the actor' do
+    context = AcceptInvitationAndJoinEntity.new(
+      actor:      @actor,
+      invitation: @invitation,
+      entity:     @entity,
+      profile:    @profile,
+      profiles:   @profiles
+    )
+    context.register_activity_context = OpenStruct.new
+    context.create_profile_context    = MiniTest::Mock.new
+
+    context.create_profile_context.expect :call, nil
+    context.call
+    context.create_profile_context.verify
   end
 
   it 'registers an activity' do
-    skip
-    AcceptInvitationAndJoinEntity.new(@actor, @invitation, @entity).call
-    activity = Activity::Collection.new(entity_id: @entity.id).all.first
-    activity.action.must_equal 'accept'
-    activity.object.resource.id.must_equal @invitation.id
+    context = AcceptInvitationAndJoinEntity.new(
+      actor:      @actor,
+      invitation: @invitation,
+      entity:     @entity,
+      profile:    @profile,
+      profiles:   @profiles
+    )
+    context.create_profile_context    = OpenStruct.new
+    context.register_activity_context = MiniTest::Mock.new
+
+    context.register_activity_context.expect :call, nil
+    context.call
+    context.register_activity_context.verify
   end
-end
+end # accept invitation and join
 

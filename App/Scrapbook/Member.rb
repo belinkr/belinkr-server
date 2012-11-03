@@ -34,6 +34,20 @@ module Belinkr
       def storage_key
         "users:#{user_id}:scrapbooks"
       end
+
+      def update(scrapbook_changes)
+        authorize?(actor, 'update')
+        @member.update(scrapbook_changes)
+        validate!
+      end
+
+      def link_to(user)
+      end
+
+      def authorize(actor, action)
+        action = 'update'
+        raise NotAllowed unless actor.id == user_id
+      end
     end # Member
   end # Scrapbook
 end # Belinkr
