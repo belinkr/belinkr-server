@@ -27,7 +27,7 @@ module Belinkr
       attribute :name_order,      String, default: 'first-last'
       attribute :email,           String
       attribute :password,        String
-      attribute :profiles,        Set[Profile::Member], default: []
+      attribute :profiles,        Set[Profile::Member], default: Set.new
       attribute :locale,          String, default: Belinkr::Config::DEFAULT_LOCALE
       attribute :timezone,        String
       attribute :created_at,      Time
@@ -82,12 +82,13 @@ module Belinkr
 
       def link_to(profile)
         profile.user_id = self.id
-        self.profiles = self.profiles.push(profile)
+        self.profiles   = self.profiles.add(profile)
         self
       end #link_to
 
       def unlink_from(profile)
         self.profiles = self.profiles.delete(profile)
+        self.delete if self.profiles.empty?
         self
       end #unlink_from
 
@@ -99,6 +100,19 @@ module Belinkr
         session.entity_id  = profiles.first.entity_id
         session
       end #authenticate
+
+      def update_details(arguments)
+        profile         = arguments.fetch(:profile)
+        user_changes    = arguments.fetch(:user_changes)
+        profile_changes = arguments.fetch(:profile_changes)
+
+        unlink_from(profile)
+        profile.update(profile_changes)
+        link_to(profile)
+
+        self.update(user_changes)
+        self
+      end
 
       private
 

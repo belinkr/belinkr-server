@@ -2,12 +2,10 @@
 require_relative '../../Locales/Loader'
 require_relative '../Reset/Collection'
 require_relative '../../Tinto/Context'
-require_relative '../../Tinto/Exceptions'
 
 module Belinkr
   class RequestPasswordReset
     include Tinto::Context
-    include Tinto::Exceptions
 
     def initialize(arguments)
       @actor    = arguments.fetch(:actor)

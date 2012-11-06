@@ -6,6 +6,7 @@ module Belinkr
     include Tinto::Context
 
     def initialize(arguments)
+      @enforcer   = arguments.fetch(:enforcer)
       @actor      = arguments.fetch(:actor)
       @workspace  = arguments.fetch(:workspace)
       @workspaces = arguments.fetch(:workspaces)
@@ -13,7 +14,7 @@ module Belinkr
     end # initialize
 
     def call
-      workspace.authorize(actor, :undelete)
+      enforcer.authorize(actor, :undelete)
       workspaces.add(workspace)
       tracker.link_to_all(workspace)
 
@@ -22,7 +23,7 @@ module Belinkr
 
     private
 
-    attr_reader :actor, :workspace, :workspaces, :tracker
+    attr_reader :enforcer, :actor, :workspace, :workspaces, :tracker
   end # UndeleteWorkspace
 end # Belinkr
 

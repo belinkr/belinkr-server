@@ -6,13 +6,14 @@ module Belinkr
     include Tinto::Context
 
     def initialize(arguments)
+      @enforcer   = arguments.fetch(:enforcer)
       @actor      = arguments.fetch(:actor)
       @scrapbook  = arguments.fetch(:scrapbook)
       @scrapbooks = arguments.fetch(:scrapbooks)
     end #initialize
 
     def call
-      scrapbook.authorize(actor, :undelete)
+      enforcer.authorize(actor, :undelete)
       scrapbook.undelete
       scrapbooks.add(scrapbook)
 
@@ -21,7 +22,7 @@ module Belinkr
 
     private
 
-    attr_reader :actor, :scrapbook, :scrapbooks
+    attr_reader :enforcer, :actor, :scrapbook, :scrapbooks
   end # UndeleteScrapbook
 end # Belinkr
 

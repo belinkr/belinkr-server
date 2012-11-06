@@ -1,15 +1,12 @@
 # encoding: utf-8
-require_relative '../../Tinto/Exceptions'
 require_relative '../../Tinto/Context'
 
 module Belinkr
   class EditUserProfile
-    include Tinto::Exceptions
     include Tinto::Context
 
-    attr_reader :actor, :user, :profile, :user_changes, :profile_changes
-
     def initialize(arguments)
+      @enforcer         = arguments.fetch(:enforcer)
       @actor            = arguments.fetch(:actor)
       @user             = arguments.fetch(:user)
       @user_changes     = arguments.fetch(:user_changes)
@@ -18,17 +15,20 @@ module Belinkr
     end #initialize
 
     def call
-      raise NotAllowed unless actor.id == user.id
-      user.update(user_changes)
+      enforcer.authorize(actor, :update)
+      user.update_details(
+        profile:          profile, 
+        user_changes:     user_changes,
+        profile_changes:  profile_changes
+      )
 
-      user.unlink_from(profile)
-      profile.update(profile_changes)
-      user.link_to(profile)
-
-      user.validate!
-      profile.validate!
       will_sync user, profile
     end # call
+
+    private
+
+    attr_reader :enforcer, :actor, :user, :profile, :user_changes, 
+                :profile_changes
   end # EditUserProfile
 end # Belinkr
 

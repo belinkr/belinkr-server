@@ -1,20 +1,19 @@
 # encoding: utf-8
 require_relative '../../Tinto/Context'
-require_relative '../../Tinto/Exceptions'
 
 module Belinkr
   class DeleteScrapbook
     include Tinto::Context
-    include Tinto::Exceptions
 
     def initialize(arguments)
+      @enforcer   = arguments.fetch(:enforcer)
       @actor      = arguments.fetch(:actor)
       @scrapbook  = arguments.fetch(:scrapbook)
       @scrapbooks = arguments.fetch(:scrapbooks)
     end # initialize
 
     def call
-      scrapbook.authorize(actor, 'delete')
+      enforcer.authorize(actor, 'delete')
       scrapbook.delete
       scrapbooks.delete scrapbook
 
@@ -23,7 +22,7 @@ module Belinkr
 
     private
 
-    attr_reader :actor, :scrapbook, :scrapbooks
+    attr_reader :enforcer, :actor, :scrapbook, :scrapbooks
   end # DeleteScrapbook
 end # Belinkr
 

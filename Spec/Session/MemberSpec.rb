@@ -31,4 +31,13 @@ describe Session::Member do
       end
     end
   end # validations
+
+  describe '#expire' do
+    it 'destroys the sesssion' do
+      session = Session::Member.new(user_id: 1, profile_id: 1, entity_id: 1)
+      session.expire
+      session.attributes.each { |attribute, value| value.must_be_nil }
+    end
+  end #expire
 end # Session::Member
+

@@ -13,7 +13,6 @@ module Belinkr
       @tracker                    = arguments.fetch(:tracker)
       @administrators             = arguments.fetch(:administrators)
       @administrator_memberships  = arguments.fetch(:administrator_memberships)
-      #memberships_for(actor, entity, 'administrator')
     end
 
     def call

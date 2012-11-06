@@ -7,6 +7,9 @@ module Belinkr
 
       def delete(*args)
       end #delete
+
+      def merge(*args)
+      end #merge
     end # Double
   end # Collection
 end # Belinkr

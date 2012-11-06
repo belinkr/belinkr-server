@@ -2,11 +2,11 @@
 module Belinkr
   module Scrapbook
     class Double
-      def authorize(*args)
-      end #authorize?
-
       def link_to(*args)
       end #link_to
+
+      def update(*args)
+      end #update
 
       def delete(*args)
       end #delete

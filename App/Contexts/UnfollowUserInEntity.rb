@@ -1,35 +1,43 @@
 # encoding: utf-8
 require_relative './RegisterActivity'
 require_relative '../../Tinto/Context'
-require_relative '../../Tinto/Exceptions'
 
 module Belinkr
   class UnfollowUserInEntity
     include Tinto::Context
 
+    attr_writer :register_activity_context
+
     def initialize(options={})
+      @enforcer         = options.fetch(:enforcer)
       @actor            = options.fetch(:actor)
       @followed         = options.fetch(:followed)
       @followers        = options.fetch(:followers)
       @following        = options.fetch(:following)
       @entity           = options.fetch(:entity)
-    end
+    end #initialize
 
     def call
-      raise Tinto::Exceptions::InvalidMember if @actor.id == @followed.id
-      @followers.delete @actor
-      @following.delete @followed
+      enforcer.authorize(actor, :unfollow)
+      followers.delete actor
+      following.delete followed
 
-      @activity_context = RegisterActivity.new(
-        actor:  @actor,
+      register_activity_context.call
+
+      will_sync followers, following, register_activity_context
+    end #call
+
+    def register_activity_context
+      @register_activity_context || RegisterActivity.new(
+        actor:  actor,
         action: 'follow', 
-        object: @followed,
-        entity: @entity
+        object: followed,
+        entity: entity
       )
-      @activity_context.call
+    end #register_activity_context
 
-      @to_sync = [@followers, @following, @activity_context]
-      @followed
-    end
+    private
+
+    attr_reader :enforcer, :actor, :followed, :followers, :following, :entity
   end # FollowUserInEntity
 end # Belinkr

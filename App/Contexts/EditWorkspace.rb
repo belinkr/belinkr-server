@@ -6,13 +6,14 @@ module Belinkr
     include Tinto::Context
 
     def initialize(arguments)
+      @enforcer           = arguments.fetch(:enforcer)
       @actor              = arguments.fetch(:actor)
       @workspace          = arguments.fetch(:workspace)
       @workspace_changes  = arguments.fetch(:workspace_changes)
     end #initialize
 
     def call
-      workspace.authorize(actor, :update)
+      enforcer.authorize(actor, :update)
       workspace.update(workspace_changes)
 
       will_sync workspace
@@ -20,7 +21,7 @@ module Belinkr
 
     private
 
-    attr_reader :actor, :workspace, :workspace_changes
+    attr_reader :enforcer, :actor, :workspace, :workspace_changes
   end # EditWorkspace
 end # Belinkr
 

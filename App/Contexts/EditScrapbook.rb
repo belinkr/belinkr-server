@@ -1,20 +1,19 @@
 # encoding: utf-8
-require_relative '../../Tinto/Exceptions'
 require_relative '../../Tinto/Context'
 
 module Belinkr
   class EditScrapbook
-    include Tinto::Exceptions
     include Tinto::Context
 
     def initialize(arguments)
+      @enforcer           = arguments.fetch(:enforcer)
       @actor              = arguments.fetch(:actor)
       @scrapbook          = arguments.fetch(:scrapbook)
       @scrapbook_changes  = arguments.fetch(:scrapbook_changes)
     end #initialize
 
     def call
-      scrapbook.authorize(actor, 'update')
+      enforcer.authorize(actor, 'update')
       scrapbook.update(scrapbook_changes)
 
       will_sync scrapbook
@@ -22,7 +21,7 @@ module Belinkr
 
     private
 
-    attr_reader :actor, :scrapbook, :scrapbook_changes
+    attr_reader :enforcer, :actor, :scrapbook, :scrapbook_changes
   end # EditScrapbook
 end # Belinkr
 

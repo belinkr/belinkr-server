@@ -4,25 +4,41 @@ require 'ostruct'
 require_relative '../../App/Contexts/DeleteScrapbook'
 require_relative '../Doubles/Scrapbook/Double'
 require_relative '../Doubles/Collection/Double'
+require_relative '../Doubles/Enforcer/Double'
 
 include Belinkr
 
 describe 'delete scrapbook' do 
   before do
-    @actor       = OpenStruct.new
-    @scrapbook   = Scrapbook::Double.new
-    @scrapbooks  = Collection::Double.new
+    @enforcer   = Enforcer::Double.new  
+    @actor      = OpenStruct.new
+    @scrapbook  = Scrapbook::Double.new
+    @scrapbooks = Collection::Double.new
+  end
+
+  it 'authorizes the actor' do
+    enforcer  = Minitest::Mock.new
+    context   = DeleteScrapbook.new(
+      enforcer:   enforcer,
+      actor:      @actor, 
+      scrapbook:  @scrapbook, 
+      scrapbooks: @scrapbooks
+    )
+    
+    enforcer.expect :authorize, enforcer, [@actor, 'delete']
+    context.call
+    enforcer.verify
   end
 
   it 'marks the scrapbook as deleted' do
     scrapbook = Minitest::Mock.new
     context   = DeleteScrapbook.new(
+      enforcer:   @enforcer,
       actor:      @actor, 
       scrapbook:  scrapbook, 
       scrapbooks: @scrapbooks
     )
     
-    scrapbook.expect :authorize, scrapbook, [@actor, 'delete']
     scrapbook.expect :delete, scrapbook
     context.call
     scrapbook.verify
@@ -31,6 +47,7 @@ describe 'delete scrapbook' do
   it 'removes it from the own scrapbooks collection of the actor' do
     scrapbooks  = Minitest::Mock.new
     context     = DeleteScrapbook.new(
+      enforcer:   @enforcer,
       actor:      @actor, 
       scrapbook:  @scrapbook,
       scrapbooks: scrapbooks

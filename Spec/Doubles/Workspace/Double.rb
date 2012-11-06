@@ -2,11 +2,11 @@
 module Belinkr
   module Workspace
     class Double
+      def update(*args)
+      end #update
+
       def link_to(*args)
       end #link_to
-
-      def authorize(*args)
-      end #authorize
     end # Double
   end # Workspace
 end # Belinkr

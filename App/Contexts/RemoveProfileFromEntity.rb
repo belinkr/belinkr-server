@@ -1,32 +1,31 @@
 # encoding: utf-8
-require_relative '../../Tinto/Exceptions'
 require_relative '../../Tinto/Context'
 
 module Belinkr
   class RemoveProfileFromEntity
     include Tinto::Context
-    include Tinto::Exceptions
-
-    attr_reader :actor, :user, :entity, :profile, :profiles
 
     def initialize(arguments)
+      @enforcer = arguments.fetch(:enforcer)
       @actor    = arguments.fetch(:actor)
       @user     = arguments.fetch(:user)
-      @entity   = arguments.fetch(:entity)
       @profile  = arguments.fetch(:profile)
       @profiles = arguments.fetch(:profiles)
     end # initialize
 
     def call
-      raise NotAllowed unless actor.id == user.id
+      enforcer.authorize(actor, :delete)
       user.unlink_from(profile)
-      user.delete if user.profiles.empty?
 
       profile.delete
       profiles.delete profile
 
       will_sync user, profile, profiles
     end # call
+
+    private
+
+    attr_reader :enforcer, :actor, :user, :profile, :profiles
   end # RemoveProfileFromEntity
 end # Belinkr
 

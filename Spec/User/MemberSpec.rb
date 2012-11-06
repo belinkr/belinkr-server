@@ -9,6 +9,14 @@ include Belinkr
 include Tinto::Exceptions
 
 describe User::Member do
+  before do
+    @valid_user = User::Member.new(
+                    first: 'John', 
+                    last: 'Doe', 
+                    email: 'jdoe@belinkr.com',
+                    password: 'changeme'
+                  )
+  end
   describe '#validations' do
     describe 'first' do
       it 'must be present' do
@@ -160,16 +168,27 @@ describe User::Member do
 
   describe '#unlink_from' do
     it 'unlinks the profile from the user' do
-      user    = User::Member.new
       profile = Profile::Member.new
 
-      user.link_to(profile)
-      profile.user_id.must_equal user.id
-      user.profiles.must_include profile
+      @valid_user.link_to(profile)
+      profile.user_id.must_equal @valid_user.id
+      @valid_user.profiles.must_include profile
 
-      user.unlink_from(profile)
-      user.profiles.wont_include profile
+      @valid_user.unlink_from(profile)
+      @valid_user.profiles.wont_include profile
     end #unlink_from
+
+    it 'deletes the user if no more profiles left' do
+      profile = Profile::Member.new
+
+      @valid_user.link_to(profile)
+      profile.user_id.must_equal @valid_user.id
+      @valid_user.profiles.must_include profile
+
+      @valid_user.deleted_at.must_be_nil
+      @valid_user.unlink_from(profile)
+      @valid_user.deleted_at.wont_be_nil
+    end
   end #unlink
 
   describe '#authenticate' do
@@ -199,5 +218,54 @@ describe User::Member do
       lambda { user.authenticate(session, 'secret') }.must_raise NotAllowed
     end
   end #authenticate
+
+  describe '#update_details' do
+    it 'requires a profile, user_changes and profile_changes' do
+      profile         = Profile::Member.new
+      user_changes    = { password: 'changed' }
+      profile_changes = { mobile: 'changed' } 
+
+      lambda { @valid_user.update_details }.must_raise ArgumentError
+      lambda { @valid_user.update_details(profile: OpenStruct.new) }
+        .must_raise KeyError
+
+      @valid_user.update_details(
+        profile:          profile, 
+        user_changes:     user_changes,
+        profile_changes:  profile_changes
+      )
+    end
+
+    it 'updates user details' do
+      profile         = Profile::Member.new
+      user_changes    = { password: 'changed' }
+      profile_changes = { mobile: 'changed' } 
+
+      old_password = @valid_user.password
+
+      @valid_user.update_details(
+        profile:          profile, 
+        user_changes:     user_changes,
+        profile_changes:  profile_changes
+      )
+
+      @valid_user.password.wont_equal old_password
+      @valid_user.password.wont_equal 'changed'
+    end
+
+    it 'updates profile details' do
+      profile         = Profile::Member.new
+      user_changes    = { password: 'changed' }
+      profile_changes = { mobile: 'changed' } 
+
+      @valid_user.update_details(
+        profile:          profile, 
+        user_changes:     user_changes,
+        profile_changes:  profile_changes
+      )
+
+      profile.mobile.must_equal 'changed'
+    end
+  end #update_details
 end # User::Member
 

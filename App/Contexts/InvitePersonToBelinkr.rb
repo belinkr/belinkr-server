@@ -5,7 +5,6 @@ require_relative './RegisterActivity'
 module Belinkr
   class InvitePersonToBelinkr
     include Tinto::Context
-    include Tinto::Exceptions
 
     attr_writer :register_activity_context
 

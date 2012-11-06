@@ -6,13 +6,14 @@ module Belinkr
     include Tinto::Context
 
     def initialize(arguments)
+      @enforcer     = arguments.fetch(:enforcer)
       @actor        = arguments.fetch(:actor)
       @invitation   = arguments.fetch(:invitation)
       @invitations  = arguments.fetch(:invitations)
     end # initialize
 
     def call
-      invitation.authorize(actor, :delete)
+      enforcer.authorize(actor, :delete)
       invitation.delete
       invitations.delete invitation
 
@@ -21,7 +22,7 @@ module Belinkr
 
     private
 
-    attr_reader :actor, :invitation, :invitations
+    attr_reader :enforcer, :actor, :invitation, :invitations
   end # DeleteInvitation
 end # Belinkr
 
