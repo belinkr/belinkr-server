@@ -2,6 +2,7 @@
 require 'minitest/autorun'
 require_relative '../../Locales/Loader'
 require_relative '../../App/Profile/Member'
+require_relative '../../App/User/Member'
 
 include Belinkr
 
@@ -68,4 +69,22 @@ describe Profile::Member do
       end
     end # department
   end # validations
+
+  describe '#user' do
+    it 'returns the user associated to this profile' do
+      profile = Profile::Member.new(user_id: 8)
+      profile.user.must_be_instance_of Belinkr::User::Member
+      profile.user.id.to_i.must_equal 8
+    end
+  end #user
+
+  describe '#link_to' do
+    it 'associates the profile to the entity' do
+      profile = Profile::Member.new
+      entity  = OpenStruct.new(id: 8)
+
+      profile.link_to(entity)
+      profile.entity_id.must_equal entity.id.to_s
+    end
+  end #link_to
 end # Profile::Member

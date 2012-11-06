@@ -4,6 +4,9 @@ module Belinkr
       def update(*args)
       end #update
 
+      def link_to(*args)
+      end #link_to
+
       def register_in(*args)
       end #register_in
 

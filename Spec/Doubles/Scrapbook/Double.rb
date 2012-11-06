@@ -5,6 +5,9 @@ module Belinkr
       def authorize(*args)
       end #authorize?
 
+      def link_to(*args)
+      end #link_to
+
       def delete(*args)
       end #delete
 

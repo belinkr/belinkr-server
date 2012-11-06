@@ -19,7 +19,7 @@ module Belinkr
 
     def call
       raise NotAllowed unless actor.id == user.id
-      user.profiles.delete profile
+      user.unlink_from(profile)
       user.delete if user.profiles.empty?
 
       profile.delete

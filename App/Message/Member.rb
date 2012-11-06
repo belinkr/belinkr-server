@@ -33,17 +33,17 @@ module Belinkr
 
       def initialize(*args)
         super(*args)
-      end
+      end #initialize
 
       def prepare(method, *args)
         message.attributes = self.send(method, *args)
         raise InvalidResource unless valid?
-      end
+      end #prepare
 
       def queue
         raise InvalidResource unless valid?
         $redis.rpush QUEUE_KEY, self.attributes.to_json
-      end
+      end #queue
 
       alias_method :sync, :queue
       

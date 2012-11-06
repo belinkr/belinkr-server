@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 require 'ostruct'
-require_relative '../../../App/User/Locator/MemoryBackend'
+require_relative '../../../App/Services/Locator/MemoryBackend'
 
 include Belinkr
 

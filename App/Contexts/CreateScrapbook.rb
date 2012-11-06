@@ -14,8 +14,7 @@ module Belinkr
     end
 
     def call
-      scrapbook.user_id = actor.id
-      scrapbook.verify
+      scrapbook.link_to(actor)
       scrapbooks.add scrapbook
 
       will_sync scrapbook, scrapbooks

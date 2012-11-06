@@ -2,8 +2,10 @@
 require 'minitest/autorun'
 require_relative '../../Locales/Loader'
 require_relative '../../App/Workspace/Member'
+require_relative '../../Tinto/Exceptions'
 
 include Belinkr
+include Tinto::Exceptions
 
 describe Workspace::Member do
   describe 'validations' do
@@ -37,4 +39,15 @@ describe Workspace::Member do
       end
     end #entity_id
   end # validations
+
+  describe '#link_to' do
+    it 'links the workspace to the entity' do
+      workspace = Workspace::Member.new
+      entity    = OpenStruct.new(id: 8)
+
+      workspace.link_to(entity)
+      workspace.entity_id.must_equal entity.id.to_s
+    end
+  end #link_to
 end # Workspace::Member
+

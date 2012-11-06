@@ -42,7 +42,9 @@ module Belinkr
       end
 
       def link_to(user)
-      end
+        self.user_id = user.id
+        self
+      end #link_to
 
       def authorize(actor, action)
         action = 'update'

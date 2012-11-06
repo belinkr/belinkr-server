@@ -2,7 +2,7 @@
 require 'minitest/autorun'
 require 'ostruct'
 require 'redis'
-require_relative '../../../App/User/Locator/RedisBackend'
+require_relative '../../../App/Services/Locator/RedisBackend'
 
 $redis ||= Redis.new
 $redis.select 8

@@ -1,26 +1,25 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'redis'
-require_relative '../../../App/Workspace/Membership/Tracker'
+require_relative '../../App/Services/Tracker'
 
 include Belinkr
 
 $redis ||= Redis.new
 $redis.select 8
 
-describe Workspace::Membership::Tracker do
+describe Workspace::Tracker do
   before do
     $redis.flushdb
     @entity_id    = 1
     @workspace_id = 2
-    @tracker      = Workspace::Membership::Tracker
-                      .new(@entity_id, @workspace_id)
+    @tracker      = Workspace::Tracker.new(@entity_id, @workspace_id)
   end
 
   describe '#initialize' do
     it 'requires an entity id and a workspace id' do
-      lambda { Workspace::Membership::Tracker.new }.must_raise ArgumentError
-      lambda { Workspace::Membership::Tracker.new 1 }.must_raise ArgumentError
+      lambda { Workspace::Tracker.new }.must_raise ArgumentError
+      lambda { Workspace::Tracker.new 1 }.must_raise ArgumentError
     end
   end #initialize
 

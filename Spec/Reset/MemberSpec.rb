@@ -30,4 +30,15 @@ describe Reset::Member do
       end
     end #email
   end # validations
+
+  describe '#link_to' do
+    it 'links the reset to the actor' do
+      reset = Reset::Member.new
+      user  = OpenStruct.new(id: 8, email: 'user@gmail.com')
+
+      reset.link_to(user)
+      reset.email.must_equal user.email
+      reset.user_id.must_equal user.id.to_s
+    end #link_to
+  end #link_to
 end # Reset::Member

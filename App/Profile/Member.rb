@@ -41,20 +41,20 @@ module Belinkr
       def initialize(attrs={})
         super attrs
         @member = Tinto::Member.new self
-      end
+      end #initialize
 
       def storage_key
         "entities:#{entity_id}:profiles"
-      end
+      end #storage_key
 
       def user
-        @user ||= User::Member.new(id: user_id).fetch
-      end
+        User::Member.new(id: user_id)
+      end #user
 
-      def link_to(user)
-        user.add_profile(self)
+      def link_to(entity)
+        self.entity_id = entity.id
         self
-      end
+      end #link_to
     end # Member
   end # Profile
 end # Belinkr

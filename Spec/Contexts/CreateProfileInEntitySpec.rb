@@ -16,10 +16,9 @@ describe 'create profile in entity' do
     @entity       = OpenStruct.new
     @profiles     = Collection::Double.new
     @user_locator = Set.new
-
   end
 
-  it 'links user and profile' do
+  it 'links profile to the entity' do
     profile = Minitest::Mock.new
     context = CreateProfileInEntity.new(
       actor:        @actor,
@@ -29,7 +28,7 @@ describe 'create profile in entity' do
       user_locator: @user_locator
     )
 
-    profile.expect :link_to, profile, [@actor]
+    profile.expect :link_to, profile, [@entity]
     context.call
     profile.verify
   end
@@ -44,6 +43,23 @@ describe 'create profile in entity' do
       user_locator: @user_locator
     )
     
+    actor.expect :register_in, actor, [@user_locator]
+    actor.expect :link_to, actor, [@profile]
+    context.call
+    actor.verify
+  end
+
+  it 'links user and profile' do
+    actor   = Minitest::Mock.new
+    context = CreateProfileInEntity.new(
+      actor:        actor,
+      profile:      @profile,
+      profiles:     @profiles,
+      entity:       @entity,
+      user_locator: @user_locator
+    )
+
+    actor.expect :link_to, actor, [@profile]
     actor.expect :register_in, actor, [@user_locator]
     context.call
     actor.verify

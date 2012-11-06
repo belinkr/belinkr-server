@@ -25,9 +25,9 @@ group :contexts do
   end
 end
 
-guard :unit do
+group :unit do
   guard :minitest, test_folders: ["Spec"], 
-  test_file_patterns: ["@Spec.rb"] do
+  test_file_patterns: ["*Spec.rb"] do
     'data_objects'
     'contexts'
   end

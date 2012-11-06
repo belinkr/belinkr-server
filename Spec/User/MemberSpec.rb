@@ -2,6 +2,7 @@
 require 'minitest/autorun'
 require_relative '../../Locales/Loader'
 require_relative '../../App/User/Member'
+require_relative '../../App/Profile/Member'
 require_relative '../../Tinto/Exceptions'
 
 include Belinkr
@@ -84,17 +85,15 @@ describe User::Member do
   end # validations
 
   describe '#name' do
-    it 'is initialized to the localized name according to the name order' do
-      user = User::Member.new(first: 'John', last: 'Doe')
-      user.name.must_equal 'John Doe'
+    it 'returns a full name following the name order' do
+      User::Member.new(first: 'John', last: 'Doe') 
+        .name.must_equal 'John Doe'
 
-      user = User::Member
-              .new(first: 'John', last: 'Doe', name_order: 'first-last')
-      user.name.must_equal 'John Doe'
+      User::Member.new(first: 'John', last: 'Doe', name_order: 'first-last')
+        .name.must_equal 'John Doe'
 
-      user = User::Member
-              .new(first: 'John', last: 'Doe', name_order: 'last-first')
-      user.name.must_equal 'Doe John'
+      User::Member.new(first: 'John', last: 'Doe', name_order: 'last-first')
+        .name.must_equal 'Doe John'
     end
   end #name
  
@@ -114,7 +113,7 @@ describe User::Member do
       user_locator.verify
     end
 
-    it 'raises if user invaid' do
+    it 'raises if user invalid' do
       user          = User::Member.new
       user_locator  = Minitest::Mock.new
 
@@ -122,4 +121,83 @@ describe User::Member do
       lambda { user.register_in(user_locator) }.must_raise InvalidMember
     end 
   end #register_in
+
+  describe '#unregister_from' do
+    it 'unregisters the email and id in the locator service' do
+      user = User::Member.new(
+        first:    'John',
+        last:     'Doe', 
+        email:    'jdoe@foo.com',
+        password: 'changeme'
+      )
+
+      user_locator = Minitest::Mock.new
+
+      user_locator.expect :delete, user_locator, [user.email, user.id]
+      user.unregister_from(user_locator)
+      user_locator.verify
+    end
+
+    it 'raises if user invalid' do
+      user          = User::Member.new
+      user_locator  = Minitest::Mock.new
+
+      user_locator.expect :add, user_locator, [user.email, user.id]
+      lambda { user.unregister_from(user_locator) }.must_raise InvalidMember
+    end
+  end #unregister_from
+
+  describe '#link_to' do
+    it 'links the profile and the user' do
+      user    = User::Member.new
+      profile = Profile::Member.new
+
+      user.link_to(profile)
+      profile.user_id.must_equal user.id
+      user.profiles.must_include profile
+    end
+  end #link_to
+
+  describe '#unlink_from' do
+    it 'unlinks the profile from the user' do
+      user    = User::Member.new
+      profile = Profile::Member.new
+
+      user.link_to(profile)
+      profile.user_id.must_equal user.id
+      user.profiles.must_include profile
+
+      user.unlink_from(profile)
+      user.profiles.wont_include profile
+    end #unlink_from
+  end #unlink
+
+  describe '#authenticate' do
+    it 'returns an authenticated session' do
+      plaintext = 'changeme'
+      session   = OpenStruct.new
+      profile   = Profile::Member.new(entity_id: 1)
+      user      = User::Member.new(password: plaintext, profiles: [profile])
+
+      user.authenticate(session, plaintext)
+
+      session.user_id     .must_equal user.id
+      session.profile_id  .must_equal profile.id
+      session.entity_id   .must_equal profile.entity_id
+    end
+
+    it 'raises if plaintext does not match user password' do
+      user    = User::Member.new(password: 'secret')
+      session = OpenStruct.new
+
+      lambda { user.authenticate(session, 'wrong') }.must_raise NotAllowed
+    end
+
+    it 'raises if user is deleted' do
+      user    = User::Member.new(password: 'secret', deleted_at: Time.now)
+      session = OpenStruct.new
+      lambda { user.authenticate(session, 'secret') }.must_raise NotAllowed
+    end
+  end #authenticate
 end # User::Member
+

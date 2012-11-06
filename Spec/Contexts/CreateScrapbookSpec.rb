@@ -2,17 +2,33 @@
 require 'minitest/autorun'
 require 'ostruct'
 require_relative '../../App/Contexts/CreateScrapbook'
+require_relative '../Doubles/Collection/Double'
+require_relative '../Doubles/Scrapbook/Double'
 
 include Belinkr
 
 describe 'create scrapbook' do
+  it 'links the scrapbook to the actor' do
+    actor       = OpenStruct.new
+    scrapbook   = Minitest::Mock.new
+    scrapbooks  = Collection::Double.new
+
+    scrapbook.expect :link_to, scrapbook, [actor]
+    context = CreateScrapbook.new(
+      actor:      actor, 
+      scrapbook:  scrapbook,
+      scrapbooks: scrapbooks
+    )
+    context.call
+    scrapbook.verify
+  end
+
   it 'adds the scrapbook to the own scrapbook collection of the user' do
     actor      = OpenStruct.new
-    scrapbook  = OpenStruct.new
-    
+    scrapbook  = Scrapbook::Double.new
     scrapbooks = Minitest::Mock.new
-    scrapbooks.expect :add, scrapbooks, [scrapbook]
 
+    scrapbooks.expect :add, scrapbooks, [scrapbook]
     context = CreateScrapbook.new(
       actor:      actor, 
       scrapbook:  scrapbook,

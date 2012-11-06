@@ -30,16 +30,16 @@ module Belinkr
       def initialize(attributes={})
         super attributes
         @member = Tinto::Member.new self
-      end
+      end #initialize
 
       def storage_key
         'resets'
-      end
+      end #storage_key
 
       def link_to(actor)
         self.email    = actor.email
         self.user_id  = actor.id
-        reset
+        self
       end #link_to
     end # Member
   end # Reset

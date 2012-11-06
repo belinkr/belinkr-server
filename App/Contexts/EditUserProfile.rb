@@ -21,13 +21,12 @@ module Belinkr
       raise NotAllowed unless actor.id == user.id
       user.update(user_changes)
 
-      user.profiles.delete(profile)
+      user.unlink_from(profile)
       profile.update(profile_changes)
-      user.profiles.push profile
+      user.link_to(profile)
 
-      user.verify
-      profile.verify
-
+      user.validate!
+      profile.validate!
       will_sync user, profile
     end # call
   end # EditUserProfile

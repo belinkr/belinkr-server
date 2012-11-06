@@ -37,16 +37,16 @@ module Belinkr
         )
       end #autoinvited_to
 
-      def is_in?(user, workspace)
+      def is_in?(workspace, user)
         collaborators_for(workspace).include?(user) ||
         administrators_for(workspace).include?(user)
       end #is_in?
 
-      def is_administrator?(user, workspace)
+      def is_administrator?(workspace, user)
         administrators_for(workspace).include?(user)
       end #is_administrator?
 
-      def is_collaborator?(user, workspace)
+      def is_collaborator?(workspace, user)
         collaborators_for(workspace).include?(user)
       end #is_collaborator?
 

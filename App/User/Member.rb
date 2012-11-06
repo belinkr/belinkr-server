@@ -17,28 +17,25 @@ module Belinkr
 
       MODEL_NAME  = 'user'
       NAME_ORDERS = %w{ first-last last-first }
-      WHITELIST   = %w{ avatar first last name_order email password locale 
-                        timezone }
+      WHITELIST   = %w{ avatar first last name_order email password 
+                        locale timezone }
 
       attribute :id,              String
       attribute :avatar,          String
       attribute :first,           String
       attribute :last,            String
-      attribute :name,            String, default: lambda { |user, a| 
-                                    user.localized_name 
-                                  }
       attribute :name_order,      String, default: 'first-last'
       attribute :email,           String
       attribute :password,        String
-      attribute :profiles,        Array[Profile::Member], default: []
+      attribute :profiles,        Set[Profile::Member], default: []
       attribute :locale,          String, default: Belinkr::Config::DEFAULT_LOCALE
       attribute :timezone,        String
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
 
-      validates_presence_of       :id, :first, :last, :name, :name_order,
-                                  :email, :password
+      validates_presence_of       :id, :first, :last, :name_order, :email, 
+                                  :password
       validates_length_of         :first, max: 50
       validates_length_of         :last,  max: 50
       validates_within            :name_order, set: NAME_ORDERS
@@ -50,30 +47,26 @@ module Belinkr
       def initialize(attrs={})
         super attrs
         @member = Tinto::Member.new self
-      end
+      end #initialize
 
       def storage_key
         'users'
-      end
-
-      def password=(plaintext)
-        super password_hash_for(plaintext)
-      end
-
-      def encrypted?(password=@password)
-        Tinto::Utils.bcrypted?(password)
-      end
-
-      def localized_name
-        return "#{last} #{first}" if name_order == 'last-first'
-        "#{first} #{last}"
-      end
+      end #storage_key
 
       alias_method :search_index, :storage_key
 
       def index_path
         "#{MODEL_NAME}/#{id}"
-      end
+      end #index_path
+
+      def name
+        return "#{last} #{first}" if name_order == 'last-first'
+        "#{first} #{last}"
+      end #name
+
+      def password=(plaintext)
+        super password_hash_for(plaintext)
+      end #password=
 
       def register_in(user_locator)
         validate!
@@ -81,36 +74,46 @@ module Belinkr
         self
       end #register_in
 
-      def add_profile(profile)
-        profile.user_id   = self.id
-        profile.entity_id = self.entity_id
+      def unregister_from(user_locator)
+        validate!
+        user_locator.delete(email, id)
+        self
+      end #unregister_from
 
-        profile.validate!
-        self.validate!
-        self.profiles.push profile
-      end #add_profile
+      def link_to(profile)
+        profile.user_id = self.id
+        self.profiles = self.profiles.push(profile)
+        self
+      end #link_to
 
+      def unlink_from(profile)
+        self.profiles = self.profiles.delete(profile)
+        self
+      end #unlink_from
 
       def authenticate(session, plaintext)
-        raise NotAllowed unless password_matches?(actor.password, plaintext)
-        raise NotAllowed if actor.deleted?
+        raise NotAllowed if self.deleted?
+        raise NotAllowed unless password_matches?(plaintext)
         session.user_id    = id
         session.profile_id = profiles.first.id
         session.entity_id  = profiles.first.entity_id
         session
-      end
+      end #authenticate
+
+      private
 
       def password_matches?(plaintext)
         BCrypt::Password.new(password).is_password?(plaintext)
-      end # password_matches?
-
-      private
+      end #password_matches?
 
       def password_hash_for(plaintext)
         return plaintext if encrypted?(plaintext)
         BCrypt::Password.create(plaintext)
       end #encrypted_password_for
+
+      def encrypted?(password=@password)
+        Tinto::Utils.bcrypted?(password)
+      end #encrypted?
     end # Member
   end # User
-end # Belinkr
-
+end # Belinkr 

@@ -16,7 +16,6 @@ module Belinkr
       workspace.authorize(actor, :undelete)
       workspaces.add(workspace)
       tracker.link_to_all(workspace)
-      #each { |memberships| memberships.add @workspace }
 
       will_sync workspace, workspaces, tracker
     end # call

@@ -37,4 +37,14 @@ describe Scrapbook::Member do
       end
     end #user_id
   end # validations
+
+  describe '#link_to' do
+    it 'links the scrapbook to the user' do
+      actor     = OpenStruct.new(id: 8)
+      scrapbook = Scrapbook::Member.new
+
+      scrapbook.link_to(actor)
+      scrapbook.user_id.must_equal actor.id.to_s
+    end
+  end #link_to
 end # Scrapbook::Member

@@ -71,16 +71,13 @@ module Belinkr
 
       def storage_key
         'invitations'
-      end
-
-      def authorize(*args)
-      end
+      end #storage_key
 
       private
 
       def sync_state
         self.state = @fsm.state.to_s
-      end
+      end #sync_state
     end # Member
   end # Invitation
 end # Belinkr

@@ -7,20 +7,17 @@ module Belinkr
     AVAILABLE_LOCALES         = ['EN', 'ZH', 'ES']
     DEFAULT_LOCALE            = :en
     DEFAULT_TIMEZONE          = 'Etc/UTC'
-    AUTHENTICATOR_STORAGE_KEY = 'authenticator'
-    XMPP_AUTHENTICATOR_STORAGE_KEY = 'xmpp_authenticator'
     INITIAL_SCRAPBOOKS        = ['favorites', 'drafts']
 
-    XMPP_BOSH_URL             = 'http://www.belinkr.com:5280/http-bind'
-    SESSION_SECRET            = ENV['XMPP_MASTER_PASS']
+    SESSION_SECRET            = 'ruobilin'
     LOCALE_COOKIE             = 'belinkr.locale'
     AUTH_TOKEN_COOKIE         = 'belinkr.auth_token'
     REMEMBER_COOKIE           = 'belinkr.remember'
     COOKIE_EXPIRATION_IN_SECS = 604800
 
+    XMPP_BOSH_URL             = 'http://www.belinkr.com:5280/http-bind'
     XMPP_HOST                 = 'www.belinkr.com'
     XMPP_QUEUE_KEY            = 'xmpp'
-    XMPP_MASTER_PASS          = 'ruobilin'
 
     # See http://activitystrea.ms/head/activity-schema.html#verbs
     ACTIVITY_ACTIONS = %w{

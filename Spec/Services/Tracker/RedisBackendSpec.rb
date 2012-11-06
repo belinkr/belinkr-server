@@ -1,22 +1,22 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'redis'
-require_relative '../../../../App/Workspace/Membership/Tracker/RedisBackend'
+require_relative '../../../App/Services/Tracker/RedisBackend'
 
-include Belinkr::Workspace::Membership
+include Belinkr
 
-describe Tracker::RedisBackend do
+describe Workspace::Tracker::RedisBackend do
   $redis ||= Redis.new
   $redis.select 8
 
   before do
     $redis.flushdb
-    @tracker = Tracker::RedisBackend.new('test')
+    @tracker = Workspace::Tracker::RedisBackend.new('test')
   end
 
   describe '#initialize' do
     it 'requires a storage key' do
-      lambda { Tracker::RedisBackend.new }.must_raise ArgumentError
+      lambda { Workspace::Tracker::RedisBackend.new }.must_raise ArgumentError
     end
   end #initialize
 
@@ -51,5 +51,5 @@ describe Tracker::RedisBackend do
       @tracker.size.must_equal 1
     end
   end #size
-end # Tracker::RedisBackend
+end # Workspace::Tracker::RedisBackend
 

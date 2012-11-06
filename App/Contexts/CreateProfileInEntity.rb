@@ -1,5 +1,5 @@
 # encoding: utf-8
-require_relative '../User/Locator'
+require_relative '../Services/Locator'
 require_relative '../../Tinto/Context'
 
 module Belinkr
@@ -15,9 +15,10 @@ module Belinkr
     end # initialize
 
     def call
-      actor.register_in(user_locator)
-      profile.link_to(actor)
-      profiles.add(profile)
+      profile   .link_to(entity)
+      actor     .register_in(user_locator)
+      actor     .link_to(profile)
+      profiles  .add(profile)
 
       will_sync actor, profile, profiles, user_locator
     end # call
