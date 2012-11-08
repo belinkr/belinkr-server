@@ -1,26 +1,21 @@
 # encoding: utf-8
+require_relative '../API'
 require_relative '../Config'
-require_relative '../App/User/Member'
-require_relative '../App/User/Locator'
-require_relative '../App/Session/Presenter'
-require_relative '../App/Contexts/LogIntoEntity'
-require_relative '../App/Contexts/LogOut'
+require_relative '../Data/Session/Presenter'
+require_relative '../Cases/LogIn/Request'
+require_relative '../Cases/LogIn/Context'
+#require_relative '../App/Cases/LogOut/Request'
+#require_relative '../App/Cases/LogOut/Context'
 
 module Belinkr
   class API < Sinatra::Base
     post '/sessions' do
-      email     = payload['email']
-      plaintext = payload['password']
-      remember  = payload['remember']
+      data              = LogIn::Request.new(payload).prepare
+      persisted_session = data.fetch(:session)
 
       dispatch :create do
-        user          = User::Member.new(id: User::Locator.new.id_for(email))
-                          .fetch
-        context       = LogIntoEntity.new(user, plaintext)
-        auth_session  = context.call
-        context.sync
-
-        session['auth_token'] = auth_session.id
+        LogIn::Context.new(data).run
+        session['auth_token'] = persisted_session.id
 
         response.set_cookie Config::AUTH_TOKEN_COOKIE, 
           value:    session['auth_token'], 
@@ -30,16 +25,19 @@ module Belinkr
           value:    session['auth_token'], 
           path:     '/',
           expires:  Time.now + Config::COOKIE_EXPIRATION_IN_SECS
-        ) if remember
+        ) if payload.fetch('remember', false)
 
-        auth_session
+        p persisted_session
+        persisted_session
       end
     end # post /sessions
 
     delete '/sessions/:id' do
+      data = LogOut::Request.new(payload.merge(id: session['auth_token']))
+
       dispatch :delete do
-        auth_session = Session::Member.new(id: session['auth_token']).fetch
-        LogOut.new(auth_session).call
+        Logout::Context.new(request).run
+        #auth_session = Session::Member.new(id: session['auth_token']).fetch
         session[:auth_token] = nil
 
         if request.cookies[Config::AUTH_TOKEN_COOKIE]
@@ -50,7 +48,7 @@ module Belinkr
           response.delete_cookie Config::REMEMBER_COOKIE , path: '/'
         end
 
-        auth_session
+        data.fetch(:session)
       end
     end # delete /sessions/:id
   end # API

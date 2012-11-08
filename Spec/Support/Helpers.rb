@@ -2,8 +2,8 @@
 require_relative '../Factories/User'
 require_relative '../Factories/Profile'
 require_relative '../Factories/Entity'
-require_relative '../../App/Session/Member'
-require_relative '../../App/Contexts/CreateProfileInEntity'
+require_relative '../../Data/Session/Member'
+require_relative '../../Cases/CreateProfileInEntity/Context'
 
 module Belinkr
   module Spec
@@ -26,10 +26,13 @@ module Belinkr
           entity    = Factory.entity(id: entity_id)
           profiles  = Profile::Collection.new(entity_id: entity.id)
 
-          context   = CreateProfileInEntity.new(user, profile, profiles, entity)
-          context.call
-          context.sync
-          entity.sync
+          context   = CreateProfileInEntity::Context.new(
+                        actor:    user, 
+                        profile:  profile, 
+                        profiles: profiles, 
+                        entity:   entity
+                      )
+          context.run
           profile
         end
 

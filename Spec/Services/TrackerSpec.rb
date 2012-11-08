@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'redis'
-require_relative '../../App/Services/Tracker'
+require_relative '../../Services/Tracker'
 
 include Belinkr
 

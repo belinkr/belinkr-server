@@ -10,14 +10,14 @@ require_relative './Tinto/Dispatcher'
 require_relative './Tinto/Localizer'
 require_relative './Tinto/Sanitizer'
 require_relative './Locales/Loader'
-require_relative 'API/Invitations'
-require_relative 'API/Resets'
+#require_relative 'API/Invitations'
+#require_relative 'API/Resets'
 require_relative 'API/Sessions'
-require_relative 'API/Users'
+#require_relative 'API/Users'
 
-require_relative 'App/Session/Member'
-require_relative 'App/User/Member'
-require_relative 'App/Entity/Member'
+require_relative 'Data/Session/Member'
+require_relative 'Data/User/Member'
+require_relative 'Data/Entity/Member'
 
 $redis ||= Redis.new
 

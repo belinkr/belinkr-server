@@ -1,35 +1,48 @@
-#guard :minitest, test_folders: ["Spec"], test_file_patterns: ["*Spec.rb"] do
-#  watch(%r|^Spec/(.*)/(.*)Spec\.rb|)
-#end
+# encoding: utf-8
 
-group :data_objects do
-  guard :minitest, test_folders: ["Spec"], 
+group :data do
+  guard :minitest, test_folders: ["Spec/Data"], 
   test_file_patterns: ["*MemberSpec.rb", "*CollectionSpec.rb"] do
-    watch(%r|^App/(.*)/(.*)\.rb|) { |matches| 
+    watch(%r|^Data/(.*)/(.*)\.rb|) { |matches| 
       "Spec/#{matches[1]}/#{matches[2]}Spec.rb" 
     }
-    watch(%r|^App/(.*)/(.*)/(.*)\.rb|) { |matches| 
+    watch(%r|^Data/(.*)/(.*)/(.*)\.rb|) { |matches| 
       "Spec/#{matches[1]}/#{matches[2]}/#{matches[3]}Spec.rb" 
     }
-    watch(%r|^Spec/(.*)/(.*)Spec\.rb|)
+    watch(%r|^Spec/Data/(.*)/(.*)Spec\.rb|)
+  end
+end
+
+group :services do
+  guard :minitest, test_folders: ["Spec/Services"], 
+  test_file_patterns: ["*Spec.rb"] do
+    watch(%r|^Services/(.*)\.rb|) { |matches| 
+      "Spec/Services/#{matches[1]}Spec.rb" 
+    }
+    watch(%r|^Services/(.*)/(.*)\.rb|) { |matches| 
+      "Spec/Services/#{matches[1]}/#{matches[2]}Spec.rb" 
+    }
+    watch(%r|^Spec/Services/(.*)Spec\.rb|)
+    watch(%r|^Spec/Services/(.*)/(.*)Spec\.rb|)
   end
 end
 
 group :contexts do
-  guard :minitest, test_folders: ["Spec/Contexts"], 
-  test_file_patterns: ["*Spec.rb"] do
-    watch(%r|^App/Contexts/(.*)\.rb|) { |matches| 
-      "Spec/Contexts/#{matches.last}Spec.rb" 
+  guard :minitest, test_folders: ["Spec/Cases"], 
+  test_file_patterns: ["*ContextSpec.rb"] do
+    watch(%r|^Cases/(.*)/(.*)\.rb|) { |matches| 
+      "Spec/#{matches[1]}/#{matches[2]}Spec.rb" 
     }
-    watch(%r|^(.*)Spec.rb|)
+    watch(%r|^Spec/Cases/(.*)/(.*)Spec\.rb|)
   end
 end
 
 group :unit do
   guard :minitest, test_folders: ["Spec"], 
   test_file_patterns: ["*Spec.rb"] do
-    'data_objects'
+    'data'
     'contexts'
+    'services'
   end
 end
 
