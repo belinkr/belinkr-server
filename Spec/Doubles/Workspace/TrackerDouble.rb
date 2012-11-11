@@ -5,6 +5,9 @@ module Belinkr
       def add(*args)
       end #add
 
+      def delete(*args)
+      end #delete
+
       def link_to_all(*args)
       end #link_to_all
 

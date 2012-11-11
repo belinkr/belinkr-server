@@ -87,5 +87,59 @@ describe Profile::Member do
       profile.entity_id.must_equal entity.id.to_s
     end
   end #link_to
+
+  describe '#increment_followers_counter' do
+    it 'increments the followers counter' do
+      profile = Profile::Member.new
+      profile.followers_counter.must_equal 0
+      profile.increment_followers_counter
+      profile.followers_counter.must_equal 1
+    end
+  end #increment_followers_counter
+
+  describe '#decrement_followers_counter' do
+    it 'decrements the followers counter' do
+      profile = Profile::Member.new
+      profile.followers_counter.must_equal 0
+      profile.increment_followers_counter
+      profile.followers_counter.must_equal 1
+    end 
+  end #decrement_followers_counter
+
+  describe '#increment_following_counter' do
+    it 'increments the following counter' do
+      profile = Profile::Member.new
+      profile.following_counter.must_equal 0
+      profile.increment_following_counter
+      profile.following_counter.must_equal 1
+    end
+  end #increment_following_counter
+
+  describe '#decrement_following_counter' do
+    it 'decrements the following counter' do
+      profile = Profile::Member.new
+      profile.following_counter.must_equal 0
+      profile.increment_following_counter
+      profile.following_counter.must_equal 1
+    end 
+  end #decrement_following_counter
+
+  describe '#increment_status_counter' do
+    it 'increments the status counter' do
+      profile = Profile::Member.new
+      profile.status_counter.must_equal 0
+      profile.increment_status_counter
+      profile.status_counter.must_equal 1
+    end
+  end #increment_status_counter
+
+  describe '#decrement_status_counter' do
+    it 'decrements the status counter' do
+      profile = Profile::Member.new
+      profile.status_counter.must_equal 0
+      profile.increment_status_counter
+      profile.status_counter.must_equal 1
+    end 
+  end #decrement_status_counter
 end # Profile::Member
 

@@ -18,14 +18,14 @@ module Belinkr
         attribute :id,              String
         attribute :workspace_id,    String
         attribute :entity_id,       String
-        attribute :invited_id,      String
+        attribute :autoinvited_id,  String
         attribute :state,           String
         attribute :created_at,      Time
         attribute :updated_at,      Time
         attribute :deleted_at,      Time
         attribute :rejected_at,     Time
 
-        validates_presence_of       :entity_id, :workspace_id, :invited_id,
+        validates_presence_of       :entity_id, :workspace_id, :autoinvited_id,
                                     :state
         
         def_delegators  :@state_machine, :accept, :reject
@@ -73,6 +73,16 @@ module Belinkr
         def storage_key
           "entities:#{entity_id}:workspaces:autoinvitations"
         end
+
+        def link_to(arguments)
+          autoinvited         = arguments.fetch(:autoinvited)
+          workspace           = arguments.fetch(:workspace)
+
+          self.autoinvited_id = autoinvited.id
+          self.workspace_id   = workspace.id
+          self.entity_id      = workspace.entity_id
+          self
+        end #link_to
 
         private
 

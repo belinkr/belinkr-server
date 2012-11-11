@@ -14,7 +14,7 @@ module Belinkr
       end # initialize
 
       def call
-        enforcer.authorize(actor, 'delete')
+        enforcer.authorize(actor, :delete)
         scrapbook.delete
         scrapbooks.delete scrapbook
 

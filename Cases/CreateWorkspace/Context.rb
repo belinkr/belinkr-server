@@ -7,31 +7,31 @@ module Belinkr
       include Tinto::Context
 
       def initialize(arguments)
-        @actor                      = arguments.fetch(:actor)
-        @workspace                  = arguments.fetch(:workspace)
-        @workspaces                 = arguments.fetch(:workspaces)
-        @entity                     = arguments.fetch(:entity)
-        @tracker                    = arguments.fetch(:tracker)
-        @administrators             = arguments.fetch(:administrators)
-        @administrator_memberships  = arguments
-                                        .fetch(:administrator_memberships)
+        @actor                        = arguments.fetch(:actor)
+        @workspace                    = arguments.fetch(:workspace)
+        @workspaces                   = arguments.fetch(:workspaces)
+        @entity                       = arguments.fetch(:entity)
+        @tracker                      = arguments.fetch(:tracker)
+        @administrators               = arguments.fetch(:administrators)
+        @memberships_as_administrator = arguments
+                                        .fetch(:memberships_as_administrator)
       end
 
       def call
-        workspace                   .link_to(entity)
-        workspaces                  .add(workspace)
-        administrators              .add(actor)
-        administrator_memberships   .add(workspace)
-        tracker                     .add('administrator', actor.id)
+        workspace                     .link_to(entity)
+        workspaces                    .add(workspace)
+        administrators                .add(actor)
+        memberships_as_administrator  .add(workspace)
+        tracker                       .add(:administrator, actor.id)
 
         will_sync workspace, workspaces, administrators, 
-                  administrator_memberships, tracker
+                  memberships_as_administrator, tracker
       end #call
 
       private
 
       attr_reader :actor, :workspace, :workspaces, :administrators, 
-                  :administrator_memberships, :tracker, :entity
+                  :memberships_as_administrator, :tracker, :entity
     end # Context
   end # CreateWorkspace
 end # Belinkr

@@ -25,7 +25,7 @@ describe 'delete scrapbook' do
       scrapbooks: @scrapbooks
     )
     
-    enforcer.expect :authorize, enforcer, [@actor, 'delete']
+    enforcer.expect :authorize, enforcer, [@actor, :delete]
     context.call
     enforcer.verify
   end

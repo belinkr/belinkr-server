@@ -49,5 +49,43 @@ describe Workspace::Member do
       workspace.entity_id.must_equal entity.id.to_s
     end
   end #link_to
+
+  describe '#increment_user_counter' do
+    it 'increments the user counter' do
+      workspace = Workspace::Member.new
+      workspace.user_counter.must_equal 0
+      workspace.increment_user_counter
+      workspace.user_counter.must_equal 1
+    end
+  end #increment_user_counter
+
+  describe '#decrement_user_counter' do
+    it 'decrements the user counter' do
+      workspace = Workspace::Member.new
+      workspace.user_counter.must_equal 0
+      workspace.increment_user_counter
+      workspace.user_counter.must_equal 1
+      workspace.decrement_user_counter
+      workspace.user_counter.must_equal 0 
+    end
+  end #decrement_user_counter
+
+  describe '#increment_status_counter' do
+    it 'increments the status counter' do
+      workspace = Workspace::Member.new
+      workspace.status_counter.must_equal 0
+      workspace.increment_status_counter
+      workspace.status_counter.must_equal 1
+    end
+  end #increment_status_counter
+
+  describe '#decrement_status_counter' do
+    it 'decrements the status counter' do
+      workspace = Workspace::Member.new
+      workspace.status_counter.must_equal 0
+      workspace.increment_status_counter
+      workspace.status_counter.must_equal 1
+    end 
+  end #decrement_status_counter
 end # Workspace::Member
 

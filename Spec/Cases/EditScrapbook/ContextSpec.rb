@@ -20,7 +20,7 @@ describe 'edit scrapbook' do
       scrapbook:          scrapbook, 
       scrapbook_changes:  scrapbook_changes
     )
-    enforcer.expect :authorize, scrapbook, [actor, 'update']
+    enforcer.expect :authorize, scrapbook, [actor, :update]
     context.call
     enforcer.verify
   end

@@ -19,9 +19,13 @@ module Belinkr
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
+      attribute :user_counter,    Integer, default: 0
+      attribute :status_counter,  Integer, default: 0
 
-      validates_presence_of       :name, :entity_id
+      validates_presence_of       :name, :entity_id, :user_counter,
+                                  :status_counter
       validates_length_of         :name, min: 1, max: 250
+      validates_numericalness_of  :user_counter, :status_counter
 
       def_delegators :@member,    *Tinto::Member::INTERFACE
 
@@ -38,6 +42,22 @@ module Belinkr
         self.entity_id = entity.id
         self
       end #link_to
+
+      def increment_user_counter
+        self.user_counter = user_counter + 1
+      end #increment_user_counter
+
+      def decrement_user_counter
+        self.user_counter = user_counter - 1
+      end #decrement_user_counter
+
+      def increment_status_counter
+        self.status_counter = status_counter + 1
+      end #increment_status_counter
+
+      def decrement_status_counter
+        self.status_counter = status_counter - 1
+      end #decrement_status_counter
     end # Member
   end # Workspace
 end # Belinkr

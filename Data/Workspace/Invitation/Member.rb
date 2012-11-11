@@ -76,6 +76,18 @@ module Belinkr
           "entities:#{entity_id}:workspaces:invitations"
         end
 
+        def link_to(arguments)
+          inviter           = arguments.fetch(:inviter)
+          invited           = arguments.fetch(:invited)
+          workspace         = arguments.fetch(:workspace)
+
+          self.inviter_id   = inviter.id
+          self.invited_id   = invited.id
+          self.workspace_id = workspace.id
+          self.entity_id    = workspace.entity_id
+          self
+        end #link_to
+
         private 
 
         def sync_state

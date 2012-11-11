@@ -173,7 +173,7 @@ en:
     attributes:
       entity_id:        entity
       workspace_id:     workspace
-      invited_id:       invited
+      autoinvited_id:   autoinvited
       state:            state
 
   message:

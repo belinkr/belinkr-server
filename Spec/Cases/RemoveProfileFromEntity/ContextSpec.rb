@@ -17,7 +17,7 @@ describe 'remove user from entity' do
     @profiles = Collection::Double.new
   end
 
-  it 'authorizes the user' do
+  it 'authorizes the actor' do
     enforcer = Minitest::Mock.new
     enforcer.expect :authorize, enforcer, [@actor, :delete]
 

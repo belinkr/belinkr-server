@@ -4,6 +4,7 @@ require 'ostruct'
 require_relative '../../../Cases/FollowUserInEntity/Context'
 require_relative '../../Doubles/Enforcer/Double'
 require_relative '../../Doubles/Collection/Double'
+require_relative '../../Doubles/Profile/Double'
 
 include Belinkr
 
@@ -12,6 +13,8 @@ describe 'follow user in entity' do
     @enforcer         = Enforcer::Double.new
     @actor            = OpenStruct.new
     @followed         = OpenStruct.new
+    @actor_profile    = Profile::Double.new
+    @followed_profile = Profile::Double.new
     @followers        = Collection::Double.new
     @following        = Collection::Double.new
     @entity           = OpenStruct.new
@@ -25,6 +28,8 @@ describe 'follow user in entity' do
       enforcer:         enforcer,
       actor:            @actor,
       followed:         @followed,
+      actor_profile:    @actor_profile,
+      followed_profile: @followed_profile,
       followers:        @followers,
       following:        @following,
       entity:           @entity,
@@ -44,6 +49,8 @@ describe 'follow user in entity' do
       actor:            @actor,
       followed:         @followed,
       followers:        @followers,
+      actor_profile:    @actor_profile,
+      followed_profile: @followed_profile,
       following:        following,
       entity:           @entity,
       actor_timeline:   @actor_timeline,
@@ -61,6 +68,8 @@ describe 'follow user in entity' do
       enforcer:         @enforcer,
       actor:            @actor,
       followed:         @followed,
+      actor_profile:    @actor_profile,
+      followed_profile: @followed_profile,
       followers:        followers,
       following:        @following,
       entity:           @entity,
@@ -79,6 +88,8 @@ describe 'follow user in entity' do
       enforcer:         @enforcer,
       actor:            @actor,
       followed:         @followed,
+      actor_profile:    @actor_profile,
+      followed_profile: @followed_profile,
       followers:        @followers,
       following:        @following,
       entity:           @entity,
@@ -89,4 +100,43 @@ describe 'follow user in entity' do
     context.call
     actor_timeline.verify
   end
+
+  it 'increments the followers counter of the followed profile' do
+    followed_profile  = Minitest::Mock.new
+    context           = FollowUserInEntity::Context.new(
+      enforcer:         @enforcer,
+      actor:            @actor,
+      followed:         @followed,
+      actor_profile:    @actor_profile,
+      followed_profile: followed_profile,
+      followers:        @followers,
+      following:        @following,
+      entity:           @entity,
+      actor_timeline:   @actor_timeline,
+      latest_statuses:  @latest_statuses
+    )
+    followed_profile.expect :increment_followers_counter, followed_profile
+    context.call
+    followed_profile.verify
+  end
+
+  it 'increments the following counter of the actor profile' do
+    actor_profile = Minitest::Mock.new
+    context       = FollowUserInEntity::Context.new(
+      enforcer:         @enforcer,
+      actor:            @actor,
+      followed:         @followed,
+      actor_profile:    actor_profile,
+      followed_profile: @followed_profile,
+      followers:        @followers,
+      following:        @following,
+      entity:           @entity,
+      actor_timeline:   @actor_timeline,
+      latest_statuses:  @latest_statuses
+    )
+    actor_profile.expect :increment_following_counter, actor_profile
+    context.call
+    actor_profile.verify
+  end
 end # follow user in entity
+

@@ -14,7 +14,7 @@ module Belinkr
       end #initialize
 
       def call
-        enforcer.authorize(actor, 'update')
+        enforcer.authorize(actor, :update)
         scrapbook.update(scrapbook_changes)
 
         will_sync scrapbook

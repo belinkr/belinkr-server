@@ -12,7 +12,9 @@ module Belinkr
       def initialize(options={})
         @enforcer         = options.fetch(:enforcer)
         @actor            = options.fetch(:actor)
+        @actor_profile    = options.fetch(:actor_profile)
         @followed         = options.fetch(:followed)
+        @followed_profile = options.fetch(:followed_profile)
         @followers        = options.fetch(:followers)
         @following        = options.fetch(:following)
         @entity           = options.fetch(:entity)
@@ -21,15 +23,17 @@ module Belinkr
       end
 
       def call
-        enforcer.authorize(actor, :follow)
-        followers.add actor
-        following.add followed
-        actor_timeline.merge latest_statuses
+        enforcer          .authorize(actor, :follow)
+        followers         .add(actor)
+        following         .add(followed)
+        actor_profile     .increment_following_counter
+        followed_profile  .increment_followers_counter
+        actor_timeline    .merge(latest_statuses)
 
         register_activity_context.call
 
-        will_sync followers, following, actor_timeline, 
-                  register_activity_context
+        will_sync followers, following, actor_profile, followed_profile, 
+                  actor_timeline, register_activity_context
       end #call
 
       def register_activity_context
@@ -43,7 +47,8 @@ module Belinkr
 
       private
 
-      attr_reader :enforcer, :actor, :followed, :followers, :following,
+      attr_reader :enforcer, :actor, :actor_profile, :followed, 
+                  :followed_profile, :followers, :following,
                   :entity, :actor_timeline, :latest_statuses
     end # Context
   end # FollowUserInEntity

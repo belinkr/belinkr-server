@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'ostruct'
 require_relative '../../../../Locales/Loader'
 require_relative '../../../../Data/Workspace/Invitation/Member'
 
@@ -101,5 +102,24 @@ describe Workspace::Invitation::Member do
       invitation.rejected?.must_equal true
     end
   end #rejected?
+
+  describe '#link_to' do
+    it 'links the invitation to the passed inviter, invited and workspace' do
+      invitation  = Workspace::Invitation::Member.new
+      inviter     = OpenStruct.new(id: 1)
+      invited     = OpenStruct.new(id: 2)
+      workspace   = OpenStruct.new(id: 3, entity_id: 4)
+      invitation.link_to(
+        inviter: inviter, 
+        invited: invited, 
+        workspace: workspace
+      )
+
+      invitation.inviter_id     .must_equal inviter.id.to_s
+      invitation.invited_id     .must_equal invited.id.to_s
+      invitation.workspace_id   .must_equal workspace.id.to_s
+      invitation.entity_id      .must_equal workspace.entity_id.to_s
+    end
+  end #link_to
 end # Workspace::Invitation::Member
 

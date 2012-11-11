@@ -126,8 +126,5 @@ describe Invitation::Member do
       @invitation.accepted?.must_equal true
     end
   end #accept
-
-  describe '#authorize' do
-
-  end #authorize
 end # Invitation::Member
+
