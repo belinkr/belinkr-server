@@ -71,7 +71,7 @@ module Belinkr
         end
 
         def storage_key
-          "entities:#{entity_id}:workspaces:autoinvitations"
+          "entities:#{entity_id}:workspaces:#{workspace_id}:autoinvitations"
         end
 
         def link_to(arguments)
@@ -93,3 +93,4 @@ module Belinkr
     end # Autoinvitation
   end # Workspace
 end # Belinkr
+

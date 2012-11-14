@@ -12,14 +12,11 @@ module Belinkr
       end #initialize
         
       def prepare
-        email     = payload.fetch('email')
-        plaintext = payload.fetch('password')
-        remember  = payload.fetch('remember', false)
-        user_id   = User::Locator.new.id_for(email)
+        user_id   = User::Locator.new.id_for(payload.fetch 'email')
 
         { 
           actor:      User::Member.new(id: user_id).fetch,
-          plaintext:  plaintext,
+          plaintext:  payload.fetch('password'),
           session:    Session::Member.new,
           sessions:   Session::Collection.new
         }

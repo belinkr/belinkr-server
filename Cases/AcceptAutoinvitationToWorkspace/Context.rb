@@ -8,7 +8,6 @@ module Belinkr
 
       def initialize(arguments)
         @actor                        = arguments.fetch(:actor)
-        @autoinvited                  = arguments.fetch(:autoinvited)
         @enforcer                     = arguments.fetch(:enforcer)
         @workspace                    = arguments.fetch(:workspace)
         @autoinvitation               = arguments.fetch(:autoinvitation)
@@ -24,8 +23,8 @@ module Belinkr
         autoinvitation              .accept
         workspace                   .increment_user_counter
 
-        tracker                     .delete(:autoinvited, autoinvited.id)
-        tracker                     .add(:collaborator, autoinvited.id)
+        tracker                     .delete(:autoinvited, actor.id)
+        tracker                     .add(:collaborator, actor.id)
 
         memberships_as_autoinvited  .delete(workspace)
         memberships_as_collaborator .add(workspace)
@@ -36,9 +35,8 @@ module Belinkr
 
       private
 
-      attr_reader :enforcer, :actor, :autoinvited, :workspace, :autoinvitation,
-                  :tracker, :memberships_as_autoinvited, 
-                  :memberships_as_collaborator
+      attr_reader :enforcer, :actor, :workspace, :autoinvitation, :tracker,
+                  :memberships_as_autoinvited, :memberships_as_collaborator
     end # Context
   end # AcceptAutoinvitationToWorkspace
 end # Belinkr
