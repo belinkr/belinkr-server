@@ -12,15 +12,15 @@ include Belinkr
 describe 'log out request model' do
   before { $redis.flushdb }
 
-  it 'returns data objects for the Log Out context' do
-    user = Factory.user(password: 'changeme')
-    user.sync
+  it 'returns data objects for the LogOut context' do
+    actor = Factory.user(password: 'changeme')
+    actor.sync
     user_locator = User::Locator.new
-    user_locator.add user.email, user.id
+    user_locator.add actor.email, actor.id
     user_locator.sync
     
     payload = { 
-      email:    user.email,
+      email:    actor.email,
       password: 'changeme',
       remember: nil
     }.to_json
@@ -29,7 +29,7 @@ describe 'log out request model' do
     request = LogIn::Request.new(payload)
     data    = request.prepare
 
-    data.fetch(:actor).id   .must_equal user.id
+    data.fetch(:actor).id   .must_equal actor.id
     data.fetch(:plaintext)  .must_equal payload.fetch('password')
     data.fetch(:session)    .must_be_instance_of Session::Member
     data.fetch(:sessions)   .must_be_instance_of Session::Collection

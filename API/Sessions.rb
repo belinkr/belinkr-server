@@ -1,7 +1,7 @@
 # encoding: utf-8
 require_relative '../API'
 require_relative '../Config'
-require_relative '../Data/Session/Presenter'
+require_relative '../Resources/Session/Presenter'
 require_relative '../Cases/LogIn/Request'
 require_relative '../Cases/LogIn/Context'
 #require_relative '../App/Cases/LogOut/Request'

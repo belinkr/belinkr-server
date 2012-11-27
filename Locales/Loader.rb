@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'i18n'
-require_relative '../Tinto/Transformer'
+require 'Tinto/Transformer'
 require_relative '../Config'
 
 Belinkr::Config::AVAILABLE_LOCALES.each do |locale|

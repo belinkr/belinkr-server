@@ -11,7 +11,7 @@ Warbler::Config.new do |config|
   config.features = %w(gemjar compiled)
 
   # Application directories to be included in the webapp.
-  config.dirs = %w(API Cases Data Services config Locales Tinto Workers)
+  config.dirs = %w(API Cases Resources Services config Locales Workers)
 
   # Additional files/directories to include, above those in config.dirs
   config.includes = ['API.rb', 'Config.rb']
@@ -94,7 +94,6 @@ Warbler::Config.new do |config|
   #  'API/**/*.rb',
   #  'App/**/*.rb',
   #  'Locales/*.rb',
-  #  'Tinto/*.rb',
   #  'Workers/**/*.rb'
   #]
 

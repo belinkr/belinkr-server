@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'set'
 require_relative './Tracker/RedisBackend'
-require_relative '../Data/Workspace/Membership/Collection'
+require_relative '../Resources/Workspace/Membership/Collection'
 
 module Belinkr
   module Workspace

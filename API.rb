@@ -6,18 +6,18 @@ require 'rack/session/redis'
 require 'sinatra/base'
 require 'carrierwave'
 
-require_relative './Tinto/Dispatcher'
-require_relative './Tinto/Localizer'
-require_relative './Tinto/Sanitizer'
+require 'Tinto/Dispatcher'
+require 'Tinto/Localizer'
+require 'Tinto/Sanitizer'
 require_relative './Locales/Loader'
-#require_relative 'API/Invitations'
-#require_relative 'API/Resets'
-require_relative 'API/Sessions'
-#require_relative 'API/Users'
+#require_relative './.API/Invitations'
+#require_relative './API/Resets'
+require_relative './API/Sessions'
+#require_relative './API/Users'
 
-require_relative 'Data/Session/Member'
-require_relative 'Data/User/Member'
-require_relative 'Data/Entity/Member'
+require_relative './Resources/Session/Member'
+require_relative './Resources/User/Member'
+require_relative './Resources/Entity/Member'
 
 $redis ||= Redis.new
 

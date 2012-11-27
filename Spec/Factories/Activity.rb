@@ -1,6 +1,6 @@
 # encoding: utf-8
 require_relative 'Random'
-require_relative '../../Data/Activity/Member'
+require_relative '../../Resources/Activity/Member'
 
 module Belinkr
   class Factory

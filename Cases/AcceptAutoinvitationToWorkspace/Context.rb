@@ -1,5 +1,6 @@
 # encoding: utf-8
-require_relative '../../Tinto/Context'
+# encoding: utf-8
+require 'Tinto/Context'
 
 module Belinkr
   module AcceptAutoinvitationToWorkspace

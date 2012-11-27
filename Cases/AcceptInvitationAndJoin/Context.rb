@@ -1,7 +1,7 @@
 # encoding: utf-8
 require_relative '../CreateProfileInEntity/Context'
 require_relative '../RegisterActivity/Context'
-require_relative '../../Tinto/Context'
+require 'Tinto/Context'
 
 module Belinkr
   module AcceptInvitationAndJoin

@@ -1,10 +1,17 @@
 # encoding: utf-8
+require_relative '../../Resources/Workspace/Autoinvitation/Member'
+require_relative '../../Resources/Workspace/Autoinvitation/Enforcer'
+require_relative '../../Resources/Workspace/Membership/Collection'
+require_relative '../../Resources/Workspace/Member'
+require_relative '../../Services/Tracker'
 
 module Belinkr
   module AcceptAutoinvitationToWorkspace
     class Request
       def initialize(payload, actor, entity)
-        @payload = payload
+        @payload  = payload
+        @actor    = actor
+        @entity   = entity
       end #initialize
 
       def prepare
@@ -18,6 +25,10 @@ module Belinkr
           memberships_as_collaborator:  memberships_as_collaborator
         }
       end #prepare
+
+      private
+
+      attr_reader :payload, :actor, :entity
 
       def autoinvitation
         Workspace::Autoinvitation.new(

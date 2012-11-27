@@ -1,5 +1,5 @@
 # encoding: utf-8
-require_relative '../../Tinto/Context'
+require 'Tinto/Context'
 require_relative '../RegisterActivity/Context'
 
 module Belinkr

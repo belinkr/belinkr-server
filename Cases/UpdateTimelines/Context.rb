@@ -1,6 +1,6 @@
 # encoding: utf-8
-require_relative '../../Data/Status/Collection'
-require_relative '../../Tinto/Context'
+require_relative '../../Resources/Status/Collection'
+require 'Tinto/Context'
 
 module Belinkr
   module UpdateTimelines

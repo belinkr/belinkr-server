@@ -1,6 +1,6 @@
 # encoding: utf-8
 require_relative '../../Services/Locator'
-require_relative '../../Tinto/Context'
+require 'Tinto/Context'
 
 module Belinkr
   module CreateProfileInEntity

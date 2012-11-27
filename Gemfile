@@ -17,6 +17,7 @@ group :production do
   gem 'mini_magick'
   gem 'pony'
   gem 'sanitize'
+  gem 'tinto'
   gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
 end
 
@@ -30,3 +31,4 @@ group :test do
   gem 'rb-fsevent', require: false
   gem 'rb-fchange', require: false
 end
+

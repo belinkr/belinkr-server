@@ -1,7 +1,7 @@
 # encoding: utf-8
-require_relative '../../Data/User/Member'
-require_relative '../../Data/Session/Member'
-require_relative '../../Data/Session/Collection'
+require_relative '../../Resources/User/Member'
+require_relative '../../Resources/Session/Member'
+require_relative '../../Resources/Session/Collection'
 require_relative '../../Services/Locator'
 
 module Belinkr

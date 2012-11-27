@@ -1,15 +1,25 @@
 # encoding: utf-8
+gem 'tinto'
 
-group :data do
-  guard :minitest, test_folders: ["Spec/Data"], 
+group :unit do
+  guard :minitest, test_folders: ["Spec"], 
+  test_file_patterns: ["*Spec.rb"] do
+    'resources'
+    'contexts'
+    'services'
+  end
+end
+
+group :resources do
+  guard :minitest, test_folders: ["Spec/Resources"], 
   test_file_patterns: ["*MemberSpec.rb", "*CollectionSpec.rb"] do
-    watch(%r|^Data/(.*)/(.*)\.rb|) { |matches| 
+    watch(%r|^Resources/(.*)/(.*)\.rb|) { |matches| 
       "Spec/#{matches[1]}/#{matches[2]}Spec.rb" 
     }
-    watch(%r|^Data/(.*)/(.*)/(.*)\.rb|) { |matches| 
+    watch(%r|^Resources/(.*)/(.*)/(.*)\.rb|) { |matches| 
       "Spec/#{matches[1]}/#{matches[2]}/#{matches[3]}Spec.rb" 
     }
-    watch(%r|^Spec/Data/(.*)/(.*)Spec\.rb|)
+    watch(%r|^Spec/Resources/(.*)/(.*)Spec\.rb|)
   end
 end
 
@@ -34,15 +44,6 @@ group :contexts do
       "Spec/#{matches[1]}/#{matches[2]}Spec.rb" 
     }
     watch(%r|^Spec/Cases/(.*)/(.*)Spec\.rb|)
-  end
-end
-
-group :unit do
-  guard :minitest, test_folders: ["Spec"], 
-  test_file_patterns: ["*Spec.rb"] do
-    'data'
-    'contexts'
-    'services'
   end
 end
 

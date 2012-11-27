@@ -1,5 +1,5 @@
 # encoding: utf-8
-require_relative '../../Tinto/Context'
+require 'Tinto/Context'
 
 module Belinkr
   module AssignCollaboratorRoleInWorkspace

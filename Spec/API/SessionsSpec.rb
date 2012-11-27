@@ -10,8 +10,8 @@ require_relative '../Factories/User'
 require_relative '../Factories/Profile'
 require_relative '../Factories/Entity'
 require_relative '../Support/Helpers'
-require_relative '../../Data/Profile/Collection'
-require_relative '../../Data/Session/Member'
+require_relative '../../Resources/Profile/Collection'
+require_relative '../../Resources/Session/Member'
 require_relative '../../Cases/CreateProfileInEntity/Context'
 
 include Belinkr

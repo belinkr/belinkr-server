@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'bcrypt'
-require_relative '../../Tinto/Context'
+require 'Tinto/Context'
 
 module Belinkr
   module LogIn
