@@ -78,26 +78,24 @@ module Belinkr
         return  {} unless actor
         return  { relationship: 'administrator'
                 } if User::Role::Orchestrator.is_entity_admin?(@actor)
-
-        return  { relationship: 'collaborator'
-                } if memberships_for(actor, :collaborator).include?(@resource)
-
+        return  { relationship: 'collaborator' 
+                } if @resource.is_collaborator?(actor)
         return  { relationship: 'administrator'
-                } if memberships_for(actor, :administrator).include?(@resource)
-
+                } if @resource.is_administrator?(actor)
         return  { relationship: 'invited'
-                } if memberships_for(actor, :invited).include?(@resource)
-
+                } if @resource.is_invited?(actor)
         return  { relationship: 'autoinvited'
-                } if memberships_for(actor, :autoinvited).include?(@resource)
-
+                } if @resource.is_autoinvited?(actor)
         return  { relationship: 'none' }
       end
 
       def tracker_for(workspace)
-        Invitation::Tracker
-            .new(workspace_id: workspace.id, entity_id: workspace.entity_id)
+        Invitation::Tracker.new(
+          workspace_id: workspace.id, 
+          entity_id: workspace.entity_id
+        )
       end
     end # Presenter
   end # Workspace
 end # Belinkr
+

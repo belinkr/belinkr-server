@@ -53,12 +53,13 @@ module Belinkr
 
       def enforcer
         Workspace::Invitation::Enforcer.new(
-          collaborators:  Set.new,
-          administrators: Set.new
+          collaborators:  relator.collaborators,
+          administrators: relator.administrators
         )
       end #enforcer
 
       def memberships_as_invited
+        relator
         Workspace::Membership::Collection.new(
           kind: 'invited',
           user_id: actor.id,

@@ -128,7 +128,10 @@ module Belinkr
       end #encrypted_password_for
 
       def encrypted?(password=@password)
+        BCrypt::Password.new(password)
         true
+      rescue BCrypt::Errors::InvalidHash
+        false
       end #encrypted?
     end # Member
   end # User

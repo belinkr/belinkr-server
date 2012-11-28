@@ -2,7 +2,7 @@
 require 'virtus'
 require 'aequitas'
 require 'Tinto/Set'
-require_relative '../../Profile/Member'
+require_relative '../../User/Member'
 
 module Belinkr
   module Workspace
@@ -31,11 +31,11 @@ module Belinkr
         end
 
         def instantiate_member(attributes)
-          Profile::Member.new attributes.merge(entity_id: entity_id)
+          User::Member.new attributes
         end
 
         def storage_key
-          "entities:#{entity_id}:workspaces:#{workspace_id}:collaborators"
+          "entities:#{entity_id}:workspaces:#{workspace_id}:#{kind}"
         end
       end # Collection
     end # User
