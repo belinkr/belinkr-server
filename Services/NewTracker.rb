@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'forwardable'
-require_relative './MemoryBackend'
+require_relative './NewTracker/MemoryBackend'
 
 module Belinkr
   module Workspace
@@ -37,11 +37,15 @@ module Belinkr
         self
       end #unlink_from_all_users
 
-      def relink_to_all_users(workspace)
-      end #relink_to_all_users
-
       def relink_to_all_workspaces(user)
+        KINDS.each { |kind| relink_to_workspaces(user, kind) }
+        self
       end #relink_to_all_workspaces
+        
+      def relink_to_all_users(workspace)
+        KINDS.each { |kind| relink_to_users(workspace, kind) }
+        self
+      end #relink_to_all_users
     end # Tracker
   end # Workspace
 end # Belinkr

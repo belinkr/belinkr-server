@@ -19,9 +19,10 @@ module Belinkr
 
       def_delegators :@set,     *Tinto::Set::INTERFACE
 
-      def initialize(attributes={})
+      def initialize(attributes={}, storage_key=nil)
         super attributes
-        @set = Tinto::Set.new self
+        @storage_key  = storage_key
+        @set          = Tinto::Set.new self
       end
 
       def instantiate_member(attributes={})
@@ -29,8 +30,9 @@ module Belinkr
       end
 
       def storage_key
-        "entities:#{entity_id}:workspaces"
+        @storage_key || "entities:#{entity_id}:workspaces"
       end
     end # Collection
   end # Workspace
 end # Belinkr
+
