@@ -1,69 +1,11 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'ostruct'
-require 'set'
+require_relative './Tracker'
 
-class Tracker
+include Belinkr::Workspace
 
-  def initialize
-    @workspaces = {}
-    @users      = {}
-  end #initialize
-
-  def register(workspace, user, kind)
-    storage_key = users_storage_key_for(workspace, kind)
-    data        = workspaces.fetch(storage_key, Set.new).add user.id
-    workspaces.store(storage_key, data)
-
-    storage_key = workspaces_storage_key_for(user, kind)
-    data        = users.fetch(storage_key, Set.new).add workspace.id
-    users.store(storage_key, data)
-
-    self
-  end #register
-
-  def unregister(workspace, user, kind)
-    storage_key = users_storage_key_for(workspace, kind)
-    data        = workspaces.fetch(storage_key, Set.new).delete user.id
-    workspaces.store(storage_key, data)
-
-    storage_key = workspaces_storage_key_for(user, kind)
-    data        = users.fetch(storage_key, Set.new).delete workspace.id
-    users.store(storage_key, data)
-
-    self
-  end #unregister
-
-  def users_for(workspace, kind)
-    workspaces.fetch(users_storage_key_for(workspace, kind), Set.new)
-  end #users_for
-
-  def workspaces_for(user, kind)
-    users.fetch(workspaces_storage_key_for(user, kind), Set.new)
-  end #workspaces_for
-
-  def unlink_from_all_workspaces(user)
-  end #unlink_from_all_workspace
-
-  def unlink_from_all_users(workspace)
-    
-  end #unlink_from_all_users
-
-  private
-
-  def users_storage_key_for(workspace, kind)
-    "workspaces:#{workspace.id}:users:#{kind}"
-  end #workspace_storage_key_for
-
-  def workspaces_storage_key_for(user, kind)
-    "users:#{user.id}:workspaces:#{kind}"
-  end #workspace_storage_key_for
-
-  attr_reader :workspaces, :users
-end # Tracker
-
-
-describe '@tracker' do
+describe 'tracker' do
   before do
     @tracker = Tracker.new
   end
@@ -163,3 +105,4 @@ describe '@tracker' do
     end
   end #workspaces_for
 end
+
