@@ -1,10 +1,12 @@
 # encoding: utf-8
 require 'redis'
-require_relative '../../App/Entity/Member'
-require_relative '../../App/User/Member'
-require_relative '../../App/Profile/Member'
-require_relative '../../App/Contexts/CreateEntity'
-require_relative '../../App/Contexts/CreateProfileInEntity'
+require_relative '../../Resources/Entity/Member'
+require_relative '../../Resources/Entity/Collection'
+require_relative '../../Resources/User/Member'
+require_relative '../../Resources/Profile/Member'
+require_relative '../../Resources/Profile/Collection'
+require_relative '../../Cases/CreateEntity/Context'
+require_relative '../../Cases/CreateProfileInEntity/Context'
 
 $redis = Redis.new
 $redis.flushdb
@@ -12,8 +14,9 @@ $redis.flushdb
 include Belinkr
 
 @entity = Entity::Member.new(name: 'belinkr labs')
+@entities = Entity::Collection.new
 
-CreateEntity.new(@entity).call
+CreateEntity::Context.new(entity: @entity, entities: @entities).run
 
 @user   = User::Member.new(
   first:    'Lorenzo',
@@ -22,7 +25,13 @@ CreateEntity.new(@entity).call
   password: 'changeme'
 )
 @profile = Profile::Member.new
+@profiles = Profile::Collection.new entity_id: @entity.id
 
-CreateProfileInEntity.new(@user, @profile, @entity).call
+CreateProfileInEntity::Context.new(
+  actor: @user,
+  profile: @profile,
+  profiles: @profiles,
+  entity: @entity,
+).run
 
 p @profile.inspect
