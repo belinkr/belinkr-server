@@ -7,27 +7,24 @@ module Belinkr
       include Tinto::Context
 
       def initialize(arguments)
-        @actor                      = arguments.fetch(:actor)
-        @workspace                  = arguments.fetch(:workspace)
-        @enforcer                   = arguments.fetch(:enforcer)
-        @invitation                 = arguments.fetch(:invitation)
-        @tracker                    = arguments.fetch(:tracker)
-        @memberships_as_invited     = arguments.fetch(:memberships_as_invited)
+        @actor      = arguments.fetch(:actor)
+        @workspace  = arguments.fetch(:workspace)
+        @enforcer   = arguments.fetch(:enforcer)
+        @invitation = arguments.fetch(:invitation)
+        @tracker    = arguments.fetch(:tracker)
       end #initialize
 
       def call
-        enforcer                    .authorize(actor, :reject)
-        invitation                  .reject
-        tracker                     .delete(:invited, actor.id)
-        memberships_as_invited      .delete(workspace)
+        enforcer    .authorize(actor, :reject)
+        invitation  .reject
+        tracker     .unregister(workspace, actor, :invited)
 
-        will_sync invitation, tracker, memberships_as_invited
+        will_sync invitation, tracker
       end #call
 
       private
 
-      attr_reader :actor, :workspace, :enforcer, :invitation, :tracker, 
-                  :memberships_as_invited
+      attr_reader :actor, :workspace, :enforcer, :invitation, :tracker
     end # Context
   end # RejectInvitationToWorkspace
 end # Belinkr

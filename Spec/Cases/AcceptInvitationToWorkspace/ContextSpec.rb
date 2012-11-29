@@ -15,8 +15,6 @@ describe 'accept invitation to workspace' do
     @workspace                    = OpenStruct.new
     @invitation                   = Workspace::Invitation::Double.new
     @tracker                      = Workspace::TrackerDouble.new
-    @memberships_as_invited       = Collection::Double.new
-    @memberships_as_collaborator  = Collection::Double.new
   end
 
   it 'authorizes the actor' do
@@ -26,9 +24,7 @@ describe 'accept invitation to workspace' do
       enforcer:                     enforcer,
       workspace:                    @workspace,
       invitation:                   @invitation,
-      tracker:                      @tracker,
-      memberships_as_invited:       @memberships_as_invited,
-      memberships_as_collaborator:  @memberships_as_collaborator
+      tracker:                      @tracker
     )
 
     enforcer.expect :authorize, true, [@actor, :accept]
@@ -43,9 +39,7 @@ describe 'accept invitation to workspace' do
       enforcer:                     @enforcer,
       workspace:                    @workspace,
       invitation:                   invitation,
-      tracker:                      @tracker,
-      memberships_as_invited:       @memberships_as_invited,
-      memberships_as_collaborator:  @memberships_as_collaborator
+      tracker:                      @tracker
     )
 
     invitation.expect :accept, invitation
@@ -60,9 +54,7 @@ describe 'accept invitation to workspace' do
       enforcer:                     @enforcer,
       workspace:                    workspace,
       invitation:                   @invitation,
-      tracker:                      @tracker,
-      memberships_as_invited:       @memberships_as_invited,
-      memberships_as_collaborator:  @memberships_as_collaborator
+      tracker:                      @tracker
     )
 
     workspace.expect :increment_user_counter, workspace
@@ -77,37 +69,12 @@ describe 'accept invitation to workspace' do
       enforcer:                     @enforcer,
       workspace:                    @workspace,
       invitation:                   @invitation,
-      tracker:                      tracker,
-      memberships_as_invited:       @memberships_as_invited,
-      memberships_as_collaborator:  @memberships_as_collaborator
+      tracker:                      tracker
     )
 
-    tracker.expect :delete, tracker, [:invited, @actor.id]
-    tracker.expect :add,    tracker, [:collaborator, @actor.id]
+    tracker.expect :accept, tracker, [@workspace, @actor, :invited]
     context.call
     tracker.verify
-  end
-
-  it 'creates a collaborator membership' do
-    memberships_as_invited      = Minitest::Mock.new
-    memberships_as_collaborator = Minitest::Mock.new
-
-    memberships_as_invited.expect :delete, memberships_as_invited, [@workspace]
-    memberships_as_collaborator.expect :add, memberships_as_collaborator, 
-                                                [@workspace]
-
-    context   = AcceptInvitationToWorkspace::Context.new(
-      actor:                        @actor,
-      enforcer:                     @enforcer,
-      workspace:                    @workspace,
-      invitation:                   @invitation,
-      tracker:                      @tracker,
-      memberships_as_invited:       memberships_as_invited,
-      memberships_as_collaborator:  memberships_as_collaborator
-    )
-    context.call
-    memberships_as_invited.verify
-    memberships_as_collaborator.verify
   end
 end # accept invitation to workspace
 

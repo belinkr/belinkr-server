@@ -7,29 +7,26 @@ module Belinkr
       include Tinto::Context
 
       def initialize(arguments)
-        @actor                      = arguments.fetch(:actor)
-        @autoinvited                = arguments.fetch(:autoinvited)
-        @workspace                  = arguments.fetch(:workspace)
-        @enforcer                   = arguments.fetch(:enforcer)
-        @autoinvitation             = arguments.fetch(:autoinvitation)
-        @tracker                    = arguments.fetch(:tracker)
-        @memberships_as_autoinvited = arguments
-                                        .fetch(:memberships_as_autoinvited)
+        @actor          = arguments.fetch(:actor)
+        @autoinvited    = arguments.fetch(:autoinvited)
+        @workspace      = arguments.fetch(:workspace)
+        @enforcer       = arguments.fetch(:enforcer)
+        @autoinvitation = arguments.fetch(:autoinvitation)
+        @tracker        = arguments.fetch(:tracker)
       end #initialize
 
       def call
-        enforcer                    .authorize(actor, :reject)
-        autoinvitation              .reject
-        tracker                     .delete(:autoinvited, autoinvited.id)
-        memberships_as_autoinvited  .delete(workspace)
+        enforcer       .authorize(actor, :reject)
+        autoinvitation .reject
+        tracker        .unregister(workspace, autoinvited, :autoinvited)
 
-        will_sync autoinvitation, tracker, memberships_as_autoinvited
+        will_sync autoinvitation, tracker
       end #call
 
       private
 
       attr_reader :actor, :autoinvited, :workspace, :enforcer, :autoinvitation,
-                  :tracker, :memberships_as_autoinvited
+                  :tracker
     end # Context
   end # RejectAutoinvitationToWorkspace
 end # Belinkr

@@ -26,59 +26,59 @@ module Belinkr
         end
 
         def link_user_to_workspace(workspace, user, kind)
-          key   = workspaces_key_for(user, kind)
-          data  = users.fetch(key, Set.new).add workspace.id.to_s
-          users.store(key, data)
-        end #link_user_to_workspace
-
-        def link_workspace_to_user(workspace, user, kind)
           key   = users_key_for(workspace, kind)
           data  = workspaces.fetch(key, Set.new).add user.id.to_s
           workspaces.store(key, data)
+        end #link_user_to_workspace
+
+        def link_workspace_to_user(workspace, user, kind)
+          key   = workspaces_key_for(user, kind)
+          data  = users.fetch(key, Set.new).add workspace.id.to_s
+          users.store(key, data)
         end #link_workspace_to_user
 
         def unlink_user_from_workspace(workspace, user, kind)
-          key   = workspaces_key_for(user, kind)
-          data  = users.fetch(key, Set.new).delete workspace.id.to_s
-          users.store(key, data)
-        end #unlink_user_from_workspace
-
-        def unlink_workspace_from_user(workspace, user, kind)
           key   = users_key_for(workspace, kind)
           data  = workspaces.fetch(key, Set.new).delete user.id.to_s
           workspaces.store(key, data)
+        end #unlink_user_from_workspace
+
+        def unlink_workspace_from_user(workspace, user, kind)
+          key   = workspaces_key_for(user, kind)
+          data  = users.fetch(key, Set.new).delete workspace.id.to_s
+          users.store(key, data)
         end #unlink_workspace_from_user
 
         def unlink_from_workspaces(user, kind)
-          key   = workspaces_key_for(user, kind)
-          data  = users.fetch(key, Set.new)
-
-          users.store(deleted_key_for(key), data)
-          users.store(key, Set.new)
+          workspace_ids = users.fetch(workspaces_key_for(user, kind), Set.new)
+          workspace_ids.each do |workspace_id|
+            workspace = Struct.new(:id).new(workspace_id)
+            unlink_user_from_workspace(workspace, user, kind)
+          end
         end #unlink_from_workspaces
 
         def unlink_from_users(workspace, kind)
-          key   = users_key_for(workspace, kind)
-          data  = workspaces.fetch(key, Set.new)
-
-          workspaces.store(deleted_key_for(key), data)
-          workspaces.store(key, Set.new)
+          user_ids = workspaces.fetch(users_key_for(workspace, kind), Set.new)
+          user_ids.each do |user_id|
+            user = Struct.new(:id).new(user_id)
+            unlink_workspace_from_user(workspace, user, kind)
+          end
         end #unlink_from_users
 
         def relink_to_workspaces(user, kind)
-          key   = workspaces_key_for(user, kind)
-          data  = users.fetch(deleted_key_for(key), Set.new)
-
-          users.store(key, data)
-          users.delete(deleted_key_for(key))
+          workspace_ids = users.fetch(workspaces_key_for(user, kind), Set.new)
+          workspace_ids.each do |workspace_id|
+            workspace = Struct.new(:id).new(workspace_id)
+            link_user_to_workspace(workspace, user, kind)
+          end
         end #relink_to_workspaces
 
         def relink_to_users(workspace, kind)
-          key   = users_key_for(workspace, kind)
-          data  = workspaces.fetch(deleted_key_for(key), Set.new)
-
-          workspaces.store(key, data)
-          workspaces.delete(deleted_key_for(key))
+          user_ids = workspaces.fetch(users_key_for(workspace, kind), Set.new)
+          user_ids.each do |user_id|
+            user = Struct.new(:id).new(user_id)
+            link_workspace_to_user(workspace, user, kind)
+          end
         end #relink_to_users
 
         def users_for(workspace, kind)
@@ -111,10 +111,6 @@ module Belinkr
           "users:#{user.id.to_s}:workspaces:#{kind}"
         end #workspace_key_for
 
-        def deleted_key_for(key)
-          "#{key}:deleted"
-        end
-
         class AugmentedSet
           def initialize(members=[])
             @set = Set.new members
@@ -124,9 +120,9 @@ module Belinkr
             @set.map(&:id).include?(other.id.to_s)
           end #include?
 
-          def method_missing(method, *args, &block)
-            @set.send method, *args, &block
-          end #method_missing
+          def empty?
+            @set.empty?
+          end
         end #AugmentedSet
       end # MemoryBackend
     end # Tracker

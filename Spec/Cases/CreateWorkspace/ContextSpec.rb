@@ -14,8 +14,6 @@ describe 'create workspace' do
     @entity                       = OpenStruct.new
     @workspace                    = Workspace::Double.new
     @workspaces                   = Collection::Double.new
-    @administrators               = Collection::Double.new
-    @memberships_as_administrator = Collection::Double.new
     @tracker                      = Workspace::TrackerDouble.new
   end
 
@@ -26,9 +24,7 @@ describe 'create workspace' do
       workspace:                    workspace,
       workspaces:                   @workspaces,
       entity:                       @entity,
-      tracker:                      @tracker,
-      administrators:               @administrators,
-      memberships_as_administrator: @memberships_as_administrator
+      tracker:                      @tracker
     )
     workspace.expect :link_to, workspace, [@entity]  
     context.call
@@ -42,59 +38,23 @@ describe 'create workspace' do
       workspace:                    @workspace,
       workspaces:                   workspaces,
       entity:                       @entity,
-      tracker:                      @tracker,
-      administrators:               @administrators,
-      memberships_as_administrator: @memberships_as_administrator
+      tracker:                      @tracker
     )
     workspaces.expect :add, workspaces, [@workspace]
     context.call
     workspaces.verify
   end
 
-  it 'adds the actor to the administrators collection' do
-    administrators  = Minitest::Mock.new
+  it 'tracks the actor as an administrator' do
+    tracker = Minitest::Mock.new
     context         = CreateWorkspace::Context.new(
       actor:                        @actor,
       workspace:                    @workspace,
       workspaces:                   @workspaces,
       entity:                       @entity,
-      tracker:                      @tracker,
-      administrators:               administrators,
-      memberships_as_administrator: @memberships_as_administrator
+      tracker:                      tracker
     )
-    administrators.expect :add, administrators, [@actor]
-    context.call
-    administrators.verify
-  end
-
-  it 'adds the workspace to the administrator memberships of the actor' do
-    memberships_as_administrator = Minitest::Mock.new
-    context   = CreateWorkspace::Context.new(
-      actor:                        @actor,
-      workspace:                    @workspace,
-      workspaces:                   @workspaces,
-      entity:                       @entity,
-      tracker:                      @tracker,
-      administrators:               @administrators,
-      memberships_as_administrator: memberships_as_administrator
-    )
-    memberships_as_administrator.expect :add, nil, [@workspace]
-    context.call
-    memberships_as_administrator.verify
-  end
-
-  it 'tracks the membership of the administrator' do
-    tracker   = Minitest::Mock.new
-    context   = CreateWorkspace::Context.new(
-      actor:                        @actor,
-      workspace:                    @workspace,
-      workspaces:                   @workspaces,
-      entity:                       @entity,
-      tracker:                      tracker,
-      administrators:               @administrators,
-      memberships_as_administrator: @memberships_as_administrator
-    )
-    tracker.expect :add, tracker, [:administrator, @actor.id]
+    tracker.expect :register, tracker, [@workspace, @actor, :administrator]
     context.call
     tracker.verify
   end

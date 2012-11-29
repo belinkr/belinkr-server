@@ -87,33 +87,9 @@ describe 'accept autoinvitation to workspace' do
       memberships_as_collaborator:  @memberships_as_collaborator
     )
 
-    tracker.expect :delete, tracker, [:autoinvited, @actor.id]
-    tracker.expect :add,    tracker, [:collaborator, @actor.id]
+    tracker.expect :accept, tracker, [@workspace, @autoinvited, :autoinvited]
     context.call
     tracker.verify
-  end
-
-  it 'creates a collaborator membership' do
-    memberships_as_autoinvited  = Minitest::Mock.new
-    memberships_as_collaborator = Minitest::Mock.new
-
-    memberships_as_autoinvited.expect :delete, memberships_as_autoinvited, [@workspace]
-    memberships_as_collaborator.expect :add, memberships_as_collaborator, 
-                                                [@workspace]
-
-    context   = AcceptAutoinvitationToWorkspace::Context.new(
-      actor:                        @actor,
-      autoinvited:                  @autoinvited,
-      enforcer:                     @enforcer,
-      workspace:                    @workspace,
-      autoinvitation:               @autoinvitation,
-      tracker:                      @tracker,
-      memberships_as_autoinvited:   memberships_as_autoinvited,
-      memberships_as_collaborator:  memberships_as_collaborator
-    )
-    context.call
-    memberships_as_autoinvited.verify
-    memberships_as_collaborator.verify
   end
 end # accept autoinvitation to workspace
 

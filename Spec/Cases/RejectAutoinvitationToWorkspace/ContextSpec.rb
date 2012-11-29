@@ -16,7 +16,6 @@ describe 'autoinvite user to workspace' do
     @workspace                  = OpenStruct.new
     @autoinvitation             = Workspace::Autoinvitation::Double.new
     @tracker                    = Workspace::TrackerDouble.new
-    @memberships_as_autoinvited = Collection::Double.new
   end
 
   it 'authorizes the actor' do
@@ -27,8 +26,7 @@ describe 'autoinvite user to workspace' do
       enforcer:                   enforcer,
       workspace:                  @workspace,
       autoinvitation:             @autoinvitation,
-      tracker:                    @tracker,
-      memberships_as_autoinvited: @memberships_as_autoinvited
+      tracker:                    @tracker
     )
     enforcer.expect :authorize, true, [@actor, :reject]
     context.call
@@ -43,8 +41,7 @@ describe 'autoinvite user to workspace' do
       enforcer:                   @enforcer,
       workspace:                  @workspace,
       autoinvitation:             autoinvitation,
-      tracker:                    @tracker,
-      memberships_as_autoinvited: @memberships_as_autoinvited
+      tracker:                    @tracker
     )
 
     autoinvitation.expect :reject, autoinvitation
@@ -52,23 +49,7 @@ describe 'autoinvite user to workspace' do
     autoinvitation.verify
   end
 
-  it 'removes the workspace from the memberhips as autoinvited of the user' do
-    memberships_as_autoinvited  = Minitest::Mock.new
-    context                     = RejectAutoinvitationToWorkspace::Context.new(
-      actor:                      @actor,
-      autoinvited:                @autoinvited,
-      enforcer:                   @enforcer,
-      workspace:                  @workspace,
-      autoinvitation:             @autoinvitation,
-      tracker:                    @tracker,
-      memberships_as_autoinvited: memberships_as_autoinvited
-    )
-    memberships_as_autoinvited.expect :delete, memberships_as_autoinvited, [@workspace]
-    context.call
-    memberships_as_autoinvited.verify
-  end
-
-  it 'deletes the autoinvited membership in the workspace tracker' do
+  it 'untracks the user as autoinvited' do
     tracker = Minitest::Mock.new
     context = RejectAutoinvitationToWorkspace::Context.new(
       actor:                      @actor,
@@ -76,10 +57,10 @@ describe 'autoinvite user to workspace' do
       enforcer:                   @enforcer,
       workspace:                  @workspace,
       autoinvitation:             @autoinvitation,
-      tracker:                    tracker,
-      memberships_as_autoinvited: @memberships_as_autoinvited
+      tracker:                    tracker
     )
-    tracker.expect :delete, tracker, [:autoinvited, @autoinvited.id]
+    tracker.expect :unregister, tracker, 
+                    [@workspace, @autoinvited, :autoinvited]
     context.call
     tracker.verify
   end

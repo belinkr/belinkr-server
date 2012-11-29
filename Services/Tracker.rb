@@ -1,111 +1,63 @@
 # encoding: utf-8
-require 'set'
+require 'forwardable'
+require_relative './Tracker/MemoryBackend'
 require_relative './Tracker/RedisBackend'
-require_relative '../Resources/Workspace/Membership/Collection'
 
 module Belinkr
   module Workspace
     class Tracker
-      include Enumerable
+      extend Forwardable
 
-      def initialize(entity_id, workspace_id)
-        @entity_id        = entity_id
-        @workspace_id     = workspace_id
-        @buffered_set     = Set.new
-        @persisted_set    = RedisBackend.new(storage_key)
-        @current_backend  = @persisted_set
-        @backlog          = []
+      KINDS = %w{ invited autoinvited administrator collaborator }
+
+      def_delegators :@backend, *MemoryBackend::INTERFACE
+
+      def initialize(backend=RedisBackend.new)
+        @backend = backend
       end #initialize
 
-      def in_memory?
-        @current_backend == @buffered_set
-      end #in_memory?
-
-      def reset(tuples=[])
-        @backlog.clear
-        @buffered_set = Set.new 
-        tuples.map { |tuple| add(*tuple) }
-        @current_backend = @buffered_set
+      def register(workspace, user, kind)
+        link_user_to_workspace(workspace, user, kind)
+        link_workspace_to_user(workspace, user, kind)
         self
-      end #reset
+      end #register
 
-      def sync
-        $redis.multi { @backlog.each { |command| command.call } }
-        @backlog.clear
+      def unregister(workspace, user, kind)
+        unlink_user_from_workspace(workspace, user, kind)
+        unlink_workspace_from_user(workspace, user, kind)
         self
-      end #sync
+      end #unregister
 
-      def synced?
-        @backlog.empty?
-      end #synced?
+      def accept(workspace, user, kind)
+        unregister(workspace, user, kind)
+        register(workspace, user, :collaborator)
+      end #accept
 
-      def fetch
-        @backlog.clear
-        @buffered_set     = Set.new @persisted_set.fetch
-        @current_backend  = @buffered_set
-        self
-      end #fetch
-
-      def fetched?
-        @current_backend == @buffered_set
-      end #fetched?
-
-      alias_method :in_memory?, :fetched?
-
-      def add(kind, user_id)
-        element = serialize(kind, user_id)
-        @backlog.push(lambda { @persisted_set.add element })
-        @buffered_set.add element
-        self
-      end #add
-
-      def delete(kind, user_id)
-        element = serialize(kind, user_id)
-        @backlog.push(lambda { @persisted_set.delete element })
-        @buffered_set.delete element
-        self
-      end #delete
-      
-      def link_to_all(workspaces)
-        each { |memberships| memberships.add workspace }
-      end
-
-      def unlink_from_all(workspace)
-        each { |memberships| memberships.delete workspace }
-      end #unlink_from_all
-
-      def each
-        fetch unless fetched?
-        @current_backend.each do |key| 
-          yield Membership::Collection.new(deserialize key)
+      def remove(workspace, user)
+        %w{ administrator collaborator}.each do |kind|
+          unregister(workspace, user, kind)
         end
-      end #each
+      end #remove
 
-      def size
-        @current_backend.size
-      end #size
+      def unlink_from_all_workspaces(user)
+        KINDS.each { |kind| unlink_from_workspaces(user, kind) }
+        self
+      end #unlink_from_all_workspaces
 
-      private
+      def unlink_from_all_users(workspace)
+        KINDS.each { |kind| unlink_from_users(workspace, kind) }
+        self
+      end #unlink_from_all_users
 
-      def serialize(kind, user_id)
-        [@entity_id, @workspace_id, kind, user_id].join(':')
-      end #serialize
-
-      def deserialize(key)
-        values = key.split(':')
-        { 
-          entity_id:    values[0], 
-          workspace_id: values[1], 
-          kind:         values[2], 
-          user_id:      values[3]
-        }
-      end
-
-      private
-
-      def storage_key
-        "entities:#{@entity_id}:workspaces:#{@workspace_id}:tracker"
-      end
+      def relink_to_all_workspaces(user)
+        KINDS.each { |kind| relink_to_workspaces(user, kind) }
+        self
+      end #relink_to_all_workspaces
+        
+      def relink_to_all_users(workspace)
+        KINDS.each { |kind| relink_to_users(workspace, kind) }
+        self
+      end #relink_to_all_users
     end # Tracker
   end # Workspace
 end # Belinkr

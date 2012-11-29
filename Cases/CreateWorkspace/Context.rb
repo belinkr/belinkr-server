@@ -7,31 +7,24 @@ module Belinkr
       include Tinto::Context
 
       def initialize(arguments)
-        @actor                        = arguments.fetch(:actor)
-        @workspace                    = arguments.fetch(:workspace)
-        @workspaces                   = arguments.fetch(:workspaces)
-        @entity                       = arguments.fetch(:entity)
-        @tracker                      = arguments.fetch(:tracker)
-        @administrators               = arguments.fetch(:administrators)
-        @memberships_as_administrator = arguments
-                                        .fetch(:memberships_as_administrator)
+        @actor      = arguments.fetch(:actor)
+        @workspace  = arguments.fetch(:workspace)
+        @workspaces = arguments.fetch(:workspaces)
+        @entity     = arguments.fetch(:entity)
+        @tracker    = arguments.fetch(:tracker)
       end
 
       def call
-        workspace                     .link_to(entity)
-        workspaces                    .add(workspace)
-        administrators                .add(actor)
-        memberships_as_administrator  .add(workspace)
-        tracker                       .add(:administrator, actor.id)
+        workspace   .link_to(entity)
+        workspaces  .add(workspace)
+        tracker     .register(workspace, actor, :administrator)
 
-        will_sync workspace, workspaces, administrators, 
-                  memberships_as_administrator, tracker
+        will_sync workspace, workspaces, tracker
       end #call
 
       private
 
-      attr_reader :actor, :workspace, :workspaces, :administrators, 
-                  :memberships_as_administrator, :tracker, :entity
+      attr_reader :actor, :workspace, :workspaces, :entity, :tracker
     end # Context
   end # CreateWorkspace
 end # Belinkr

@@ -17,7 +17,7 @@ module Belinkr
       def call
         enforcer.authorize(actor, :delete)
         workspaces.delete(workspace)
-        tracker.unlink_from_all(workspace)
+        tracker.unlink_from_all_users(workspace)
 
         will_sync workspace, workspaces, tracker
       end # call

@@ -17,7 +17,7 @@ module Belinkr
       def call
         enforcer.authorize(actor, :undelete)
         workspaces.add(workspace)
-        tracker.link_to_all(workspace)
+        tracker.relink_to_all_users(workspace)
 
         will_sync workspace, workspaces, tracker
       end # call

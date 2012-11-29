@@ -7,34 +7,32 @@ module Belinkr
       include Tinto::Context
 
       def initialize(arguments)
-        @actor                  = arguments.fetch(:actor)
-        @invited                = arguments.fetch(:invited)
-        @enforcer               = arguments.fetch(:enforcer)
-        @workspace              = arguments.fetch(:workspace)
-        @invitation             = arguments.fetch(:invitation)
-        @invitations            = arguments.fetch(:invitations)
-        @tracker                = arguments.fetch(:tracker)
-        @memberships_as_invited = arguments.fetch(:memberships_as_invited)
+        @actor        = arguments.fetch(:actor)
+        @invited      = arguments.fetch(:invited)
+        @enforcer     = arguments.fetch(:enforcer)
+        @workspace    = arguments.fetch(:workspace)
+        @invitation   = arguments.fetch(:invitation)
+        @invitations  = arguments.fetch(:invitations)
+        @tracker      = arguments.fetch(:tracker)
       end #initialize
 
       def call
-        enforcer                .authorize(actor, :invite)
-        invitation              .link_to(
-                                  inviter:    actor,
-                                  invited:    invited,
-                                  workspace:  workspace
-                                )
-        invitations             .add(invitation)
-        tracker                 .add(:invited, actor.id)
-        memberships_as_invited  .add(workspace)
+        enforcer      .authorize(actor, :invite)
+        invitation    .link_to(
+                        inviter:    actor,
+                        invited:    invited,
+                        workspace:  workspace
+                      )
+        invitations   .add(invitation)
+        tracker       .register(workspace, invited, :invited)
 
-        will_sync invitations, invitation, tracker, memberships_as_invited
+        will_sync invitations, invitation, tracker
       end #call
 
       private
 
       attr_reader :actor, :invited, :enforcer, :workspace, :invitation,
-                  :invitations, :tracker, :memberships_as_invited
+                  :invitations, :tracker
     end # Context
   end # InviteUserToWorkspace
 end # Belinkr

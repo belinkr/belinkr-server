@@ -7,35 +7,25 @@ module Belinkr
       include Tinto::Context
 
       def initialize(arguments)
-        @actor                        = arguments.fetch(:actor)
-        @enforcer                     = arguments.fetch(:enforcer)
-        @workspace                    = arguments.fetch(:workspace)
-        @invitation                   = arguments.fetch(:invitation)
-        @tracker                      = arguments.fetch(:tracker)
-        @memberships_as_invited       = arguments.fetch(:memberships_as_invited)
-        @memberships_as_collaborator  = arguments
-                                          .fetch(:memberships_as_collaborator)
+        @actor      = arguments.fetch(:actor)
+        @enforcer   = arguments.fetch(:enforcer)
+        @workspace  = arguments.fetch(:workspace)
+        @invitation = arguments.fetch(:invitation)
+        @tracker    = arguments.fetch(:tracker)
       end #initialize
 
       def call
-        enforcer                    .authorize(actor, :accept)
-        invitation                  .accept
-        workspace                   .increment_user_counter
+        enforcer    .authorize(actor, :accept)
+        invitation  .accept
+        workspace   .increment_user_counter
+        tracker     .accept(workspace, actor, :invited)
 
-        tracker                     .delete(:invited, actor.id)
-        tracker                     .add(:collaborator, actor.id)
-
-        memberships_as_invited      .delete(workspace)
-        memberships_as_collaborator .add(workspace)
-
-        will_sync invitation, workspace, tracker, memberships_as_invited,
-                  memberships_as_collaborator
+        will_sync invitation, workspace, tracker
       end #call
 
       private
 
-      attr_reader :enforcer, :actor, :workspace, :invitation, :tracker, 
-                  :memberships_as_invited, :memberships_as_collaborator
+      attr_reader :enforcer, :actor, :workspace, :invitation, :tracker
     end # Context
   end # AcceptInvitationToWorkspace
 end # Belinkr

@@ -1,170 +1,178 @@
 # encoding: utf-8
 require 'minitest/autorun'
-require 'redis'
+require 'ostruct'
+require 'uuidtools'
 require_relative '../../Services/Tracker'
-
-include Belinkr
 
 $redis ||= Redis.new
 $redis.select 8
 
-describe Workspace::Tracker do
+include Belinkr::Workspace
+
+describe 'tracker' do
   before do
     $redis.flushdb
-    @entity_id    = 1
-    @workspace_id = 2
-    @tracker      = Workspace::Tracker.new(@entity_id, @workspace_id)
+    backend = [Tracker::MemoryBackend.new, Tracker::RedisBackend.new].sample
+    @tracker  = Tracker.new(backend)
   end
 
-  describe '#initialize' do
-    it 'requires an entity id and a workspace id' do
-      lambda { Workspace::Tracker.new }.must_raise ArgumentError
-      lambda { Workspace::Tracker.new 1 }.must_raise ArgumentError
+  describe '#register' do
+    it 'registers the relationship' do
+      entity    = factory
+      user      = factory
+      workspace = factory
+      kind      = 'invited'
+
+      @tracker.register(workspace, user, kind)
+
+      @tracker.users_for(workspace, kind)         .must_include user
+      @tracker.workspaces_for(entity, user, kind) .must_include workspace
     end
-  end #initialize
+  end #register
 
-  describe '#reset' do
-    it 'resets the contents of the set' do
-      @tracker.reset
-      @tracker.add 1, 2
-      @tracker.size.must_equal 1
-      @tracker.reset
-      @tracker.size.must_equal 0
+  describe '#unregister' do
+    it 'unregisters the relationship' do
+      entity    = factory
+      user      = factory
+      workspace = factory
+      kind      = 'invited'
+
+      @tracker.register(workspace, user, kind)
+
+      @tracker.users_for(workspace, kind)         .must_include user
+      @tracker.workspaces_for(entity, user, kind) .must_include workspace
+
+      @tracker.unregister(workspace, user, kind)
+
+      @tracker.users_for(workspace, kind)         .wont_include user
+      @tracker.workspaces_for(entity, user, kind) .wont_include workspace
     end
+  end #unregister
 
-    it 'activates the memory backend' do
-      @tracker.reset
-      @tracker.in_memory?.must_equal true
+  describe '#unlink_all_workspaces_from' do
+    it 'unlinks the user from all workspaces' do
+      entity      = factory
+      user        = factory
+      workspace1  = factory
+      workspace2  = factory
+
+      @tracker.register(workspace1, user, 'invited')
+      @tracker.register(workspace2, user, 'autoinvited')
+
+      @tracker.users_for(workspace1, 'invited').must_include user
+      @tracker.users_for(workspace2, 'autoinvited').must_include user
+
+      @tracker.unlink_from_all_workspaces(user)
+
+      @tracker.users_for(workspace1, 'invited').wont_include user
+      @tracker.users_for(workspace2, 'autoinvited').wont_include user
     end
+  end #unlink_all_workspaces_from
 
-    it 'clears the backlog if no elements passed' do
-      @tracker.add 1, 2
-      @tracker.synced?.must_equal false
-      @tracker.reset
-      @tracker.synced?.must_equal true
+  describe '#unlink_from_all_users' do
+    it 'unlinks the workspace from all users' do
+      entity    = factory
+      workspace = factory
+      user1     = factory
+      user2     = factory
+
+      @tracker.register(workspace, user1, 'invited')
+      @tracker.register(workspace, user2, 'autoinvited')
+
+      @tracker.workspaces_for(entity, user1, 'invited')     .must_include workspace 
+      @tracker.workspaces_for(entity, user2, 'autoinvited') .must_include workspace
+
+      @tracker.unlink_from_all_users(workspace)
+
+      @tracker.workspaces_for(entity, user1, 'invited')     .wont_include workspace 
+      @tracker.workspaces_for(entity, user2, 'autoinvited') .wont_include workspace
     end
+  end #unlink_from_all_users
 
-    it 'queues add operations in the backlog for passed tuples' do
-      @tracker.reset
-      @tracker.synced?.must_equal true
-      @tracker.reset [[1, 2]]
-      @tracker.synced?.must_equal false
-      @tracker.size.must_equal 1
+  describe '#relink_to_all_workspaces' do
+    it 'relinks the user to all workspaces he was previously linked to' do
+      entity      = factory
+      user        = factory
+      workspace1  = factory
+      workspace2  = factory
+
+      @tracker.register(workspace1, user, 'invited')
+      @tracker.register(workspace2, user, 'autoinvited')
+
+      @tracker.users_for(workspace1, 'invited')     .must_include user
+      @tracker.users_for(workspace2, 'autoinvited') .must_include user
+
+      @tracker.unlink_from_all_workspaces(user)
+
+      @tracker.users_for(workspace1, 'invited')     .wont_include user
+      @tracker.users_for(workspace2, 'autoinvited') .wont_include user
+
+      @tracker.relink_to_all_workspaces(user)
+
+      @tracker.users_for(workspace1, 'invited')     .must_include user
+      @tracker.users_for(workspace2, 'autoinvited') .must_include user
     end
-  end #reset
+  end #relink_to_all_workspaces
 
-  describe '#sync' do
-    it 'clears the backlog' do
-      @tracker.add 1, 2
-      @tracker.synced?.must_equal false
-      @tracker.sync
-      @tracker.synced?.must_equal true
+  describe '#relink_to_all_users' do
+    it 'relinks the workspaces to all users it was previously linked to' do
+      entity    = factory
+      workspace = factory
+      user1     = factory
+      user2     = factory
+
+      @tracker.register(workspace, user1, 'invited')
+      @tracker.register(workspace, user2, 'autoinvited')
+
+      @tracker.workspaces_for(entity, user1, 'invited')     .must_include workspace 
+      @tracker.workspaces_for(entity, user2, 'autoinvited') .must_include workspace
+
+      @tracker.unlink_from_all_users(workspace)
+
+      @tracker.workspaces_for(entity, user1, 'invited')     .wont_include workspace 
+      @tracker.workspaces_for(entity, user2, 'autoinvited') .wont_include workspace
+
+      @tracker.relink_to_all_users(workspace)
+
+      @tracker.workspaces_for(entity, user1, 'invited')     .must_include workspace 
+      @tracker.workspaces_for(entity, user2, 'autoinvited') .must_include workspace
     end
-  end #sync
+  end #relink_to_all_users
 
-  describe '#synced?' do
-    it 'returns true if the backlog is empty' do
-      @tracker.synced?.must_equal true
-      @tracker.add 1, 2
-      @tracker.synced?.must_equal false
+  describe '#users_for' do
+    it 'returns a collection of users in the workspace with this state' do
+      entity    = factory
+      user      = factory
+      workspace = factory
+      kind      = 'invited'
+
+      @tracker.register(workspace, user, kind)
+
+      @tracker.users_for(workspace, 'invited')        .wont_be_empty
+      @tracker.users_for(workspace, 'autoinvited')    .must_be_empty
+      @tracker.users_for(workspace, 'collaborator')   .must_be_empty
+      @tracker.users_for(workspace, 'administrator')  .must_be_empty
     end
-  end #synced?
+  end #users_for
 
-  describe '#fetch' do
-    it 'gets all elements from the persisted set' do
-      @tracker.add 1, 2
-      @tracker.sync
+  describe '#workspaces_for' do
+    it 'returns a collection of workspaces where the user is in this state' do
+      entity    = factory
+      user      = factory
+      workspace = factory
+      kind      = 'invited'
 
-      @tracker.size.must_equal 1
-      @tracker.reset
-      @tracker.size.must_equal 0
-      @tracker.fetch
-      @tracker.size.must_equal 1
+      @tracker.register(workspace, user, kind)
+
+      @tracker.workspaces_for(entity, user, 'invited')        .wont_be_empty
+      @tracker.workspaces_for(entity, user, 'autoinvited')    .must_be_empty
+      @tracker.workspaces_for(entity, user, 'collaborator')   .must_be_empty
+      @tracker.workspaces_for(entity, user, 'administrator')  .must_be_empty
     end
-  end #fetch
+  end #workspaces_for
 
-  describe '#fetched?' do
-    it 'returns true if the current backend is persisted' do
-      @tracker.fetched?.must_equal false
-    end
-
-    it 'returns true if the current backend is in memory' do
-      @tracker.reset
-      @tracker.fetched?.must_equal true
-    end
-  end #fetched?
-
-  describe '#in_memory?' do
-    it 'returns true if the current backend is persisted' do
-      @tracker.in_memory?.must_equal false
-    end
-
-    it 'returns true if the current backend is in memory' do
-      @tracker.reset
-      @tracker.in_memory?.must_equal true
-    end
-  end #in_memory?
-
-  describe '#add' do
-    it 'adds a membership signature' do
-      @tracker.reset
-      @tracker.add 'administrator', 5
-      @tracker.size.must_equal 1
-    end
-
-    it 'queues the operation in the backlog 
-    if running on the persistent backend' do
-      @tracker.reset
-      @tracker.add 'administrator', 5
-      @tracker.sync
-
-      @tracker.fetch
-      @tracker.size.must_equal 1
-    end
-  end #add
-
-  describe '#delete' do
-    it 'deletes a membership signature' do
-      @tracker.reset
-      @tracker.add 'administrator', 5
-      @tracker.size.must_equal 1
-      @tracker.delete 'administrator', 5
-      @tracker.size.must_equal 0
-    end
-
-    it 'queues the operation in the backlog 
-    if running on the persistent backend' do
-      @tracker.reset([['administrator', 5]])
-      @tracker.sync
-      @tracker.fetch
-      @tracker.size.must_equal 1
-
-      @tracker.delete 'administrator', 5
-      @tracker.sync
-      @tracker.fetch
-      @tracker.size.must_equal 0
-    end
-  end #delete
-
-  describe '#each' do
-    it 'instantiates a Membership::Collection for each element' do
-      @tracker.reset
-      @tracker.add 'administrator', 5
-      memberships = @tracker.map.first
-      memberships.must_be_instance_of Workspace::Membership::Collection
-      memberships.must_be :valid?
-      memberships.kind      .must_equal 'administrator'
-      memberships.user_id   .must_equal '5'
-      memberships.entity_id .must_equal @entity_id.to_s
-    end
-
-    it 'fetches unless running in memory' do
-      @tracker.add 1, 2
-      @tracker.sync
-      @tracker.map.to_a.size.must_equal 1
-      @tracker.reset
-      @tracker.map.to_a.size.must_equal 0
-    end
-  end #each
+  def factory
+    OpenStruct.new(id: UUIDTools::UUID.timestamp_create.to_s)
+  end #factory
 end
 

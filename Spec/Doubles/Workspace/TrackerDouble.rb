@@ -2,17 +2,29 @@
 module Belinkr
   module Workspace
     class TrackerDouble
-      def add(*args)
-      end #add
+      def accept(*args)
+      end #accept
 
-      def delete(*args)
-      end #delete
+      def remove(*args)
+      end #remove
 
-      def link_to_all(*args)
-      end #link_to_all
+      def register(*args)
+      end #register
 
-      def unlink_from_all(*args)
-      end #unlink_from_all
+      def unregister(*args)
+      end #unregister
+
+      def unlink_from_all_workspaces(*args)
+      end #unlink_from_all_workspaces
+
+      def unlink_from_all_users(*args)
+      end #unlink_from_all_users
+
+      def relink_to_all_workspaces(*args)
+      end #relink_all_to_workspaces
+
+      def relink_to_all_users(*args)
+      end #relink_to_all_users
     end # TrackerDouble
   end # Workspace
 end # Belinkr

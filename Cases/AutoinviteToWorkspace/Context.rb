@@ -7,34 +7,30 @@ module Belinkr
       include Tinto::Context
 
       def initialize(arguments)
-        @actor                      = arguments.fetch(:actor)
-        @enforcer                   = arguments.fetch(:enforcer)
-        @workspace                  = arguments.fetch(:workspace)
-        @autoinvitation             = arguments.fetch(:autoinvitation)
-        @autoinvitations            = arguments.fetch(:autoinvitations)
-        @tracker                    = arguments.fetch(:tracker)
-        @memberships_as_autoinvited = arguments
-                                        .fetch(:memberships_as_autoinvited)
+        @actor            = arguments.fetch(:actor)
+        @enforcer         = arguments.fetch(:enforcer)
+        @workspace        = arguments.fetch(:workspace)
+        @autoinvitation   = arguments.fetch(:autoinvitation)
+        @autoinvitations  = arguments.fetch(:autoinvitations)
+        @tracker          = arguments.fetch(:tracker)
       end #initialize
 
       def call
-        enforcer                    .authorize(actor, :autoinvite)
-        autoinvitation              .link_to(
-                                      autoinvited:  actor,
-                                      workspace:    workspace
-                                    )
-        autoinvitations             .add(autoinvitation)
-        tracker                     .add(:autoinvited, actor.id)
-        memberships_as_autoinvited  .add(workspace)
+        enforcer          .authorize(actor, :autoinvite)
+        autoinvitation    .link_to(
+                            autoinvited:  actor,
+                            workspace:    workspace
+                          )
+        autoinvitations   .add(autoinvitation)
+        tracker           .register(workspace, actor, :autoinvited)
 
-        will_sync autoinvitations, autoinvitation, tracker, 
-                  memberships_as_autoinvited
+        will_sync autoinvitations, autoinvitation, tracker 
       end #call
 
       private
 
       attr_reader :actor, :enforcer, :workspace, :autoinvitation, 
-                  :autoinvitations, :tracker, :memberships_as_autoinvited
+                  :autoinvitations, :tracker
     end # Context
   end # AutoinviteToWorkspace
 end # Belinkr

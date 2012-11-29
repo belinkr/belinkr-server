@@ -47,7 +47,7 @@ describe 'delete workspace' do
     workspaces.verify
   end
 
-  it 'adds the workspace to the memberships of all users involved' do
+  it 'relinks the workspace to all users previously involved in it' do
     tracker = Minitest::Mock.new
     context = UndeleteWorkspace::Context.new(
       enforcer:   @enforcer,
@@ -57,7 +57,7 @@ describe 'delete workspace' do
       tracker:    tracker
     )
 
-    tracker.expect :link_to_all, true, [@workspace]
+    tracker.expect :relink_to_all_users, tracker, [@workspace]
     context.call
     tracker.verify
   end

@@ -16,7 +16,6 @@ describe 'autoinvite to workspace' do
     @autoinvitation             = Workspace::Autoinvitation::Double.new
     @autoinvitations            = Collection::Double.new
     @tracker                    = Workspace::TrackerDouble.new
-    @memberships_as_autoinvited = Collection::Double.new
   end
 
   it 'authorizes the actor' do
@@ -27,8 +26,7 @@ describe 'autoinvite to workspace' do
       workspace:                  @workspace,
       autoinvitation:             @autoinvitation,
       autoinvitations:            @autoinvitations,
-      tracker:                    @tracker,
-      memberships_as_autoinvited: @memberships_as_autoinvited
+      tracker:                    @tracker
     )
     enforcer.expect :authorize, true, [@actor, :autoinvite]
     context.call
@@ -43,8 +41,7 @@ describe 'autoinvite to workspace' do
       workspace:                  @workspace,
       autoinvitation:             autoinvitation,
       autoinvitations:            @autoinvitations,
-      tracker:                    @tracker,
-      memberships_as_autoinvited: @memberships_as_autoinvited
+      tracker:                    @tracker
     )
     autoinvitation.expect :link_to, autoinvitation, [{
                             autoinvited:  @actor,
@@ -62,31 +59,14 @@ describe 'autoinvite to workspace' do
       workspace:                  @workspace,
       autoinvitation:             @autoinvitation,
       autoinvitations:            autoinvitations,
-      tracker:                    @tracker,
-      memberships_as_autoinvited: @memberships_as_autoinvited
+      tracker:                    @tracker
     )
     autoinvitations.expect :add, autoinvitations, [@autoinvitation]
     context.call
     autoinvitations.verify
   end
 
-  it 'adds the workspace to the autoinvited collection of the user' do
-    memberships_as_autoinvited = Minitest::Mock.new
-    context   = AutoinviteToWorkspace::Context.new(
-      actor:                      @actor,
-      enforcer:                   @enforcer,
-      workspace:                  @workspace,
-      autoinvitation:             @autoinvitation,
-      autoinvitations:            @autoinvitations,
-      tracker:                    @tracker,
-      memberships_as_autoinvited: memberships_as_autoinvited
-    )
-    memberships_as_autoinvited.expect :add, memberships_as_autoinvited, [@workspace]
-    context.call
-    memberships_as_autoinvited.verify
-  end
-
-  it 'registers the autoinvitation membership in the workspace tracker' do
+  it 'tracks the user as autoinvited' do
     tracker = Minitest::Mock.new
     context = AutoinviteToWorkspace::Context.new(
       actor:                      @actor,
@@ -94,10 +74,9 @@ describe 'autoinvite to workspace' do
       workspace:                  @workspace,
       autoinvitation:             @autoinvitation,
       autoinvitations:            @autoinvitations,
-      tracker:                    tracker,
-      memberships_as_autoinvited: @memberships_as_autoinvited
+      tracker:                    tracker
     )
-    tracker.expect :add, tracker, [:autoinvited, @actor.id]
+    tracker.expect :register, tracker, [@workspace, @actor, :autoinvited]
     context.call
     tracker.verify
   end

@@ -17,7 +17,6 @@ describe 'invite user to workspace' do
     @invitation             = Workspace::Invitation::Double.new
     @invitations            = Collection::Double.new
     @tracker                = Workspace::TrackerDouble.new
-    @memberships_as_invited = Collection::Double.new
   end
 
   it 'authorizes the actor' do
@@ -29,8 +28,7 @@ describe 'invite user to workspace' do
       workspace:              @workspace,
       invitation:             @invitation,
       invitations:            @invitations,
-      tracker:                @tracker,
-      memberships_as_invited: @memberships_as_invited
+      tracker:                @tracker
     )
     enforcer.expect :authorize, true, [@actor, :invite]
     context.call
@@ -46,8 +44,7 @@ describe 'invite user to workspace' do
       workspace:              @workspace,
       invitation:             invitation,
       invitations:            @invitations,
-      tracker:                @tracker,
-      memberships_as_invited: @memberships_as_invited
+      tracker:                @tracker
     )
     invitation.expect :link_to, invitation, [{
                         inviter:    @actor,
@@ -67,16 +64,15 @@ describe 'invite user to workspace' do
       workspace:              @workspace,
       invitation:             @invitation,
       invitations:            invitations,
-      tracker:                @tracker,
-      memberships_as_invited: @memberships_as_invited
+      tracker:                @tracker
     )
     invitations.expect :add, invitations, [@invitation]
     context.call
     invitations.verify
   end
 
-  it 'adds the workspace to the invited collection of the user' do
-    memberships_as_invited = Minitest::Mock.new
+  it 'tracks the user as invited' do
+    tracker   = Minitest::Mock.new
     context   = InviteUserToWorkspace::Context.new(
       actor:                  @actor,
       invited:                @invited,
@@ -84,27 +80,9 @@ describe 'invite user to workspace' do
       workspace:              @workspace,
       invitation:             @invitation,
       invitations:            @invitations,
-      tracker:                @tracker,
-      memberships_as_invited: memberships_as_invited
+      tracker:                tracker
     )
-    memberships_as_invited.expect :add, memberships_as_invited, [@workspace]
-    context.call
-    memberships_as_invited.verify
-  end
-
-  it 'registers the invitation membership in the workspace tracker' do
-    tracker = Minitest::Mock.new
-    context   = InviteUserToWorkspace::Context.new(
-      actor:                  @actor,
-      invited:                @invited,
-      enforcer:               @enforcer,
-      workspace:              @workspace,
-      invitation:             @invitation,
-      invitations:            @invitations,
-      tracker:                tracker,
-      memberships_as_invited: @memberships_as_invited
-    )
-    tracker.expect :add, tracker, [:invited, @actor.id]
+    tracker.expect :register, tracker, [@workspace, @invited, :invited]
     context.call
     tracker.verify
   end

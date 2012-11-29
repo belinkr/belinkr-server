@@ -47,7 +47,7 @@ describe 'delete workspace' do
     workspaces.verify
   end
 
-  it 'deletes the workspace from the memberships of all users involved' do
+  it 'unlinks all users from the workspace' do
     tracker = Minitest::Mock.new
     context = DeleteWorkspace::Context.new(
       enforcer:   @enforcer,
@@ -57,7 +57,7 @@ describe 'delete workspace' do
       tracker:    tracker
     )
 
-    tracker.expect :unlink_from_all, true, [@workspace]
+    tracker.expect :unlink_from_all_users, tracker, [@workspace]
     context.call
     tracker.verify
   end
