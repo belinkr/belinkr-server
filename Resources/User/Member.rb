@@ -128,10 +128,8 @@ module Belinkr
       end #encrypted_password_for
 
       def encrypted?(password=@password)
-        BCrypt::Password.new(password)
-        true
-      rescue BCrypt::Errors::InvalidHash
-        false
+        #copy from BCrypt::Password#valid_hash?
+        password =~ /^\$[0-9a-z]{2}\$[0-9]{2}\$[A-Za-z0-9\.\/]{53}$/
       end #encrypted?
     end # Member
   end # User
