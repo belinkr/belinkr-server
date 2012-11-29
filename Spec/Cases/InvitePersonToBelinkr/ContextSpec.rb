@@ -8,7 +8,7 @@ require_relative '../../Doubles/Message/Double'
 
 include Belinkr
 
-describe 'invite user to Belinkr' do
+describe 'invite person to Belinkr' do
   before do
     @actor        = OpenStruct.new
     @invitation   = Invitation::Double.new
@@ -65,5 +65,5 @@ describe 'invite user to Belinkr' do
     context.call
     message.verify
   end
-end # invite user to Belinkr
+end # invite person to Belinkr
 

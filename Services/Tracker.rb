@@ -39,6 +39,9 @@ module Belinkr
         end
       end #remove
 
+      def assign_role(workspace, user, role)
+      end
+
       def unlink_from_all_workspaces(user)
         KINDS.each { |kind| unlink_from_workspaces(user, kind) }
         self

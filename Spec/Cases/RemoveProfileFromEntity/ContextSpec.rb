@@ -8,7 +8,7 @@ require_relative '../../Doubles/Collection/Double'
 
 include Belinkr
 
-describe 'remove user from entity' do
+describe 'remove profile from entity' do
   before do
     @enforcer = Enforcer::Double.new
     @actor    = User::Double.new
@@ -76,5 +76,5 @@ describe 'remove user from entity' do
     context.call
     profiles.verify
   end
-end
+end # remove profile from entity
 

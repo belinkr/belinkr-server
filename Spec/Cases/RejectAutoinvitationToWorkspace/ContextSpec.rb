@@ -8,7 +8,7 @@ require_relative '../../Doubles/Workspace/TrackerDouble'
 
 include Belinkr
 
-describe 'autoinvite user to workspace' do
+describe 'reject autoinvitation to workspace' do
   before do
     @actor                      = OpenStruct.new(id: 1)
     @autoinvited                = OpenStruct.new(id: 2)

@@ -7,7 +7,7 @@ require_relative '../../Doubles/Profile/Double'
 
 include Belinkr
 
-describe 'edit profile' do
+describe 'edit user profile' do
   before do
     @enforcer         = Enforcer::Double.new
     @actor            = User::Double.new

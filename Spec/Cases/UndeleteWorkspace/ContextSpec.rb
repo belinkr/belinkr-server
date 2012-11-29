@@ -10,7 +10,7 @@ require_relative '../../Doubles/Enforcer/Double'
 
 include Belinkr
 
-describe 'delete workspace' do
+describe 'undelete workspace' do
   before do
     @enforcer   = Enforcer::Double.new
     @actor      = OpenStruct.new
@@ -75,5 +75,5 @@ describe 'delete workspace' do
     context.syncables.must_include @workspaces
     context.syncables.must_include @tracker
   end
-end # delete workspace
+end # undelete workspace
 
