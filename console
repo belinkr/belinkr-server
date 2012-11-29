@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+ENV['RACK_ENV'] ||= 'production'
+require 'pry'
+require 'i18n' 
+require 'tzinfo' 
+require 'json' 
+require 'uuidtools'
+require 'bcrypt'
+require 'rack' 
+require 'sinatra/base' 
+require 'virtus' 
+require 'aequitas' 
+require 'statemachine'
+require 'redis' 
+require 'redis-rack'
+require 'carrierwave'
+require 'mini_magick'
+require 'pony'
+require 'sanitize'
+
+require_relative 'API'
+#$redis = Redis.new host: "localhost", port: 6379
+
+%w{Resources Cases Services}.each do |dir|
+  Dir.glob("#{dir}/**/*").each do |file|
+    puts file
+    next if file.include? 'Workspace'
+    require_relative file if File.file? file
+  end
+end
+pry
