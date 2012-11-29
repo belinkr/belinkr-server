@@ -1,73 +1,52 @@
-#encoding: utf-8
-require_relative '../../../tinto/exceptions'
-require_relative '../../user/role/orchestrator'
-require_relative '../util'
+# encoding: utf-8
+require 'Tinto/Exceptions'
 
 module Belinkr
   module Workspace
     module Autoinvitation
       class Enforcer
         include Tinto::Exceptions
-        include Util
 
-        def self.authorize(user, action, workspace, autoinvitation)
-          new(workspace, autoinvitation).send(:"#{action}_by?", user)
-        end
-
-        def initialize(workspace, autoinvitation)
+        def initialize(workspace, autoinvitation,
+        tracker=Workspace::Tracker.new)
           @workspace      = workspace
           @autoinvitation = autoinvitation
-        end
-       
-        private
+          @tracker        = tracker
+        end #initialize
 
-        def read_by?(user)
-          raise NotAllowed if     @workspace.deleted_at
-          raise NotAllowed unless is_in?(@workspace, user) ||
-                                  user.id == @autoinvitation.invited_id
+        def authorize(actor, action, *args)
+          send action, actor, *args
+        end #authorize
+
+        def autoinvite(actor, *args)
+          raise NotAllowed if is_in?(actor)
+          raise NotAllowed if tracker.is?(workspace, actor, :invited)
+          raise NotAllowed if tracker.is?(workspace, actor, :autoinvited)
+          true
         end
 
-        def collection_by?(user)
-          return if User::Role::Orchestrator.is_entity_admin?(user)
-          raise NotAllowed unless is_in?(@workspace, user)
+        def accept(actor, autoinvited)
+          raise NotAllowed unless is_in?(actor)
+          raise NotAllowed if is_in?(autoinvited)
+          true
         end
 
-        def request_by?(user)
-          raise NotAllowed if     @workspace.deleted_at
-          
-          validation_error "validation.errors.already_in_workspace" if 
-            is_in?(@workspace, user)
-
-          validation_error "validation.errors.already_requested" if 
-            already_requested?
+        def reject(actor, autoinvited)
+          raise NotAllowed unless is_in?(actor)
+          raise NotAllowed if is_in?(autoinvited)
+          true
         end
-        
-        def accept_by?(user)
-          raise NotAllowed unless user.id
-          raise NotAllowed unless @autoinvitation.entity_id    == user.entity_id
-          raise NotAllowed unless @autoinvitation.workspace_id == @workspace.id
-          return if User::Role::Orchestrator.is_entity_admin?(user)
-          raise NotAllowed unless administrators_for(@workspace).include?(user)  
-        end
-      
-        alias_method :reject_by?, :accept_by?
-        alias_method :delete_by?, :accept_by?
 
         private
 
-        def already_requested?
-          Autoinvitation::Collection
-            .new(workspace_id: @workspace.id, entity_id: @workspace.entity_id)
-            .include?(@autoinvitation)
-        end
+        attr_reader :workspace, :autoinvitation, :tracker
 
-        def validation_error(message_key)
-          violation = Aequitas::Violation.new @autoinvitation, 
-                                              I18n::t(message_key)
-          @autoinvitation.errors[:invited_id] << violation
-          raise InvalidResource 
+        def is_in?(user)
+          tracker.is?(workspace, user, :collaborator) ||
+          tracker.is?(workspace, user, :administrator)
         end
       end # Enforcer
     end # Autoinvitation
   end # Workspace
 end # Belinkr
+

@@ -72,7 +72,8 @@ describe 'accept invitation to workspace' do
       tracker:                      tracker
     )
 
-    tracker.expect :accept, tracker, [@workspace, @actor, :invited]
+    tracker.expect :assign_role, tracker,
+                    [@workspace, @actor, :collaborator]
     context.call
     tracker.verify
   end

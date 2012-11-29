@@ -28,19 +28,17 @@ module Belinkr
         self
       end #unregister
 
-      def accept(workspace, user, kind)
-        unregister(workspace, user, kind)
-        register(workspace, user, :collaborator)
-      end #accept
+      def assign_role(workspace, user, kind)
+        KINDS.each { |kind| unregister(workspace, user, kind) }
+        register(workspace, user, kind)
+        self
+      end #assign_role
 
       def remove(workspace, user)
-        %w{ administrator collaborator}.each do |kind|
-          unregister(workspace, user, kind)
-        end
+        unregister(workspace, user, :collaborator)
+        unregister(workspace, user, :administrator)
+        self
       end #remove
-
-      def assign_role(workspace, user, role)
-      end
 
       def unlink_from_all_workspaces(user)
         KINDS.each { |kind| unlink_from_workspaces(user, kind) }

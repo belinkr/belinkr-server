@@ -17,7 +17,7 @@ module Belinkr
       end #initialize
 
       def call
-        enforcer      .authorize(actor, :invite)
+        enforcer      .authorize(actor, :invite, invited)
         invitation    .link_to(
                         inviter:    actor,
                         invited:    invited,

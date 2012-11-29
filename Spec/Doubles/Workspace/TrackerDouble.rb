@@ -8,9 +8,6 @@ module Belinkr
       def unregister(*args)
       end #unregister
 
-      def accept(*args)
-      end #accept
-
       def remove(*args)
       end #remove
 

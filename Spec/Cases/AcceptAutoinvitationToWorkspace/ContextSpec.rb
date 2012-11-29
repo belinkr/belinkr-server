@@ -87,7 +87,8 @@ describe 'accept autoinvitation to workspace' do
       memberships_as_collaborator:  @memberships_as_collaborator
     )
 
-    tracker.expect :accept, tracker, [@workspace, @autoinvited, :autoinvited]
+    tracker.expect :assign_role, tracker,
+                    [@workspace, @autoinvited, :collaborator]
     context.call
     tracker.verify
   end

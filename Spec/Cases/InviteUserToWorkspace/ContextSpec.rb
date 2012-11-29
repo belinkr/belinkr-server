@@ -30,7 +30,7 @@ describe 'invite user to workspace' do
       invitations:            @invitations,
       tracker:                @tracker
     )
-    enforcer.expect :authorize, true, [@actor, :invite]
+    enforcer.expect :authorize, true, [@actor, :invite, @invited]
     context.call
     enforcer.verify
   end

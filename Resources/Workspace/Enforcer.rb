@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'Tinto/Exceptions'
+require_relative '../../Services/Tracker'
 
 module Belinkr
   module Workspace
@@ -10,9 +11,9 @@ module Belinkr
       COLLABORATOR_ACTIONS  =  %w{ create leave }
       ACTIONS               = COLLABORATOR_ACTIONS + ADMINISTRATOR_ACTIONS
 
-      def initialize(arguments)
-        @administrators = arguments.fetch(:administrators)
-        @collaborators  = arguments.fetch(:collaborators)
+      def initialize(workspace, tracker=Workspace::Tracker.new)
+        @workspace  = workspace
+        @tracker    = tracker
       end #initialize
 
       def authorize(actor, action)
@@ -23,14 +24,15 @@ module Belinkr
 
       private
 
-      attr_reader :administrators, :collaborators
+      attr_reader :workspace, :tracker
 
       def is_in?(actor)
-        administrators.include?(actor) || collaborators.include?(actor)
+        tracker.is?(workspace, actor, :collaborator) ||
+        tracker.is?(workspace, actor, :administrator)
       end
 
       def evil_collaborator?(actor, action)
-        collaborators.include?(actor) &&
+        tracker.is?(workspace, actor, :collaborator) &&
         !COLLABORATOR_ACTIONS.include?(action)
       end #evil_collaborator?
     end # Enforcer

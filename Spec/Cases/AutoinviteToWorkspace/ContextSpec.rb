@@ -28,7 +28,7 @@ describe 'autoinvite to workspace' do
       autoinvitations:            @autoinvitations,
       tracker:                    @tracker
     )
-    enforcer.expect :authorize, true, [@actor, :autoinvite]
+    enforcer.expect :authorize, true, [@actor, :autoinvite, @actor]
     context.call
     enforcer.verify
   end

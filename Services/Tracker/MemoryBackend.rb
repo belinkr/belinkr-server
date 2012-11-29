@@ -18,6 +18,7 @@ module Belinkr
           relink_to_users
           users_for
           workspaces_for
+          is?
         }
 
         def initialize
@@ -88,6 +89,11 @@ module Belinkr
         def workspaces_for(entity, user, kind)
           workspaces = AugmentedSet.new workspace_members_for(entity, user, kind)
         end #workspaces_for
+
+        def is?(workspace, user, kind)
+          user_ids = workspaces.fetch(users_key_for(workspace, kind), [])
+          user_ids.include?(user.id.to_s)
+        end #is?
 
         private 
 

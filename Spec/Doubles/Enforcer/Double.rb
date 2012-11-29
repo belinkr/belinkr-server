@@ -5,7 +5,7 @@ module Belinkr
       def initialize(*args)
       end #initialize
 
-      def authorize(actor, action)
+      def authorize(actor, action, *args)
       end #authorize
     end # Double
   end # Enforcer
