@@ -5,7 +5,7 @@ require 'redis'
 require_relative '../../Factories/Entity'
 require_relative '../../Factories/User'
 require_relative '../../Factories/Workspace'
-require_relative '../../../Cases/AcceptInvitationToWorkspace/Request'
+require_relative '../../../Cases/RejectInvitationToWorkspace/Request'
 
 $redis ||= Redis.new
 $redis.select 8
@@ -15,7 +15,7 @@ include Belinkr
 describe 'accept invitation to workspace request model' do
   before { $redis.flushdb }
 
-  it 'returns data objects for the AcceptInvitationToWorkspace context' do
+  it 'returns data objects for the RejectInvitationToWorkspace context' do
     entity      = Factory.entity.sync
     inviter     = Factory.user.sync
     actor       = Factory.user.sync
@@ -29,7 +29,7 @@ describe 'accept invitation to workspace request model' do
     payload     = { id: invitation.id, workspace_id: workspace.id }.to_json
 
     payload     = JSON.parse(payload)
-    request     = AcceptInvitationToWorkspace::Request
+    request     = RejectInvitationToWorkspace::Request
                     .new(payload, actor, entity)
     data        = request.prepare
 

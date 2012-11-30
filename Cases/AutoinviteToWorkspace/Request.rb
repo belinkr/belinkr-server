@@ -1,12 +1,13 @@
 # encoding: utf-8
 require_relative '../../Resources/Workspace/Autoinvitation/Member'
+require_relative '../../Resources/Workspace/Autoinvitation/Collection'
 require_relative '../../Resources/Workspace/Autoinvitation/Enforcer'
 require_relative '../../Resources/Workspace/Member'
 require_relative '../../Resources/User/Member'
 require_relative '../../Services/Tracker'
 
 module Belinkr
-  module AcceptAutoinvitationToWorkspace
+  module AutoinviteToWorkspace
     class Request
       def initialize(payload, actor, entity)
         @payload  = payload
@@ -16,12 +17,12 @@ module Belinkr
 
       def prepare
         {
-          actor:          actor,
-          workspace:      workspace,
-          autoinvitation: autoinvitation,
-          autoinvited:    autoinvited,
-          enforcer:       enforcer,
-          tracker:        tracker
+          actor:            actor,
+          workspace:        workspace,
+          autoinvitation:   autoinvitation,
+          autoinvitations:  autoinvitations,
+          enforcer:         enforcer,
+          tracker:          tracker
         }
       end #prepare
 
@@ -38,16 +39,18 @@ module Belinkr
 
       def autoinvitation
         @autoinvitation ||= Workspace::Autoinvitation::Member.new(
-          id:           payload.fetch('id'),
-          workspace_id: payload.fetch('workspace_id'),
-          entity_id:    entity.id
-        ).fetch
+          autoinvited_id: payload.fetch('autoinvited_id'),
+          workspace_id:   payload.fetch('workspace_id'),
+          entity_id:      entity.id
+        )
       end #autoinvitation
 
-      def autoinvited
-        @autoinvited ||= User::Member.new(id: autoinvitation.autoinvited_id)
-                          .fetch
-      end #autoinvited
+      def autoinvitations
+        @autoinvitations ||= Workspace::Autoinvitation::Collection.new(
+          workspace_id: payload.fetch('workspace_id'),
+          entity_id:    entity.id
+        )
+      end #autoinvitations
 
       def enforcer
         Workspace::Autoinvitation::Enforcer
@@ -58,6 +61,6 @@ module Belinkr
         @tracker ||= Workspace::Tracker.new
       end #tracker
     end # Request
-  end # AcceptAutoinvitationToWorkspace
+  end # AutoinviteToWorkspace
 end # Belinkr
 

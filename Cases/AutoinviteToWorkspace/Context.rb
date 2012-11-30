@@ -8,10 +8,10 @@ module Belinkr
 
       def initialize(arguments)
         @actor            = arguments.fetch(:actor)
-        @enforcer         = arguments.fetch(:enforcer)
         @workspace        = arguments.fetch(:workspace)
         @autoinvitation   = arguments.fetch(:autoinvitation)
         @autoinvitations  = arguments.fetch(:autoinvitations)
+        @enforcer         = arguments.fetch(:enforcer)
         @tracker          = arguments.fetch(:tracker)
       end #initialize
 

@@ -6,7 +6,7 @@ require_relative '../../Resources/User/Member'
 require_relative '../../Services/Tracker'
 
 module Belinkr
-  module AcceptAutoinvitationToWorkspace
+  module RejectAutoinvitationToWorkspace
     class Request
       def initialize(payload, actor, entity)
         @payload  = payload
@@ -58,6 +58,6 @@ module Belinkr
         @tracker ||= Workspace::Tracker.new
       end #tracker
     end # Request
-  end # AcceptAutoinvitationToWorkspace
+  end # RejectAutoinvitationToWorkspace
 end # Belinkr
 

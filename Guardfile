@@ -47,6 +47,16 @@ group :contexts do
   end
 end
 
+group :requests do
+  guard :minitest, test_folders: ["Spec/Cases"], 
+  test_file_patterns: ["*RequestSpec.rb"] do
+    watch(%r|^Cases/(.*)/(.*)\.rb|) { |matches| 
+      "Spec/#{matches[1]}/#{matches[2]}Spec.rb" 
+    }
+    watch(%r|^Spec/Cases/(.*)/(.*)Spec\.rb|)
+  end
+end
+
 notification :tmux, 
   display_message: true,
 

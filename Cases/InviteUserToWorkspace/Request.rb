@@ -1,11 +1,12 @@
 # encoding: utf-8
 require_relative '../../Resources/Workspace/Invitation/Member'
+require_relative '../../Resources/Workspace/Invitation/Collection'
 require_relative '../../Resources/Workspace/Invitation/Enforcer'
 require_relative '../../Resources/Workspace/Member'
 require_relative '../../Services/Tracker'
 
 module Belinkr
-  module AcceptInvitationToWorkspace
+  module InviteUserToWorkspace
     class Request
       def initialize(payload, actor, entity)
         @payload  = payload
@@ -15,11 +16,13 @@ module Belinkr
 
       def prepare
         {
-          actor:      actor,
-          workspace:  workspace,
-          invitation: invitation,
-          enforcer:   enforcer,
-          tracker:    tracker
+          actor:        actor,
+          workspace:    workspace,
+          invited:      invited,
+          invitation:   invitation,
+          invitations:  invitations,
+          enforcer:     enforcer,
+          tracker:      tracker
         }
       end #prepare
 
@@ -34,13 +37,25 @@ module Belinkr
         ).fetch
       end #workspace
 
+      def invited
+        @invited ||= User::Member.new(id: payload.fetch('invited_id')).fetch
+      end #invited
+
       def invitation
         @invitation ||= Workspace::Invitation::Member.new(
-          id:           payload.fetch('id'),
+          inviter_id:   actor.id,
+          invited_id:   payload.fetch('invited_id'),
           workspace_id: payload.fetch('workspace_id'),
           entity_id:    entity.id
-        ).fetch
+        )
       end #invitation
+
+      def invitations
+        @invitations ||= Workspace::Invitation::Collection.new(
+          workspace_id: payload.fetch('workspace_id'),
+          entity_id:    entity.id
+        )
+      end #invitations
 
       def enforcer
         Workspace::Invitation::Enforcer.new(workspace, invitation, tracker)
@@ -50,6 +65,6 @@ module Belinkr
         @tracker ||= Workspace::Tracker.new
       end #tracker
     end # Request
-  end # AcceptInvitationToWorkspace
+  end # InviteUserToWorkspace
 end # Belinkr
 
