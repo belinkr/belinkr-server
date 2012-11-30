@@ -42,12 +42,7 @@ module Belinkr
       end #invited
 
       def invitation
-        @invitation ||= Workspace::Invitation::Member.new(
-          inviter_id:   actor.id,
-          invited_id:   payload.fetch('invited_id'),
-          workspace_id: payload.fetch('workspace_id'),
-          entity_id:    entity.id
-        )
+        @invitation ||= Workspace::Invitation::Member.new(payload.merge scope)
       end #invitation
 
       def invitations
@@ -64,6 +59,10 @@ module Belinkr
       def tracker
         @tracker ||= Workspace::Tracker.new
       end #tracker
+
+      def scope
+        { entity_id: entity.id }
+      end #scope
     end # Request
   end # InviteUserToWorkspace
 end # Belinkr

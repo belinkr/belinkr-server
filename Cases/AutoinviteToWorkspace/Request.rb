@@ -39,9 +39,7 @@ module Belinkr
 
       def autoinvitation
         @autoinvitation ||= Workspace::Autoinvitation::Member.new(
-          autoinvited_id: payload.fetch('autoinvited_id'),
-          workspace_id:   payload.fetch('workspace_id'),
-          entity_id:      entity.id
+          payload.merge scope
         )
       end #autoinvitation
 
@@ -60,6 +58,10 @@ module Belinkr
       def tracker
         @tracker ||= Workspace::Tracker.new
       end #tracker
+
+      def scope
+        { entity_id: entity.id }
+      end #scope
     end # Request
   end # AutoinviteToWorkspace
 end # Belinkr
