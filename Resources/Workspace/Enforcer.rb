@@ -12,8 +12,8 @@ module Belinkr
       ACTIONS               = COLLABORATOR_ACTIONS + ADMINISTRATOR_ACTIONS
 
       def initialize(workspace, tracker=Workspace::Tracker.new)
-        @workspace  = workspace
-        @tracker    = tracker
+        @workspace      = workspace
+        @tracker        = tracker
       end #initialize
 
       def authorize(actor, action)

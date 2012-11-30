@@ -28,12 +28,18 @@ module Belinkr
         self
       end #unregister
 
+      # Register the passed user with the passed kind
+      # Ensure it'll be the only kind registered for that user
+      # in this workspace, by cleaning up all kinds for this 
+      # user first
       def assign_role(workspace, user, kind)
         KINDS.each { |kind| unregister(workspace, user, kind) }
         register(workspace, user, kind)
         self
       end #assign_role
 
+      # Remove a user from this workspace, no matter he is
+      # a collaborator or administrator
       def remove(workspace, user)
         unregister(workspace, user, :collaborator)
         unregister(workspace, user, :administrator)

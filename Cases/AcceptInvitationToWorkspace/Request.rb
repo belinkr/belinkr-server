@@ -18,14 +18,22 @@ module Belinkr
           actor:      actor,
           workspace:  workspace,
           invitation: invitation,
-          enforcer:   Workspace::Invitation::Enforcer.new,
-          tracker:    Workspace::Tracker.new
+          enforcer:   enforcer,
+          tracker:    tracker
         }
       end #prepare
 
       private
 
       attr_reader :payload, :actor, :entity
+
+      def workspace
+        @workspace ||= Workspace::Member.new(
+          id:           payload.fetch('workspace_id'),
+          user_id:      actor.id,
+          entity_id:    entity.id
+        ).fetch
+      end #workspace
 
       def invitation
         @invitation ||= Workspace::Invitation::Member.new(
@@ -35,13 +43,13 @@ module Belinkr
         ).fetch
       end #invitation
 
-      def workspace
-        @workspace ||= Workspace::Member.new(
-          id:           payload.fetch('workspace_id'),
-          user_id:      actor.id,
-          entity_id:    entity.id
-        ).fetch
-      end #workspace
+      def enforcer
+        Workspace::Invitation::Enforcer.new(workspace, invitation, tracker)
+      end #enforcer
+
+      def tracker
+        @tracker ||= Workspace::Tracker.new
+      end #tracker
     end # Request
   end # AcceptInvitationToWorkspace
 end # Belinkr

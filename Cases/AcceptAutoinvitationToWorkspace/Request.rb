@@ -20,8 +20,8 @@ module Belinkr
           workspace:      workspace,
           autoinvitation: autoinvitation,
           autoinvited:    autoinvited,
-          enforcer:       Workspace::Autoinvitation::Enforcer.new,
-          tracker:        Workspace::Tracker.new
+          enforcer:       enforcer,
+          tracker:        tracker
         }
       end #prepare
 
@@ -29,25 +29,35 @@ module Belinkr
 
       attr_reader :payload, :actor, :entity
 
+      def workspace
+        @workspace ||= Workspace::Member.new(
+          id:           payload.fetch('workspace_id'),
+          user_id:      actor.id,
+          entity_id:    entity.id
+        ).fetch
+      end #workspace
+
       def autoinvitation
-        @autoinvitation ||= Workspace::Autoinvitation.new(
-          id:           payload.fetch('id')
+        @autoinvitation ||= Workspace::Autoinvitation::Member.new(
+          id:           payload.fetch('id'),
           workspace_id: payload.fetch('workspace_id'),
           entity_id:    entity.id
         ).fetch
       end #autoinvitation
 
-      def workspace
-        @workspace ||= Workspace::Member.new(
-          id:           payload.fetch('workspace_id'),
-          user_id:      actor.id
-          entity_id:    entity.id
-        ).fetch
-      end #workspace
-
       def autoinvited
-        User::Member.new(id: autoinvitation.autoinvited_id).fetch
+        @autoinvited ||= User::Member.new(id: autoinvitation.autoinvited_id)
+                          .fetch
       end #autoinvited
+
+      def enforcer
+        Workspace::Autoinvitation::Enforcer
+          .new(workspace, autoinvitation, tracker)
+      end #enforcer
+
+      def tracker
+        @tracker ||= Workspace::Tracker.new
+      end #tracker
     end # Request
   end # AcceptAutoinvitationToWorkspace
 end # Belinkr
