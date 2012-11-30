@@ -64,7 +64,13 @@ module Belinkr
         session[:auth_token] ||= auth_token_cookie    if auth_token_cookie
         session[:auth_token] ||= remember_cookie      if remember_cookie
 
-        @current_session = Session::Member.new(id: session[:auth_token]).fetch
+        begin
+          @current_session = Session::Member.new(id: session[:auth_token]).fetch
+        rescue Tinto::Exceptions::NotFound
+          response.delete_cookie Config::AUTH_TOKEN_COOKIE, path: '/'
+          return false
+        end
+
       end
 
       def current_entity
