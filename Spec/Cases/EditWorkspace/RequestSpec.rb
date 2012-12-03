@@ -20,7 +20,7 @@ describe 'request model for EditWorkspace' do
                   entity_id: entity.id
                 ).sync
     
-    payload = { id: workspace.id, name: 'changed' }
+    payload = { workspace_id: workspace.id, name: 'changed' }
     payload = JSON.parse(payload.to_json)
     data    = EditWorkspace::Request.new(payload, actor, entity).prepare
 

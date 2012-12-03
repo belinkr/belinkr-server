@@ -29,7 +29,6 @@ describe API do
     it 'authenticates the user and creates a new session' do
       user, password = create_account
       post '/sessions', { email: user.email, password: password }.to_json
-      dump
       last_response.status.must_equal 201
 
       get '/statuses'

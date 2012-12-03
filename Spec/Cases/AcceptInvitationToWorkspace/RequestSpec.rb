@@ -26,7 +26,10 @@ describe 'accept invitation to workspace request model' do
                     workspace_id: workspace.id,
                     entity_id:    entity.id
                   ).sync
-    payload     = { id: invitation.id, workspace_id: workspace.id }.to_json
+    payload     = {
+                    invitation_id:  invitation.id,
+                    workspace_id:   workspace.id
+                  }.to_json
 
     payload     = JSON.parse(payload)
     request     = AcceptInvitationToWorkspace::Request

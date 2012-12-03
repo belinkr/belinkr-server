@@ -27,7 +27,6 @@ module Belinkr
           expires:  Time.now + Config::COOKIE_EXPIRATION_IN_SECS
         ) if payload.fetch('remember', false)
 
-        p persisted_session
         persisted_session
       end
     end # post /sessions

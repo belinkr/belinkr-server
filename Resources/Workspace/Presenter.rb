@@ -1,100 +1,47 @@
 # encoding: utf-8
 require 'json'
-require_relative 'util'
-require_relative 'invitation/tracker'
-require_relative 'status/collection'
-require_relative '../user/role/orchestrator'
-require_relative '../../tinto/utils'
+require 'Tinto/Presenter'
 
 module Belinkr
   module Workspace
     class Presenter
-      include Util 
-
-      def initialize(resource, actor=nil)
-        @resource = resource
-        @actor    = actor
-      end
+      def initialize(workspace, actor=nil)
+        @workspace  = workspace
+        @actor      = actor
+      end #initialize
 
       def as_json
         as_poro.to_json
-      end
+      end #as_json
 
       def as_poro
         {
-          id:             @resource.id,
-          name:           @resource.name,
-          entity_id:      @resource.entity_id,
-        }.merge! relationship
-         .merge! counters
-         .merge! Tinto::Presenter.timestamps_for(@resource)
-         .merge! Tinto::Presenter.errors_for(@resource)
-         .merge! links
+          id:         workspace.id,
+          name:       workspace.name,
+          entity_id:  workspace.entity_id,
+        }
+          .merge! Tinto::Presenter.timestamps_for(workspace)
+          .merge! Tinto::Presenter.errors_for(workspace)
+          .merge! counters
+          .merge! links
       end
 
       private
 
-      def links
-        base_path = "/workspaces"
-        links = {
-          self: "#{base_path}/#{@resource.id}",
-        }.merge! invitation_link
-
-        { links: links }
-      end
-
-      def invitation_link
-        invitations = tracker_for(@resource).invitations_for(@actor)
-        return {} unless invitations && !invitations.empty?
-        invitation = invitations.first
-        return { 
-          invitation: "/workspaces/#{@resource.id}/invitations/#{invitation.id}",
-          invitation_accept: "/workspaces/#{@resource.id}/invitations/accepted/#{invitation.id}",
-          invitation_reject: "/workspaces/#{@resource.id}/invitations/rejected/#{invitation.id}"
-        }
-      end
+      attr_reader :actor, :workspace
 
       def counters
-        return {} unless @resource.id
-        {
-          statuses_count: statuses_count,
-          people_count:   people_count
+        { 
+          counters: {
+            users:    workspace.user_counter,
+            statuses: workspace.status_counter
+          }
         }
-      end
+      end #counters
 
-      def statuses_count
-        Workspace::Status::Collection.new(
-          kind:         :general,
-          workspace_id: @resource.id,
-          entity_id:    @resource.entity_id
-        ).size
-      end
-
-      def people_count
-        administrators_for(@resource).size + collaborators_for(@resource).size
-      end
-
-      def relationship(actor = @actor)
-        return  {} unless actor
-        return  { relationship: 'administrator'
-                } if User::Role::Orchestrator.is_entity_admin?(@actor)
-        return  { relationship: 'collaborator' 
-                } if @resource.is_collaborator?(actor)
-        return  { relationship: 'administrator'
-                } if @resource.is_administrator?(actor)
-        return  { relationship: 'invited'
-                } if @resource.is_invited?(actor)
-        return  { relationship: 'autoinvited'
-                } if @resource.is_autoinvited?(actor)
-        return  { relationship: 'none' }
-      end
-
-      def tracker_for(workspace)
-        Invitation::Tracker.new(
-          workspace_id: workspace.id, 
-          entity_id: workspace.entity_id
-        )
-      end
+      def links
+        { _links: { } }
+      end #links
     end # Presenter
   end # Workspace
 end # Belinkr

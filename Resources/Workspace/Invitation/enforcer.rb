@@ -18,10 +18,11 @@ module Belinkr
         end #authorize
 
         def invite(actor, invited)
+          relationship = tracker.relationship_for(workspace, invited)
           raise NotAllowed unless is_in?(actor)
           raise NotAllowed if is_in?(invited)
-          raise NotAllowed if tracker.is?(workspace, invited, :invited)
-          raise NotAllowed if tracker.is?(workspace, invited, :autoinvited)
+          raise NotAllowed if relationship == 'invited'
+          raise NotAllowed if relationship == 'autoinvited'
           true
         end
 
@@ -40,9 +41,10 @@ module Belinkr
         attr_reader :workspace, :invitation, :tracker
 
         def is_in?(user)
-          tracker.is?(workspace, user, :collaborator) ||
-          tracker.is?(workspace, user, :administrator)
-        end
+          relationship = tracker.relationship_for(workspace, user)
+          (relationship == 'collaborator') || (relationship == 'administrator')
+        end #is_in?
+
         #  validation_error "validation.errors.already_in_workspace" if 
         #  validation_error "validation.errors.already_requested" if 
         #  validation_error "validation.errors.already_invited" if 

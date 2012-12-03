@@ -3,6 +3,7 @@ require_relative '../Factories/User'
 require_relative '../Factories/Profile'
 require_relative '../Factories/Entity'
 require_relative '../../Resources/Session/Member'
+require_relative '../../Resources/Profile/Collection'
 require_relative '../../Cases/CreateProfileInEntity/Context'
 
 module Belinkr
@@ -10,20 +11,19 @@ module Belinkr
     module API
       module Helpers
         def session_for(profile)
-          return @http_session if @http_session
           session = Session::Member.new(
             user_id:      profile.user_id, 
             profile_id:   profile.id,
             entity_id:    profile.entity_id 
           ).sync
 
-          @http_session = { "rack.session" => { auth_token: session.id } }
+          { "rack.session" => { auth_token: session.id } }
         end
 
-        def create_user_and_profile(entity_id=nil)
-          user      = Factory.user
+        def create_user_and_profile(entity=nil)
+          user      = Factory.user(profiles: [])
           profile   = Factory.profile
-          entity    = Factory.entity(id: entity_id)
+          entity    ||= Factory.entity.sync
           profiles  = Profile::Collection.new(entity_id: entity.id)
 
           context   = CreateProfileInEntity::Context.new(
@@ -33,7 +33,7 @@ module Belinkr
                         entity:   entity
                       )
           context.run
-          profile
+          [user, profile, entity]
         end
 
         def dump

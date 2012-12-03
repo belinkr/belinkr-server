@@ -7,8 +7,8 @@ module Belinkr
     class Enforcer
       include Tinto::Exceptions
 
-      ADMINISTRATOR_ACTIONS = %w{ update delete undelete promote demote remove }
-      COLLABORATOR_ACTIONS  =  %w{ create leave }
+      ADMINISTRATOR_ACTIONS = %w{update delete undelete promote demote remove}
+      COLLABORATOR_ACTIONS  = %w{create leave}
       ACTIONS               = COLLABORATOR_ACTIONS + ADMINISTRATOR_ACTIONS
 
       def initialize(workspace, tracker=Workspace::Tracker.new)
@@ -27,12 +27,12 @@ module Belinkr
       attr_reader :workspace, :tracker
 
       def is_in?(actor)
-        tracker.is?(workspace, actor, :collaborator) ||
-        tracker.is?(workspace, actor, :administrator)
+        relationship = tracker.relationship_for(workspace, actor)
+        relationship == 'collaborator' || relationship == 'administrator'
       end
 
       def evil_collaborator?(actor, action)
-        tracker.is?(workspace, actor, :collaborator) &&
+        tracker.relationship_for(workspace, actor) == 'collaborator' &&
         !COLLABORATOR_ACTIONS.include?(action)
       end #evil_collaborator?
     end # Enforcer

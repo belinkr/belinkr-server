@@ -36,7 +36,7 @@ module Belinkr
 
       def invitation
         @invitation ||= Workspace::Invitation::Member.new(
-          id:           payload.fetch('id'),
+          id:           payload.fetch('invitation_id'),
           workspace_id: payload.fetch('workspace_id'),
           entity_id:    entity.id
         ).fetch

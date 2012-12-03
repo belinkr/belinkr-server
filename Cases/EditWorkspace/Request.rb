@@ -26,7 +26,7 @@ module Belinkr
 
       def workspace
         @workspace ||= Workspace::Member.new(
-          id:         payload.fetch('id'),
+          id:         payload.fetch('workspace_id'),
           entity_id:  entity.id
         ).fetch
       end #workspace

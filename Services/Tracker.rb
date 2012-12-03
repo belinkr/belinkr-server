@@ -84,6 +84,9 @@ module Belinkr
         self
       end #relink_to_all_users
 
+      def sync
+      end #sync
+
       private
 
       def track(workspace, user, kind)

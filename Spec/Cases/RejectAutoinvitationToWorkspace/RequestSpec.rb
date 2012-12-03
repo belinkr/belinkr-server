@@ -24,7 +24,10 @@ describe 'accept autoinvitation to workspace request model' do
                         entity_id:      entity.id,
                         autoinvited_id: actor.id
                       ).sync
-    payload         = { id: autoinvitation.id, workspace_id: workspace.id }
+    payload         = {
+                        autoinvitation_id:  autoinvitation.id,
+                        workspace_id:       workspace.id
+                      }
     payload         = JSON.parse(payload.to_json)
     request         = RejectAutoinvitationToWorkspace::Request
                         .new(payload, actor, entity)

@@ -38,7 +38,7 @@ module Belinkr
 
       def autoinvitation
         @autoinvitation ||= Workspace::Autoinvitation::Member.new(
-          id:           payload.fetch('id'),
+          id:           payload.fetch('autoinvitation_id'),
           workspace_id: payload.fetch('workspace_id'),
           entity_id:    entity.id
         ).fetch

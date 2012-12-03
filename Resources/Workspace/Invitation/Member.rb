@@ -39,7 +39,7 @@ module Belinkr
           @state_machine = Statemachine.build do
             state :pending
             state :accepted
-            state(:rejected) { on_entry :rejected_at= }
+            state(:rejected) { on_entry :set_rejected_at }
 
             trans :pending, :accept, :accepted
             trans :pending, :reject, :rejected
@@ -92,7 +92,11 @@ module Belinkr
 
         def sync_state
           self.state = @state_machine.state.to_s 
-        end
+        end #sync_state
+
+        def set_rejected_at
+          self.rejected_at = Time.now
+        end #set_rejected_at
       end # Member
     end # Invitation
   end # Workspace

@@ -50,6 +50,10 @@ module Belinkr
           Tinto::Sanitizer.sanitize_hash(JSON.parse(request.body.read.to_s))
       end
 
+      def combined_input
+        payload.to_hash.merge(params)
+      end #combined_input
+
       def sanitize_params!
         self.params = 
           send(:indifferent_params, Tinto::Sanitizer.sanitize_hash(params))
