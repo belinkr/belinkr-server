@@ -16,8 +16,6 @@ describe 'accept autoinvitation to workspace' do
     @workspace                    = OpenStruct.new
     @autoinvitation               = Workspace::Autoinvitation::Double.new
     @tracker                      = Workspace::TrackerDouble.new
-    @memberships_as_autoinvited   = Collection::Double.new
-    @memberships_as_collaborator  = Collection::Double.new
   end
 
   it 'authorizes the actor' do
@@ -28,9 +26,7 @@ describe 'accept autoinvitation to workspace' do
       enforcer:                     enforcer,
       workspace:                    @workspace,
       autoinvitation:               @autoinvitation,
-      tracker:                      @tracker,
-      memberships_as_autoinvited:   @memberships_as_autoinvited,
-      memberships_as_collaborator:  @memberships_as_collaborator
+      tracker:                      @tracker
     )
 
     enforcer.expect :authorize, true, [@actor, :accept]
@@ -46,9 +42,7 @@ describe 'accept autoinvitation to workspace' do
       enforcer:                     @enforcer,
       workspace:                    @workspace,
       autoinvitation:               autoinvitation,
-      tracker:                      @tracker,
-      memberships_as_autoinvited:   @memberships_as_autoinvited,
-      memberships_as_collaborator:  @memberships_as_collaborator
+      tracker:                      @tracker
     )
 
     autoinvitation.expect :accept, autoinvitation
@@ -64,9 +58,7 @@ describe 'accept autoinvitation to workspace' do
       enforcer:                     @enforcer,
       workspace:                    workspace,
       autoinvitation:               @autoinvitation,
-      tracker:                      @tracker,
-      memberships_as_autoinvited:   @memberships_as_autoinvited,
-      memberships_as_collaborator:  @memberships_as_collaborator
+      tracker:                      @tracker
     )
 
     workspace.expect :increment_user_counter, workspace
@@ -82,13 +74,10 @@ describe 'accept autoinvitation to workspace' do
       enforcer:                     @enforcer,
       workspace:                    @workspace,
       autoinvitation:               @autoinvitation,
-      tracker:                      tracker,
-      memberships_as_autoinvited:   @memberships_as_autoinvited,
-      memberships_as_collaborator:  @memberships_as_collaborator
+      tracker:                      tracker
     )
 
-    tracker.expect :assign_role, tracker,
-                    [@workspace, @autoinvited, :collaborator]
+    tracker.expect :track_collaborator, tracker, [@workspace, @autoinvited]
     context.call
     tracker.verify
   end

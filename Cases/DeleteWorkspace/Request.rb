@@ -1,10 +1,11 @@
 # encoding: utf-8
-require_relative '../../Resources/Workspace/Collection'
 require_relative '../../Resources/Workspace/Member'
+require_relative '../../Resources/Workspace/Collection'
+require_relative '../../Resources/Workspace/Enforcer'
 require_relative '../../Services/Tracker'
-
+  
 module Belinkr
-  module CreateWorkspace
+  module DeleteWorkspace
     class Request
       def initialize(payload, actor, entity)
         @payload  = payload
@@ -17,7 +18,7 @@ module Belinkr
           actor:      actor,
           workspace:  workspace,
           workspaces: workspaces,
-          entity:     entity,
+          enforcer:   enforcer,
           tracker:    tracker
         }
       end #prepare
@@ -27,21 +28,24 @@ module Belinkr
       attr_reader :payload, :actor, :entity
 
       def workspace
-        @workspace ||= Workspace::Member.new(payload.merge scope)
+        @workspace ||= Workspace::Member.new(
+          id:         payload.fetch('workspace_id'),
+          entity_id:  entity.id
+        ).fetch
       end #workspace
 
       def workspaces
         @workspaces ||= Workspace::Collection.new(entity_id: entity.id)
       end #workspaces
 
-      def tracker
-        @tracker ||= Workspace::Tracker.new
-      end #tracker
+      def enforcer
+        Workspace::Enforcer.new(workspace)
+      end #enforcer
 
-      def scope
-        { entity_id: entity.id }
-      end # scope
+      def tracker
+        Workspace::Tracker.new
+      end #tracker
     end # Request
-  end # CreateWorkspace
+  end # DeleteWorkspace
 end # Belinkr
 

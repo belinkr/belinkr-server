@@ -2,17 +2,26 @@
 module Belinkr
   module Workspace
     class TrackerDouble
-      def register(*args)
-      end #register
+      def track_administrator(*args)
+      end #track_administrator
 
-      def unregister(*args)
-      end #unregister
+      def track_collaborator(*args)
+      end #track_collaborator
+
+      def track_invitation(*args)
+      end #track_invitation
+
+      def track_autoinvitation(*args)
+      end #track_autoinvitaiton
+
+      def untrack_invitation(*args)
+      end #untrack_invitation
+
+      def untrack_autoinvitation(*args)
+      end #untrack_autoinvitation
 
       def remove(*args)
       end #remove
-
-      def assign_role(*args)
-      end #assign_role
 
       def unlink_from_all_workspaces(*args)
       end #unlink_from_all_workspaces

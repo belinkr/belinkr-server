@@ -16,7 +16,7 @@ module Belinkr
 
       def call
         enforcer.authorize(actor, :assign_role)
-        tracker.assign_role(workspace, target_user, :collaborator)
+        tracker.track_collaborator(workspace, target_user)
 
         will_sync tracker
       end #call

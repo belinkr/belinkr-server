@@ -40,8 +40,7 @@ describe 'assign collaborator role in workspace' do
       enforcer:     @enforcer,
       tracker:      tracker
     )
-    tracker.expect :assign_role, tracker,
-                    [@workspace, @target_user, :collaborator]
+    tracker.expect :track_collaborator, tracker, [@workspace, @target_user]
     context.call
     tracker.verify
   end

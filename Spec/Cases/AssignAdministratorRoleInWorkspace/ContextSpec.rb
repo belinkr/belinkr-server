@@ -40,8 +40,7 @@ describe 'assign administrator role in workspace' do
       enforcer:     @enforcer,
       tracker:      tracker
     )
-    tracker.expect :assign_role, tracker,
-                    [@workspace, @target_user, :administrator]
+    tracker.expect :track_administrator, tracker, [@workspace, @target_user]
     context.call
     tracker.verify
   end

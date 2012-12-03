@@ -17,7 +17,7 @@ module Belinkr
       def call
         workspace   .link_to(entity)
         workspaces  .add(workspace)
-        tracker     .register(workspace, actor, :administrator)
+        tracker     .track_administrator(workspace, actor)
 
         will_sync workspace, workspaces, tracker
       end #call

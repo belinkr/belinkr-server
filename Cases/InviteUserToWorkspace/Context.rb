@@ -24,7 +24,7 @@ module Belinkr
                         workspace:  workspace
                       )
         invitations   .add(invitation)
-        tracker       .register(workspace, invited, :invited)
+        tracker       .track_invitation(workspace, invited, invitation)
 
         will_sync invitations, invitation, tracker
       end #call

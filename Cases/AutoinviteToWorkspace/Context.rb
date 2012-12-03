@@ -16,13 +16,13 @@ module Belinkr
       end #initialize
 
       def call
-        enforcer          .authorize(actor, :autoinvite, actor)
-        autoinvitation    .link_to(
-                            autoinvited:  actor,
-                            workspace:    workspace
-                          )
-        autoinvitations   .add(autoinvitation)
-        tracker           .register(workspace, actor, :autoinvited)
+        enforcer        .authorize(actor, :autoinvite, actor)
+        autoinvitation  .link_to(
+                          autoinvited:  actor,
+                          workspace:    workspace
+                        )
+        autoinvitations .add(autoinvitation)
+        tracker         .track_autoinvitation(workspace, actor, autoinvitation)
 
         will_sync autoinvitations, autoinvitation, tracker 
       end #call

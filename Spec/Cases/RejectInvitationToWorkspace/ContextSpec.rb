@@ -55,7 +55,8 @@ describe 'reject invitation to workspace' do
       invitation:   @invitation,
       tracker:      tracker
     )
-    tracker.expect :unregister, tracker, [@workspace, @actor, :invited]
+    tracker.expect :untrack_invitation, tracker,
+      [@workspace, @actor, @invitation]
     context.call
     tracker.verify
   end

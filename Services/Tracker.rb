@@ -16,33 +16,51 @@ module Belinkr
         @backend = backend
       end #initialize
 
-      def register(workspace, user, kind)
-        link_user_to_workspace(workspace, user, kind)
-        link_workspace_to_user(workspace, user, kind)
+      def track_collaborator(workspace, user)
+        KINDS.each { |kind| untrack(workspace, user, kind) }
+        track(workspace, user, :collaborator)
+        track_relationship(workspace, user, :collaborator)
         self
-      end #register
+      end #track_collaborator
 
-      def unregister(workspace, user, kind)
-        unlink_user_from_workspace(workspace, user, kind)
-        unlink_workspace_from_user(workspace, user, kind)
+      def track_administrator(workspace, user)
+        KINDS.each { |kind| untrack(workspace, user, kind) }
+        track(workspace, user, :administrator)
+        track_relationship(workspace, user, :administrator)
         self
-      end #unregister
+      end #track_administrator
 
-      # Register the passed user with the passed kind
-      # Ensure it'll be the only kind registered for that user
-      # in this workspace, by cleaning up all kinds for this 
-      # user first
-      def assign_role(workspace, user, kind)
-        KINDS.each { |kind| unregister(workspace, user, kind) }
-        register(workspace, user, kind)
+      def track_invitation(workspace, user, invitation)
+        track(workspace, user, :invited)
+        track_relationship(workspace, user, "invitation:#{invitation.id}")
         self
-      end #assign_role
+      end #track_invitation
+
+      def track_autoinvitation(workspace, user, autoinvitation)
+        track(workspace, user, :autoinvited)
+        track_relationship(workspace, user,
+          "autoinvitation:#{autoinvitation.id}")
+        self
+      end #track_autoinvitation
+
+      def untrack_invitation(workspace, user, invitation)
+        untrack(workspace, user, :invited)
+        untrack_relationship(workspace, user)
+        self
+      end #untrack_invitation
+
+      def untrack_autoinvitation(workspace, user, autoinvitation)
+        untrack(workspace, user, :autoinvited)
+        untrack_relationship(workspace, user)
+        self
+      end #untrack_autoinvitation
 
       # Remove a user from this workspace, no matter he is
       # a collaborator or administrator
       def remove(workspace, user)
-        unregister(workspace, user, :collaborator)
-        unregister(workspace, user, :administrator)
+        untrack(workspace, user, :collaborator)
+        untrack(workspace, user, :administrator)
+        untrack_relationship(workspace, user)
         self
       end #remove
 
@@ -65,6 +83,18 @@ module Belinkr
         KINDS.each { |kind| relink_to_users(workspace, kind) }
         self
       end #relink_to_all_users
+
+      private
+
+      def track(workspace, user, kind)
+        link_user_to_workspace(workspace, user, kind)
+        link_workspace_to_user(workspace, user, kind)
+      end #track
+
+      def untrack(workspace, user, kind)
+        unlink_user_from_workspace(workspace, user, kind)
+        unlink_workspace_from_user(workspace, user, kind)
+      end #untrack
     end # Tracker
   end # Workspace
 end # Belinkr

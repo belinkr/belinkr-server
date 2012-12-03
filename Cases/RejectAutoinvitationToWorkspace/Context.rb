@@ -18,7 +18,7 @@ module Belinkr
       def call
         enforcer       .authorize(actor, :reject)
         autoinvitation .reject
-        tracker        .unregister(workspace, autoinvited, :autoinvited)
+        tracker.untrack_autoinvitation(workspace, autoinvited, autoinvitation)
 
         will_sync autoinvitation, tracker
       end #call

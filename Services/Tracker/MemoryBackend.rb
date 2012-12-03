@@ -8,6 +8,8 @@ module Belinkr
     class Tracker
       class MemoryBackend
         INTERFACE = %w{
+          track_relationship
+          untrack_relationship
           link_user_to_workspace
           link_workspace_to_user
           unlink_user_from_workspace
@@ -16,9 +18,11 @@ module Belinkr
           unlink_from_users
           relink_to_workspaces
           relink_to_users
+          relationship_for
           users_for
           workspaces_for
-          is?
+          invitation_for
+          autoinvitation_for
         }
 
         def initialize
@@ -89,11 +93,6 @@ module Belinkr
         def workspaces_for(entity, user, kind)
           workspaces = AugmentedSet.new workspace_members_for(entity, user, kind)
         end #workspaces_for
-
-        def is?(workspace, user, kind)
-          user_ids = workspaces.fetch(users_key_for(workspace, kind), [])
-          user_ids.include?(user.id.to_s)
-        end #is?
 
         private 
 

@@ -76,7 +76,8 @@ describe 'autoinvite to workspace' do
       autoinvitations:            @autoinvitations,
       tracker:                    tracker
     )
-    tracker.expect :register, tracker, [@workspace, @actor, :autoinvited]
+    tracker.expect :track_autoinvitation, tracker,
+                    [@workspace, @actor, @autoinvitation]
     context.call
     tracker.verify
   end

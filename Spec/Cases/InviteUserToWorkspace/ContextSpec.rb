@@ -82,7 +82,8 @@ describe 'invite user to workspace' do
       invitations:            @invitations,
       tracker:                tracker
     )
-    tracker.expect :register, tracker, [@workspace, @invited, :invited]
+    tracker.expect :track_invitation, tracker,
+      [@workspace, @invited, @invitation]
     context.call
     tracker.verify
   end

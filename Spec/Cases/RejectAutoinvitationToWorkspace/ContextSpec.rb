@@ -59,8 +59,8 @@ describe 'reject autoinvitation to workspace' do
       autoinvitation:             @autoinvitation,
       tracker:                    tracker
     )
-    tracker.expect :unregister, tracker, 
-                    [@workspace, @autoinvited, :autoinvited]
+    tracker.expect :untrack_autoinvitation, tracker, 
+                    [@workspace, @autoinvited, @autoinvitation]
     context.call
     tracker.verify
   end

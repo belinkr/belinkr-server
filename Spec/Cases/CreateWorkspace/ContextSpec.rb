@@ -54,7 +54,7 @@ describe 'create workspace' do
       entity:                       @entity,
       tracker:                      tracker
     )
-    tracker.expect :register, tracker, [@workspace, @actor, :administrator]
+    tracker.expect :track_administrator, tracker, [@workspace, @actor]
     context.call
     tracker.verify
   end

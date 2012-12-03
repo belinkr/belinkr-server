@@ -19,7 +19,7 @@ module Belinkr
         enforcer        .authorize(actor, :accept)
         autoinvitation  .accept
         workspace       .increment_user_counter
-        tracker         .assign_role(workspace, autoinvited, :collaborator)
+        tracker         .track_collaborator(workspace, autoinvited)
 
         will_sync autoinvitation, workspace, tracker
       end #call
