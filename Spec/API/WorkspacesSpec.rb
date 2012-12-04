@@ -50,6 +50,7 @@ describe API do
     end
 
     it 'returns the relationship with the current user' do
+      skip
     end
 
     it 'returns the number of statuses in the workspace' do
@@ -74,9 +75,11 @@ describe API do
     end
 
     it 'returns the number of administrators in the workspace' do
+      skip
     end
 
     it 'returns the number of collaborators in the workspace' do
+      skip
     end
   end # GET /workspaces/:workspace_id
 
@@ -84,9 +87,10 @@ describe API do
     it "it return all workspaces in the entity" do
       actor, profile, entity = create_user_and_profile
       5.times { create_workspace_by(profile) }
-      get '/workspaces', {}, session_for(profile)
-      last_response.status.must_equal 200
 
+      get '/workspaces', {}, session_for(profile)
+
+      last_response.status.must_equal 200
       workspaces = JSON.parse(last_response.body)
       workspaces.size.must_equal 5
     end
@@ -96,8 +100,8 @@ describe API do
       50.times { create_workspace_by(profile) }
 
       get '/workspaces?page=1', {}, session_for(profile)
-      last_response.status.must_equal 200
 
+      last_response.status.must_equal 200
       workspaces = JSON.parse(last_response.body)
       workspaces.size.must_equal 20
     end
@@ -110,7 +114,7 @@ describe API do
       changes   = { name: "changed" }
 
       put "/workspaces/#{workspace.fetch('id')}", changes.to_json,
-        session_for(profile)
+          session_for(profile)
 
       last_response.status.must_equal 200
       workspace = JSON.parse(last_response.body)
@@ -123,7 +127,7 @@ describe API do
       changes   = { name: '' }
 
       put "/workspaces/#{workspace.fetch('id')}", changes.to_json,
-        session_for(profile)
+          session_for(profile)
 
       last_response.status.must_equal 400
 
@@ -141,23 +145,23 @@ describe API do
       last_response.status.must_equal 204
       last_response.body  .must_be_empty
     end
-  end # DELETE /workspaces/:id
+  end # DELETE /workspaces/:workspace_id
 
-  describe "POST /workspaces/:id/invitations" do
+  describe "POST /workspaces/:workspace_id/invitations" do
     it "creates an invitation" do
       actor, profile, entity = create_user_and_profile
       workspace = create_workspace_by(profile)
 
       invited = Factory.user.sync
-      post "/workspaces/#{workspace.fetch('id')}/invitations", 
-        { invited_id: invited.id }.to_json, session_for(profile)
+      post  "/workspaces/#{workspace.fetch('id')}/invitations", 
+            { invited_id: invited.id }.to_json, session_for(profile)
 
       last_response.status.must_equal 201
 
       invitation = JSON.parse(last_response.body)
       invitation.fetch('state' )     .must_equal 'pending'
     end
-  end # POST /workspaces/:id/invitations
+  end # POST /workspaces/:workspace_id/invitations
 
   describe "GET /workspaces/:workspace_id/invitations" do
     it "gets a page of invitations" do
@@ -165,80 +169,79 @@ describe API do
       workspace = create_workspace_by(profile)
       users = (1..50).map do 
         invited  = Factory.user.sync
-        post "/workspaces/#{workspace.fetch('id')}/invitations", 
-          { invited_id: invited.id }.to_json, session_for(profile)
+        post  "/workspaces/#{workspace.fetch('id')}/invitations", 
+              { invited_id: invited.id }.to_json, session_for(profile)
       end
 
-      get "/workspaces/#{workspace.fetch('id')}/invitations?page=1", {}, 
-        session_for(profile) 
+      get "/workspaces/#{workspace.fetch('id')}/invitations?page=1",
+          {}, session_for(profile)
+
       last_response.status.must_equal 200
       invitations = JSON.parse(last_response.body)
       invitations.size.must_equal 20
     end
   end # GET /workspaces/:workspace_id/invitations
 
-  describe "GET /workspaces/:id/invitations/:invitation_id" do
+  describe "GET /workspaces/:workspace_id/invitations/:invitation_id" do
     it "retrieves an invitation" do
-      actor, profile, entity = create_user_and_profile
-      workspace     = create_workspace_by(profile)
-      workspace_id  = workspace.fetch('id')
-      invited, invitation = create_invitation_for(workspace, profile)
-      invitation_id = invitation.fetch('id')
+      actor, profile, entity        = create_user_and_profile
+      invited_user, invited_profile = create_user_and_profile(entity)
 
-      get "/workspaces/#{workspace_id}/invitations/#{invitation_id}", 
-        {}, session_for(profile)
+      workspace   = create_workspace_by(profile)
+      invitation  = create_invitation_for(workspace, profile, invited_user)
+
+      get "/workspaces/#{workspace.fetch('id')}" +
+          "/invitations/#{invitation.fetch('id')}", 
+          {}, session_for(profile)
 
       last_response.status.must_equal 200
       invitation = JSON.parse(last_response.body)
-      invitation.fetch('id').must_equal invitation_id
+      invitation.fetch('id').must_equal invitation.fetch('id')
     end
-  end # GET /workspaces/:id/invitations/accepted/:invitation_id
+  end # GET /workspaces/:workspace_id/invitations/accepted/:invitation_id
 
-  describe "POST /workspaces/:id/invitations/accepted/:invitation_id" do
+  describe "POST /workspaces/:workspace_id/invitations/accepted/:invitation_id" do
     it "accepts an invitation" do
-      actor, profile, entity          = create_user_and_profile
-      invited_actor, invited_profile, entity  = create_user_and_profile(entity)
-      workspace     = create_workspace_by(profile)
-      workspace_id  = workspace.fetch('id')
-      invited, invitation = 
-        create_invitation_for(workspace, profile, invited_actor)
-      invitation_id = invitation.fetch('id')
+      actor, profile, entity        = create_user_and_profile
+      invited_user, invited_profile = create_user_and_profile(entity)
 
-      post "/workspaces/#{workspace.fetch('id')}/invitations/accepted/#{invitation_id}",
-        {}, session_for(invited_profile)
+      workspace   = create_workspace_by(profile)
+      invitation  = create_invitation_for(workspace, profile, invited_user)
+
+      post  "/workspaces/#{workspace.fetch('id')}" + 
+            "/invitations/accepted/#{invitation.fetch('id')}", 
+            {}, session_for(invited_profile)
 
       last_response.status.must_equal 200
       invitation = JSON.parse(last_response.body)
       invitation.fetch('state').must_equal 'accepted'
     end
-  end # PUT /workspaces/:id/invitations/accepted/:invitation_id
+  end # PUT /workspaces/:workspace_id/invitations/accepted/:invitation_id
 
-  describe "PUT /workspaces/:id/invitations/rejected/:invitation_id" do
+  describe "PUT /workspaces/:workspace_id/invitations/rejected/:invitation_id" do
     it "rejects an invitation" do
-      actor, profile, entity          = create_user_and_profile
-      invited_actor, invited_profile, entity  = create_user_and_profile(entity)
-      workspace     = create_workspace_by(profile)
-      workspace_id  = workspace.fetch('id')
-      invited, invitation = 
-        create_invitation_for(workspace, profile, invited_actor)
-      invitation_id = invitation.fetch('id')
+      actor, profile, entity        = create_user_and_profile
+      invited_user, invited_profile = create_user_and_profile(entity)
 
-      post "/workspaces/#{workspace.fetch('id')}/invitations/rejected/#{invitation_id}",
-        {}, session_for(invited_profile)
+      workspace   = create_workspace_by(profile)
+      invitation  = create_invitation_for(workspace, profile, invited_user)
+
+      post  "/workspaces/#{workspace.fetch('id')}" +
+            "/invitations/rejected/#{invitation.fetch('id')}",
+            {}, session_for(invited_profile)
 
       last_response.status.must_equal 200
       invitation = JSON.parse(last_response.body)
       invitation.fetch('state').must_equal 'rejected'
       invitation.fetch('rejected_at').wont_be_empty
     end
-  end # PUT /workspaces/:id/invitations/rejected/:invitation_id
+  end # PUT /workspaces/:workspace_id/invitations/rejected/:invitation_id
 
-  def create_invitation_for(workspace, profile, invited=nil)
+  def create_invitation_for(workspace, profile, invited_user)
     invited ||= Factory.user.sync
     post "/workspaces/#{workspace.fetch('id')}/invitations", 
       { invited_id: invited.id }.to_json, session_for(profile)
-    invitation = JSON.parse(last_response.body) 
-    [invited, invitation]
+    invitation = JSON.parse(last_response.body)
   end
 
   def create_workspace_by(profile)
