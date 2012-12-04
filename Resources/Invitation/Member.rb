@@ -5,6 +5,7 @@ require 'virtus'
 require 'aequitas'
 require 'statemachine'
 require 'Tinto/Member'
+require_relative '../../Locales/Loader'
 
 module Belinkr
   module Invitation

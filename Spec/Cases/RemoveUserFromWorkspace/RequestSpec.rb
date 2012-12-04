@@ -22,7 +22,7 @@ describe 'request model for RemoveUserFromWorkspace' do
     actor       = OpenStruct.new
 
     payload     = { 
-                    id: target_user.id, 
+                    user_id:      target_user.id, 
                     workspace_id: workspace.id 
                   }
     payload     = JSON.parse(payload.to_json)

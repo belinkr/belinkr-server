@@ -402,7 +402,6 @@ describe API do
       delete  "/workspaces/#{workspace.fetch('id')}" +
               "/users/#{collaborator.id}",
               {}, session_for(collaborator_profile)
-      dump
 
       last_response.status.must_equal 200
     end
@@ -444,7 +443,6 @@ describe API do
       get "/workspaces/#{workspace.fetch('id')}/collaborators",
           {}, session_for(administrator_profile)
 
-      dump
       last_response.status.must_equal 200
       collaborators = JSON.parse(last_response.body)
       collaborators.size.must_equal 20

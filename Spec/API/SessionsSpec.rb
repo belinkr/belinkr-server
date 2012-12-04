@@ -38,7 +38,6 @@ describe API do
     end
 
     it 'stores the session token in a persistent cookie if "remember" option' do
-      skip
       user, password = create_account
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
         .must_be_nil
@@ -53,7 +52,6 @@ describe API do
     end
 
     it 'sets a non-persistent cookie marking the user-agent as "logged in"' do
-      skip
       user, password = create_account
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
         .must_be_nil
@@ -70,7 +68,6 @@ describe API do
 
   describe 'DELETE /sessions/:id' do
     it 'clears the session' do
-      skip
       user, password = create_account
 
       post '/sessions', { email: user.email, password: password }.to_json
@@ -81,6 +78,8 @@ describe API do
 
       delete '/sessions/1'
       last_response.status.must_equal 204
+      last_response.body.must_be_empty
+
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
         .must_be_nil
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
@@ -122,7 +121,6 @@ describe API do
 
   describe 'general settings in cookies' do
     it 'sets a cookie for the locale' do
-      skip
       user, password = create_account
       rack_mock_session.cookie_jar[Belinkr::Config::LOCALE_COOKIE].must_be_nil
       post '/sessions', { email: user.email, password: password }.to_json
@@ -153,6 +151,6 @@ describe API do
   end
 
   def image_file_path
-    "#{File.dirname(__FILE__)}/../support/logo.png"
+    "#{File.dirname(__FILE__)}/../Support/logo.png"
   end
 end # API

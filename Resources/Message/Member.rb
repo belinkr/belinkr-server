@@ -3,12 +3,13 @@ require 'redis'
 require 'json'
 require 'virtus'
 require 'aequitas'
-require_relative '../../Config'
 require 'Tinto/Exceptions'
+require 'i18n'
+require_relative '../../Config'
 
 module Belinkr
-  module Mailer
-    class Message
+  module Message
+    class Member
       include Virtus
       include Aequitas
       include Tinto::Exceptions
@@ -64,7 +65,7 @@ module Belinkr
             invitation_link:  "#{base_path}/#{invitation.id}"
           }
         }
-      end
+      end #invitation_for
 
       def reset_for(actor, reset)
         base_path = "https://#{Belinkr::Config::HOSTNAME}/resets"
@@ -79,7 +80,7 @@ module Belinkr
                             reset_link: "#{base_path}/#{reset.id}"
                           }
         }
-      end #invitation_for
-    end # Message
-  end # Mailer
+      end #reset_for
+    end # Member
+  end # Message
 end # Belinkr

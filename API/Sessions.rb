@@ -4,8 +4,8 @@ require_relative '../Config'
 require_relative '../Resources/Session/Presenter'
 require_relative '../Cases/LogIn/Request'
 require_relative '../Cases/LogIn/Context'
-#require_relative '../App/Cases/LogOut/Request'
-#require_relative '../App/Cases/LogOut/Context'
+require_relative '../Cases/LogOut/Request'
+require_relative '../Cases/LogOut/Context'
 
 module Belinkr
   class API < Sinatra::Base
@@ -29,14 +29,16 @@ module Belinkr
 
         persisted_session
       end
-    end # post /sessions
+    end # POST /sessions
 
     delete '/sessions/:id' do
-      data = LogOut::Request.new(payload.merge(id: session['auth_token']))
+      session_id  = session['auth_token'] || params.fetch('id')
+      data        = LogOut::Request.new(id: session_id).prepare
+      persisted_session = data.fetch(:session)
 
       dispatch :delete do
-        Logout::Context.new(request).run
-        #auth_session = Session::Member.new(id: session['auth_token']).fetch
+        LogOut::Context.new(data).run
+
         session[:auth_token] = nil
 
         if request.cookies[Config::AUTH_TOKEN_COOKIE]
@@ -47,8 +49,8 @@ module Belinkr
           response.delete_cookie Config::REMEMBER_COOKIE , path: '/'
         end
 
-        data.fetch(:session)
+        persisted_session
       end
-    end # delete /sessions/:id
+    end # DELETE /sessions/:id
   end # API
 end # Belinkr

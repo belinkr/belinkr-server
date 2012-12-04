@@ -10,15 +10,9 @@ require_relative '../App/Contexts/ResetPassword'
 module Belinkr
   class API < Sinatra::Base
     post '/resets' do
+      data = RequestPasswordReset::Request.new(payload).prepare
       begin
-        email   = payload.fetch('email')
-        user    = User::Member.new(id: User::Locator.new.id_for(email)).fetch
-        reset   = Reset::Member.new
-        resets  = Reset::Collection.new
-
-        context = RequestPasswordReset.new(user, reset, resets)
-        context.call
-        context.sync
+        RequestPasswordReset::Context.new(data).run
       rescue Tinto::Exceptions::NotFound
       ensure return 201
       end
