@@ -42,7 +42,7 @@ module Belinkr
 
         def is_in?(user)
           relationship = tracker.relationship_for(workspace, user)
-          (relationship == 'collaborator') || (relationship == 'administrator')
+          relationship == 'collaborator' || relationship == 'administrator'
         end #is_in?
 
         #  validation_error "validation.errors.already_in_workspace" if 

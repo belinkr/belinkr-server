@@ -33,7 +33,7 @@ module Belinkr
 
       def evil_collaborator?(actor, action)
         tracker.relationship_for(workspace, actor) == 'collaborator' &&
-        !COLLABORATOR_ACTIONS.include?(action)
+        !COLLABORATOR_ACTIONS.include?(action.to_s)
       end #evil_collaborator?
     end # Enforcer
   end # Workspace

@@ -28,7 +28,7 @@ describe 'reject autoinvitation to workspace' do
       autoinvitation:             @autoinvitation,
       tracker:                    @tracker
     )
-    enforcer.expect :authorize, true, [@actor, :reject]
+    enforcer.expect :authorize, true, [@actor, :reject, @autoinvited]
     context.call
     enforcer.verify
   end

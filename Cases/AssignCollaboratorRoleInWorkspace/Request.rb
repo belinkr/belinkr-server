@@ -28,7 +28,7 @@ module Belinkr
       attr_accessor :payload, :actor, :entity
 
       def target_user
-        @target_user ||= User::Member.new(id: payload.fetch('id')).fetch
+        @target_user ||= User::Member.new(id: payload.fetch('user_id')).fetch
       end #target_user
 
       def workspace

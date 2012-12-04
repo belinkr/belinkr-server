@@ -7,8 +7,8 @@ module Belinkr
     module Autoinvitation
       class Presenter
         def initialize(autoinvitation, actor=nil)
-          @autoinvitation = resource
-          @actor    = actor
+          @autoinvitation = autoinvitation
+          @actor          = actor
         end #initialize
 
         def as_json

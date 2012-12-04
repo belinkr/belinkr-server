@@ -20,9 +20,9 @@ module Belinkr
         @set          = Tinto::Set.new self
       end #initialize
 
-      def instantiate_members(attributes={})
+      def instantiate_member(attributes={})
         Member.new attributes
-      end #instantiate_members
+      end #instantiate_member
 
       def storage_key
         @storage_key || 'users'

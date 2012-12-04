@@ -8,7 +8,7 @@ module Belinkr
         include Tinto::Exceptions
 
         def initialize(workspace, autoinvitation,
-        tracker=Workspace::Tracker.new)
+          tracker=Workspace::Tracker.new)
           @workspace      = workspace
           @autoinvitation = autoinvitation
           @tracker        = tracker
@@ -18,10 +18,11 @@ module Belinkr
           send action, actor, *args
         end #authorize
 
-        def autoinvite(actor, *args)
-          raise NotAllowed if is_in?(actor)
-          raise NotAllowed if tracker.is?(workspace, actor, :invited)
-          raise NotAllowed if tracker.is?(workspace, actor, :autoinvited)
+        def autoinvite(autoinvited, *args)
+          relationship = tracker.relationship_for(workspace, autoinvited)
+          raise NotAllowed if is_in?(autoinvited)
+          raise NotAllowed if relationship == 'invited'
+          raise NotAllowed if relationship == 'autoinvited'
           true
         end
 
@@ -42,9 +43,9 @@ module Belinkr
         attr_reader :workspace, :autoinvitation, :tracker
 
         def is_in?(user)
-          tracker.is?(workspace, user, :collaborator) ||
-          tracker.is?(workspace, user, :administrator)
-        end
+          relationship = tracker.relationship_for(workspace, user)
+          relationship == 'collaborator' || relationship == 'administrator'
+        end #is_in?
       end # Enforcer
     end # Autoinvitation
   end # Workspace
