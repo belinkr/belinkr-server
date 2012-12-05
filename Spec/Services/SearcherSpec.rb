@@ -3,30 +3,37 @@ require 'minitest/autorun'
 require 'ostruct'
 require_relative '../../Services/Searcher'
 
-include Belinkr
+include Belinkr::User
 
-describe User::Searcher do
+describe Searcher do
   before do
-    @user_id = 1
-    @searcher = User::Searcher.new
+    @searcher = Searcher.new
   end
 
   describe '#initialize' do
     it "init MemoryBackend" do
-      @searcher.instance_variable_get('@buffered_hash')
-        .must_be_instance_of User::Searcher::MemoryBackend
+      @searcher.instance_variable_get('@backend')
+        .must_be_instance_of Searcher::MemoryBackend
+    end
+
+    it "init passed ESBackend" do
+      @searcher = Searcher.new Searcher::ESBackend.new
+      @searcher.instance_variable_get('@backend')
+        .must_be_instance_of Searcher::ESBackend
     end
   end #initialize
 
   describe "#store_user" do
     it "store key value into passed backend" do
       buffer = MiniTest::Mock.new
-      searcher = User::Searcher.new(buffer: buffer)
-      buffer.expect :store_user, {id:1,name:"User 1"}, ['users:1', {id:1,name:"User 1"}]
+      searcher = Searcher.new(buffer)
+      buffer.expect :store_user, {id:1,name:"User 1"},
+        ['users:1', {id:1,name:"User 1"}]
       searcher.store_user('users:1', {id:1,name:"User 1"})
       buffer.verify
     end
   end
+
   describe "#autocomplete" do
     it "return a list of users whose names start from given chars" do
       store_fake_users
@@ -34,6 +41,7 @@ describe User::Searcher do
       @searcher.autocomplete("To").size.must_equal 1
       @searcher.autocomplete("Rad").size.must_equal 1
       @searcher.autocomplete("MM").size.must_equal 0
+      @searcher.autocomplete("Rad")["users:2"][:name].must_equal "Tom Rad"
     end
   end
 

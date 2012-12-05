@@ -1,4 +1,3 @@
-require 'set'
 module Belinkr
   module User
     class Searcher
