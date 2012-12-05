@@ -36,7 +36,6 @@ module Belinkr
       end
 
       def update(scrapbook_changes)
-        authorize?(actor, 'update')
         @member.update(scrapbook_changes)
         validate!
       end
@@ -45,11 +44,7 @@ module Belinkr
         self.user_id = user.id
         self
       end #link_to
-
-      def authorize(actor, action)
-        action = 'update'
-        raise NotAllowed unless actor.id == user_id
-      end
     end # Member
   end # Scrapbook
 end # Belinkr
+

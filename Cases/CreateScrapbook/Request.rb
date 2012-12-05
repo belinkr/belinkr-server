@@ -23,12 +23,16 @@ module Belinkr
       attr_accessor :payload, :actor
 
       def scrapbook
-        Scrapbook::Member.new(payload)
+        Scrapbook::Member.new(payload.merge scope)
       end #scrapbook
 
       def scrapbooks
-        Scrapbook::Collection.new(user_id: actor.id)
+        Scrapbook::Collection.new(user_id: actor.id, kind: 'own')
       end #scrapbooks
+
+      def scope
+        { user_id: actor.id }
+      end #scope
     end # Request
   end # CreateScrapbook
 end # Belinkr

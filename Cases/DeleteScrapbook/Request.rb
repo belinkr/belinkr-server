@@ -32,7 +32,7 @@ module Belinkr
       end #scrapbook
 
       def scrapbooks
-        Scrapbook::Collection.new(user_id: actor.id)
+        Scrapbook::Collection.new(user_id: actor.id, kind: 'own')
       end #scrapbooks
 
       def enforcer
