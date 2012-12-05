@@ -4,6 +4,7 @@ module Belinkr
       class MemoryBackend
         INTERFACE = %w{
           store_user
+          autocomplete
         }
 
         def initialize
