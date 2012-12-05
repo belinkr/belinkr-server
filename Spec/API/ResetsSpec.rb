@@ -5,11 +5,11 @@ require 'json'
 require_relative '../../API/Resets'
 require_relative '../Support/Helpers'
 require_relative '../Factories/Reset'
-require_relative '../../App/Reset/Collection'
 
-include Belinkr
 $redis ||= Redis.new
 $redis.select 8
+
+include Belinkr
 
 describe API do
   def app; API.new; end
@@ -20,47 +20,54 @@ describe API do
 
   describe 'POST /resets' do
     it 'creates a password reset' do
-      profile = create_user_and_profile
-      post '/resets', { email: profile.user.fetch.email }
+      actor, profile = create_user_and_profile
+      post '/resets', { email: actor.email }.to_json
 
       last_response.status.must_equal 201
       last_response.body.must_be_empty
     end
 
     it 'returns 201 if email not found, to avoid a user enumeration attack' do
-      post '/resets', { email: 'nonexistent@belinkr.com' }
+      post '/resets', { email: 'nonexistent@belinkr.com' }.to_json
       last_response.status.must_equal 201
       last_response.body.must_be_empty
     end
   end # POST /resets
 
-  describe 'GET /resets/:id' do
+  describe 'GET /resets/:reset_id' do
     it 'retrieves a password reset' do
-      profile = create_user_and_profile
-      post '/resets', { email: profile.user.fetch.email }.to_json
+      actor, profile = create_user_and_profile
+      post '/resets', { email: actor.email }.to_json
+
       resets  = Reset::Collection.new.fetch
-      reset   = resets.first
+      reset   = resets.first.fetch
 
       get "/resets/#{reset.id}"
 
       last_response.status.must_equal 200
       last_response.body.must_be_empty
     end
-  end # GET /resets/:id
+  end # GET /resets/:reset_id
 
-  describe 'PUT /resets/:id' do
+  describe 'PUT /resets/:reset_id' do
     it 'sets a new password' do
-      profile = create_user_and_profile
-      post '/resets', { email: profile.user.fetch.email }.to_json
+      actor, profile = create_user_and_profile
+      post '/resets', { email: actor.email }.to_json
+
       resets  = Reset::Collection.new.fetch
-      reset   = resets.first
+      reset   = resets.first.fetch
+
+      User::Member.new(id: reset.user_id).fetch.password
+        .must_equal actor.password
 
       put "/resets/#{reset.id}", { password: 'changed' }.to_json
+
       last_response.status.must_equal 200
       last_response.body.must_be_empty
 
-      User::Member.new(id: reset.user_id).password
-        .wont_equal profile.user.password
+      changed_actor = User::Member.new(id: reset.user_id).fetch
+      changed_actor.password   .wont_equal actor.password
     end
-  end # PUT /resets/:id
+  end # PUT /resets/:reset_id
 end # API
+

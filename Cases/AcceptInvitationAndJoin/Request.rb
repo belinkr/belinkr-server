@@ -40,12 +40,16 @@ module Belinkr
       end #entity
 
       def profile
-        Profile::Member.new(payload)
+        Profile::Member.new(payload.merge scope)
       end #profile
 
       def profiles
-        Profile::Collection.new
+        Profile::Collection.new(scope)
       end #profiles
+
+      def scope
+        { entity_id: entity.id }
+      end #scope
     end # Request
   end # AcceptInvitationAndJoin
 end # Belinkr

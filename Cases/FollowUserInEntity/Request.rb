@@ -57,14 +57,14 @@ module Belinkr
 
       def followers
         Follower::Collection.new(
-          profile_id: followed_profile.id,
+          user_id:    followed.id,
           entity_id:  entity.id
         )
       end #followers
 
       def following
         Following::Collection.new(
-          profile_id: actor_profile.id,
+          user_id:    actor.id,
           entity_id:  entity.id
         )
       end #following

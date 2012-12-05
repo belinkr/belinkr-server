@@ -16,10 +16,11 @@ describe 'request model for InvitePersonToBelinkr' do
     data    = InvitePersonToBelinkr::Request
                 .new(payload, actor, entity).prepare
     
-    data.fetch(:actor).id     .must_equal actor.id
-    data.fetch(:entity).id    .must_equal entity.id
-    data.fetch(:invitation)   .must_be_instance_of Invitation::Member
-    data.fetch(:invitations)  .must_be_instance_of Invitation::Collection
+    data.fetch(:actor).id               .must_equal actor.id
+    data.fetch(:entity).id              .must_equal entity.id
+    data.fetch(:invitation).inviter_id  .must_equal actor.id.to_s
+    data.fetch(:invitation).entity_id   .must_equal entity.id.to_s
+    data.fetch(:invitations).entity_id  .must_equal entity.id.to_s
     data.fetch(:message)      .must_be_instance_of Message::Member
   end
 end # request model for InvitePersonToBelinkr

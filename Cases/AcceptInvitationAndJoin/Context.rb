@@ -21,13 +21,12 @@ module Belinkr
       def call
         invitation.accept
         create_profile_context.call
-        register_activity_context.call
 
-        will_sync invitation, create_profile_context, register_activity_context
+        will_sync invitation, create_profile_context
       end #call
 
       def create_profile_context
-        @create_profile_context || CreateProfileInEntity.new(
+        @create_profile_context ||= CreateProfileInEntity::Context.new(
           actor:      actor,
           profile:    profile,
           profiles:   profiles,
@@ -36,7 +35,7 @@ module Belinkr
       end #create_profile_context
 
       def register_activity_context
-        @register_activity_context || RegisterActivity::Context.new(
+        @register_activity_context ||= RegisterActivity::Context.new(
           actor:      actor, 
           action:     'accept',
           object:     invitation,

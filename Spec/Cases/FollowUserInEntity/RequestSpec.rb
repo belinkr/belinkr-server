@@ -28,8 +28,8 @@ describe 'request model for FollowUserInProfile' do
     data.fetch(:actor_profile)        .must_equal actor_profile
     data.fetch(:followed).id          .must_equal followed.id
     data.fetch(:followed_profile).id  .must_equal followed_profile.id
-    data.fetch(:followers).profile_id .must_equal followed_profile.id
-    data.fetch(:following).profile_id .must_equal actor_profile.id
+    data.fetch(:followers).user_id    .must_equal followed.id
+    data.fetch(:following).user_id    .must_equal actor.id
     data.fetch(:entity)               .must_equal entity
     data.fetch(:actor_timeline)       .must_be_instance_of Status::Collection
     data.fetch(:latest_statuses)      .must_be_instance_of Status::Collection

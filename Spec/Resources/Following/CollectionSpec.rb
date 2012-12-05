@@ -7,14 +7,14 @@ include Belinkr
 
 describe Following::Collection do
   describe 'validations' do
-    describe '#profile_id' do
+    describe '#user_id' do
       it 'must be present' do
         collection = Following::Collection.new
         collection.valid?.must_equal false
 
-        collection.errors[:profile_id].must_include 'profile must not be blank'
+        collection.errors[:user_id].must_include 'user must not be blank'
       end
-    end #profile_id
+    end #user_id
 
     describe '#entity_id' do
       it 'must be present' do

@@ -28,10 +28,8 @@ module Belinkr
         actor_profile     .decrement_following_counter
         followed_profile  .decrement_followers_counter
 
-        register_activity_context.call
-
         will_sync followers, following, actor_profile, 
-                  followed_profile, register_activity_context
+                  followed_profile
       end #call
 
       def register_activity_context

@@ -24,7 +24,7 @@ module Belinkr
 
         register_activity_context.call
 
-        will_sync invitation, invitations, message, register_activity_context
+        will_sync invitation, invitations, message
       end #call
 
       def register_activity_context

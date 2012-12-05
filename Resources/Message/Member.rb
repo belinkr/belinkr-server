@@ -37,7 +37,7 @@ module Belinkr
       end #initialize
 
       def prepare(method, *args)
-        message.attributes = self.send(method, *args)
+        self.attributes = self.send(method, *args)
         raise InvalidResource unless valid?
       end #prepare
 

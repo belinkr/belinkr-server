@@ -25,11 +25,11 @@ describe 'request model for UnfollowUserInProfile' do
     
     data.fetch(:enforcer)               .must_be_instance_of Follower::Enforcer
     data.fetch(:actor)                  .must_equal actor
-    data.fetch(:actor_profile)          .must_equal actor_profile
     data.fetch(:followed).id            .must_equal followed.id
+    data.fetch(:actor_profile)          .must_equal actor_profile
     data.fetch(:followed_profile).id    .must_equal followed_profile.id
-    data.fetch(:followers).profile_id   .must_equal followed_profile.id
-    data.fetch(:following).profile_id   .must_equal actor_profile.id              
+    data.fetch(:followers).user_id      .must_equal followed.id
+    data.fetch(:following).user_id      .must_equal actor.id              
     data.fetch(:entity)                 .must_equal entity
   end
 

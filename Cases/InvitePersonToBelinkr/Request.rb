@@ -27,16 +27,20 @@ module Belinkr
       attr_reader :payload, :actor, :entity
 
       def invitation
-        Invitation::Member.new(payload)
+        Invitation::Member.new(payload.merge(scope))
       end #invitation
 
       def invitations
-        Invitation::Collection.new
+        Invitation::Collection.new(entity_id: entity.id)
       end #invitations
 
       def message
         Message::Member.new
       end #message
+
+      def scope
+        { entity_id: entity.id, inviter_id: actor.id }
+      end #scope
     end # Request
   end # InvitePersonToBelinkr
 end # Belinkr

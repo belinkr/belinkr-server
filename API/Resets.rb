@@ -1,43 +1,37 @@
 # encoding: utf-8
 require_relative '../API'
-require_relative '../App/Reset/Member'
-require_relative '../App/Reset/Presenter'
-require_relative '../App/User/Member'
-require_relative '../App/User/Locator'
-require_relative '../App/Contexts/RequestPasswordReset'
-require_relative '../App/Contexts/ResetPassword'
+require_relative '../Cases/RequestPasswordReset/Context'
+require_relative '../Cases/RequestPasswordReset/Request'
+require_relative '../Cases/ResetPassword/Context'
+require_relative '../Cases/ResetPassword/Request'
 
 module Belinkr
   class API < Sinatra::Base
     post '/resets' do
-      data = RequestPasswordReset::Request.new(payload).prepare
       begin
+        data = RequestPasswordReset::Request.new(payload).prepare
         RequestPasswordReset::Context.new(data).run
       rescue Tinto::Exceptions::NotFound
       ensure return 201
       end
     end # post /resets
 
-    get '/resets/:id' do
+    get '/resets/:reset_id' do
       dispatch :read do
-        Reset::Member.new(id: params[:id])
+        Reset::Member.new(id: params.fetch('reset_id'))
         return 200
       end
     end # get /resets/:id
 
-    put '/resets/:id' do
-      reset         = Reset::Member.new(id: params[:id]).fetch
-      user          = User::Member.new(
-                        id: User::Locator.new.id_for(reset.email)
-                      ).fetch
-      user_changes  = payload
+    put '/resets/:reset_id' do
+      data  = ResetPassword::Request.new(combined_input).prepare
+      reset = data.fetch(:reset)
 
       dispatch :update, reset do
-        context = ResetPassword.new(user, user_changes, reset)
-        context.call
-        context.sync
+        ResetPassword::Context.new(data).run
         return 200
       end
     end # put /resets/:id
   end # API
 end # Belinkr
+

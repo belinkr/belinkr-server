@@ -71,8 +71,13 @@ module Belinkr
       end
 
       def storage_key
-        'invitations'
+        'invitation'
       end #storage_key
+
+      def link_to(user)
+        self.inviter_id = user.id
+        self
+      end #link_to
 
       private
 

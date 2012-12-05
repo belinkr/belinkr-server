@@ -7,8 +7,8 @@ module Belinkr
     class Presenter
       BASE_PATH = '/invitations'
 
-      def initialize(resource, actor=nil)
-        @resource = resource
+      def initialize(invitation, actor=nil)
+        @invitation = invitation
       end #initialize
 
       def as_json
@@ -17,27 +17,27 @@ module Belinkr
 
       def as_poro
         {
-          id:             @resource.id,
-          entity_id:      @resource.entity_id,
-          inviter_id:     @resource.inviter_id,
-          invited_name:   @resource.invited_name,
-          invited_email:  @resource.invited_email,
-          locale:         @resource.locale,
-          state:          @resource.state,
-        }.merge! Tinto::Presenter.timestamps_for(@resource)
-         .merge! Tinto::Presenter.errors_for(@resource)
+          id:             invitation.id,
+          invited_name:   invitation.invited_name,
+          invited_email:  invitation.invited_email,
+          locale:         invitation.locale
+        }.merge! Tinto::Presenter.timestamps_for(invitation)
+         .merge! Tinto::Presenter.errors_for(invitation)
          .merge! links
       end #as_poro
 
       private
 
+      attr_reader :invitation
+
       def links
-        invitation_base_path = "#{BASE_PATH}/#{@resource.id}"
+        invitation_base_path = "#{BASE_PATH}/#{invitation.id}"
         {
             self:       invitation_base_path,
-            inviter:    "/users/#{@resource.inviter_id}"
+            inviter:    "/users/#{invitation.inviter_id}"
         }
       end #links
     end # Presenter
   end # Invitation
 end # Belinkr
+

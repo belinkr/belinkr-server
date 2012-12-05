@@ -30,10 +30,8 @@ module Belinkr
         followed_profile  .increment_followers_counter
         actor_timeline    .merge(latest_statuses)
 
-        register_activity_context.call
-
         will_sync followers, following, actor_profile, followed_profile, 
-                  actor_timeline, register_activity_context
+                  actor_timeline
       end #call
 
       def register_activity_context
