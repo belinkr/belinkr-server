@@ -13,13 +13,11 @@ describe Searcher do
 
   describe '#initialize' do
     it "init MemoryBackend" do
-      @searcher.instance_variable_get('@backend')
-        .must_be_instance_of Searcher::MemoryBackend
+      @searcher.backend.must_be_instance_of Searcher::MemoryBackend
     end
 
     it "init passed ESBackend" do
-      @es_searcher.instance_variable_get('@backend')
-        .must_be_instance_of Searcher::ESBackend
+      @es_searcher.backend.must_be_instance_of Searcher::ESBackend
     end
   end #initialize
 
@@ -41,13 +39,14 @@ describe Searcher do
       @searcher.autocomplete("To").size.must_equal 1
       @searcher.autocomplete("Rad").size.must_equal 1
       @searcher.autocomplete("MM").size.must_equal 0
-      @searcher.autocomplete("Rad")["users:2"][:name].must_equal "Tom Rad"
+      @searcher.autocomplete("Rad").fetch("users:2").fetch(:name)
+        .must_equal "Tom Rad"
     end
 
     it "#store then search user in ESBackend" do
       es_store_fake_users
       @es_searcher.autocomplete("J").size.must_equal 2
-      @es_searcher.autocomplete("J")["users:1"]
+      @es_searcher.autocomplete("J").fetch("users:1")
         .must_equal({id: 1, name:"Jack Web"})
     end
 

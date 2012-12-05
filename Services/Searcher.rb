@@ -8,12 +8,13 @@ module Belinkr
     class Searcher
       extend Forwardable
       def_delegators :@backend, *MemoryBackend::INTERFACE 
+      attr_reader :backend
 
       def initialize(backend=MemoryBackend.new)
         @backend     = backend
         # TODO: add more backends like Redis and ES
         #@persisted_set    = RedisBackend.new(storage_key)
-        #@current_backend  = @persisted_set
+        #@backend  = @persisted_set
         @backlog          = []
       end #initialize
 
