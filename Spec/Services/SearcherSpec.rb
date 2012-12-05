@@ -8,6 +8,7 @@ include Belinkr::User
 describe Searcher do
   before do
     @searcher = Searcher.new
+    @es_searcher = Searcher.new Searcher::ESBackend.new
   end
 
   describe '#initialize' do
@@ -17,8 +18,7 @@ describe Searcher do
     end
 
     it "init passed ESBackend" do
-      @searcher = Searcher.new Searcher::ESBackend.new
-      @searcher.instance_variable_get('@backend')
+      @es_searcher.instance_variable_get('@backend')
         .must_be_instance_of Searcher::ESBackend
     end
   end #initialize
@@ -43,6 +43,14 @@ describe Searcher do
       @searcher.autocomplete("MM").size.must_equal 0
       @searcher.autocomplete("Rad")["users:2"][:name].must_equal "Tom Rad"
     end
+
+    it "#store then search user in ESBackend" do
+      es_store_fake_users
+      @es_searcher.autocomplete("J").size.must_equal 2
+      @es_searcher.autocomplete("J")["users:1"]
+        .must_equal({id: 1, name:"Jack Web"})
+    end
+
   end
 
   def store_fake_users
@@ -50,6 +58,12 @@ describe Searcher do
     @searcher.store_user('users:2', {id:2,name:"Tom Rad"})
     @searcher.store_user('users:3', {id:3,name:"Jerry Feb"})
   end
+  def es_store_fake_users
+    @es_searcher.store_user('users:1', {id:1,name:"Jack Web"})
+    @es_searcher.store_user('users:2', {id:2,name:"Tom Rad"})
+    @es_searcher.store_user('users:3', {id:3,name:"Jerry Feb"})
+  end
+
 
 end
 
