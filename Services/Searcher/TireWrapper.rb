@@ -1,6 +1,7 @@
 require 'tire'
 module Belinkr
   module TireWrapper
+    Tire.configure {wrapper Hash}
     def index_store(name, hash)
       Tire.index name do
         store hash
@@ -18,7 +19,7 @@ module Belinkr
     def index_search(name, term)
       s = Tire.search name do
         query do
-          string  "name:#{term}"
+          string  "name:*#{term}*"
         end
       end
       s.results
