@@ -17,7 +17,7 @@ module Belinkr
 
         def autocomplete(chars)
           @users.select do |k,v|
-            v[:name].match chars
+            v.fetch(:name).match chars
           end
         end
 
