@@ -14,8 +14,8 @@ describe TireWrapper do
       @backend.index_store "users", {id: 2, name: 'User 2'}
       results= @backend.index_search("users", "User")
       results.wont_be_empty
-      results[0].name.must_equal "User 1"
-      results[1].name.must_equal "User 2"
+      results[0].fetch("_source").fetch("name").must_equal "User 1"
+      results[1].fetch("_source").fetch("name").must_equal "User 2"
     end
   end
 

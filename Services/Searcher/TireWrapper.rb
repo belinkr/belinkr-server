@@ -16,6 +16,8 @@ module Belinkr
       Tire::Index.new(name).delete
     end
 
+    #search returns a hash: {"_index"=>"users", "_type"=>"document", "_id"=>"1",
+    #"_score"=>1.0, "_source"=>{"id"=>1, "name"=>"User 1"}}
     def index_search(name, term)
       s = Tire.search name do
         query do
