@@ -2,25 +2,23 @@ module Belinkr
   class Searcher
     class MemoryBackend
       INTERFACE = %w{
-        store_user
+        store
         autocomplete
       }
 
+      attr_reader :storage
       def initialize(index_name)
-        class << self
-          self
-        end.class_eval do
-          attr_reader index_name
-        end
-        instance_variable_set("@users",{})
+        @index_name = index_name
+        @storage = {}
+        @storage[index_name] ={}
       end
 
-      def store_user(key,value)
-        @users.store(key,value)
+      def store(key,value)
+        @storage.fetch(@index_name).store(key,value)
       end
 
       def autocomplete(index_name, chars)
-        instance_variable_get('@'+index_name).select do |k,v|
+        @storage.fetch(@index_name).select do |k,v|
           v.fetch(:name).match chars
         end
       end

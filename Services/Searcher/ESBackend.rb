@@ -10,7 +10,7 @@ module Belinkr
         index_create @index_name 
       end
 
-      def store_user(key, value)
+      def store(key, value)
         index_name, hash = transform_input(key, value)
         index_store(index_name, hash)
       end

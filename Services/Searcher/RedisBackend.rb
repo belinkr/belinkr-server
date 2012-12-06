@@ -6,7 +6,7 @@ module Belinkr
         @index_name = index_name
       end
 
-      def store_user(key, value)
+      def store(key, value)
         $redis.set key, value.to_json
 
       end

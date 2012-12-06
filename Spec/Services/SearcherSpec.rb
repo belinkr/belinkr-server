@@ -31,13 +31,13 @@ describe Searcher do
     end
   end #initialize
 
-  describe "#store_user" do
+  describe "#store" do
     it "store key value into passed backend" do
       buffer = MiniTest::Mock.new
       searcher = Searcher.new(buffer)
-      buffer.expect :store_user, {id:1,name:"User 1"},
+      buffer.expect :store, {id:1,name:"User 1"},
         ['users:1', {id:1,name:"User 1"}]
-      searcher.store_user('users:1', {id:1,name:"User 1"})
+      searcher.store('users:1', {id:1,name:"User 1"})
       buffer.verify
     end
   end
@@ -71,19 +71,19 @@ describe Searcher do
   end
 
   def store_fake_users
-    @searcher.store_user('users:1', {id:1,name:"Jack Web"})
-    @searcher.store_user('users:2', {id:2,name:"Tom Rad"})
-    @searcher.store_user('users:3', {id:3,name:"Jerry Feb"})
+    @searcher.store('users:1', {id:1,name:"Jack Web"})
+    @searcher.store('users:2', {id:2,name:"Tom Rad"})
+    @searcher.store('users:3', {id:3,name:"Jerry Feb"})
   end
   def es_store_fake_users
-    @es_searcher.store_user('users:1', {id:1,name:"Jack Web"})
-    @es_searcher.store_user('users:2', {id:2,name:"Tom Rad"})
-    @es_searcher.store_user('users:3', {id:3,name:"Jerry Feb"})
+    @es_searcher.store('users:1', {id:1,name:"Jack Web"})
+    @es_searcher.store('users:2', {id:2,name:"Tom Rad"})
+    @es_searcher.store('users:3', {id:3,name:"Jerry Feb"})
   end
   def redis_store_fake_users
-    @redis_searcher.store_user('users:1', {id:1,name:"Jack Web"})
-    @redis_searcher.store_user('users:2', {id:2,name:"Tom Rad"})
-    @redis_searcher.store_user('users:3', {id:3,name:"Jerry Feb"})
+    @redis_searcher.store('users:1', {id:1,name:"Jack Web"})
+    @redis_searcher.store('users:2', {id:2,name:"Tom Rad"})
+    @redis_searcher.store('users:3', {id:3,name:"Jerry Feb"})
   end
 
 

@@ -15,11 +15,11 @@ describe Searcher::RedisBackend do
     end
   end
 
-  describe "#store_user and #autocomplete" do
+  describe "#store and #autocomplete" do
     it "store passed user into redis db" do
-      @backend.store_user "users:1", {id: 1, name: "User User"}
-      @backend.store_user "users:2", {id: 2, name: "DDD CCC"}
-      @backend.store_user "users:3", {id: 3, name: "CU CME"}
+      @backend.store "users:1", {id: 1, name: "User User"}
+      @backend.store "users:2", {id: 2, name: "DDD CCC"}
+      @backend.store "users:3", {id: 3, name: "CU CME"}
       result = @backend.autocomplete("users", "U")
       result.size.must_equal 2
       result.fetch("users:1").fetch(:name).must_equal "User User"
