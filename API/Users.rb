@@ -1,11 +1,5 @@
 # encoding: utf-8
 require_relative '../API'
-require_relative '../App/User/Member'
-require_relative '../App/Profile/Member'
-require_relative '../App/Profile/Collection'
-require_relative '../App/Profile/Presenter'
-require_relative '../App/Contexts/EditUserProfile'
-require_relative '../App/Contexts/RemoveProfileFromEntity'
 
 module Belinkr
   class API < Sinatra::Base

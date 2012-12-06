@@ -35,6 +35,7 @@ module Belinkr
       end
 
       def storage_key
+        return unless context
         "#{context.storage_key}:#{context.id}:timelines:#{kind}"
       end
     end # Collection
