@@ -52,6 +52,7 @@ describe 'accept invitation and join' do
   end
 
   it 'registers an activity' do
+    skip
     context = AcceptInvitationAndJoin::Context.new(
       actor:      @actor,
       invitation: @invitation,
