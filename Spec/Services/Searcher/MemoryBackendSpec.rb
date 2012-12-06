@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require_relative '../../../Services/Searcher/MemoryBackend'
-include Belinkr::User
-describe Searcher do
+include Belinkr
+describe Searcher::MemoryBackend do
   before  do
-    @backend = Searcher::MemoryBackend.new
+    @backend = Searcher::MemoryBackend.new "users"
   end
 
   describe "#initialize" do
@@ -28,7 +28,7 @@ describe Searcher do
       @backend.store_user("users:1", {id: 1, name: "Cindy User"})
       @backend.store_user("users:2", {id: 2, name: "Kate User"})
       @backend.store_user("users:3", {id: 3, name: "DDD One"})
-      @backend.autocomplete("User").must_equal({
+      @backend.autocomplete("users","User").must_equal({
         "users:1" => {id: 1, name: "Cindy User"},
         "users:2" => {id: 2, name: "Kate User"}
       })

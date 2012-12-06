@@ -4,25 +4,23 @@ require_relative './Searcher/MemoryBackend'
 require_relative './Searcher/ESBackend'
 
 module Belinkr
-  module User
-    class Searcher
-      extend Forwardable
-      def_delegators :@backend, *MemoryBackend::INTERFACE 
-      attr_reader :backend
+  class Searcher
+    extend Forwardable
+    def_delegators :@backend, *MemoryBackend::INTERFACE 
+    attr_reader :backend
 
-      def initialize(backend=ESBackend.new)
-        @backend     = backend
-        # TODO: add more backends like Redis and ES
-        #@persisted_set    = RedisBackend.new(storage_key)
-        #@backend  = @persisted_set
-        @backlog          = []
-      end #initialize
+    def initialize(backend)
+      @backend     = backend
+      # TODO: add more backends like Redis and ES
+      #@persisted_set    = RedisBackend.new(storage_key)
+      #@backend  = @persisted_set
+      @backlog          = []
+    end #initialize
 
-      def autocomplete(chars)
-        @backend.autocomplete(chars)
-      end
+    def autocomplete(index, chars)
+      @backend.autocomplete(index, chars)
+    end
 
-    end # Searcher
-  end # User
+  end # Searcher
 end # Belinkr
 

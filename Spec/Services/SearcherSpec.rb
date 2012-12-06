@@ -3,12 +3,12 @@ require 'minitest/autorun'
 require 'ostruct'
 require_relative '../../Services/Searcher'
 
-include Belinkr::User
+include Belinkr
 
 describe Searcher do
   before do
-    @searcher = Searcher.new Searcher::MemoryBackend.new
-    @es_searcher = Searcher.new
+    @searcher = Searcher.new Searcher::MemoryBackend.new "users"
+    @es_searcher = Searcher.new Searcher::ESBackend.new "users"
   end
 
   describe '#initialize' do
@@ -18,6 +18,10 @@ describe Searcher do
 
     it "init passed ESBackend" do
       @es_searcher.backend.must_be_instance_of Searcher::ESBackend
+    end
+
+    it "raise if no backend pass" do
+      lambda{Searcher.new}.must_raise ArgumentError
     end
   end #initialize
 
@@ -35,18 +39,18 @@ describe Searcher do
   describe "#autocomplete" do
     it "return a list of users whose names start from given chars" do
       store_fake_users
-      @searcher.autocomplete("J").size.must_equal 2
-      @searcher.autocomplete("To").size.must_equal 1
-      @searcher.autocomplete("Rad").size.must_equal 1
-      @searcher.autocomplete("MM").size.must_equal 0
-      @searcher.autocomplete("Rad").fetch("users:2").fetch(:name)
+      @searcher.autocomplete("users", "J").size.must_equal 2
+      @searcher.autocomplete("users", "To").size.must_equal 1
+      @searcher.autocomplete("users", "Rad").size.must_equal 1
+      @searcher.autocomplete("users", "MM").size.must_equal 0
+      @searcher.autocomplete("users", "Rad").fetch("users:2").fetch(:name)
         .must_equal "Tom Rad"
     end
 
     it "#store then search user in ESBackend" do
       es_store_fake_users
-      @es_searcher.autocomplete("J").size.must_equal 2
-      @es_searcher.autocomplete("J").fetch("users:1")
+      @es_searcher.autocomplete("users","J").size.must_equal 2
+      @es_searcher.autocomplete("users","J").fetch("users:1")
         .must_equal({id: 1, name:"Jack Web"})
     end
 
