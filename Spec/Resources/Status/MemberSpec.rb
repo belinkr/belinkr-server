@@ -43,20 +43,17 @@ describe Status::Member do
     end #author
   end # validations
 
-  describe '#user' do
-  end
-
-  describe '#user' do
+  describe '#author' do
     it 'returns a polymorphic object that proxies a User' do
       status = Status::Member.new
       status.author = User::Member.new(id: 1, first: 'John', last: 'Doe')
       status.author.name.must_equal 'John Doe'
 
       json = status.to_json
-      status = Status::Member.new JSON.parse(json)
+      status = Status::Member.new JSON.parse(status.to_json)
       status.author.name.must_equal 'John Doe'
     end
-  end #user
+  end #author
 
   describe '#forwarder' do
     it 'returns a polymorphic object that proxies a User' do
@@ -64,8 +61,7 @@ describe Status::Member do
       status.forwarder = User::Member.new(id: 1, first: 'John', last: 'Doe')
       status.forwarder.name.must_equal 'John Doe'
 
-      json = status.to_json
-      status = Status::Member.new JSON.parse(json)
+      status = Status::Member.new JSON.parse(status.to_json)
       status.forwarder.name.must_equal 'John Doe'
     end
   end #forwarder

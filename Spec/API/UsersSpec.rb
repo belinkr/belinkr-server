@@ -18,6 +18,7 @@ describe API do
 
   describe 'GET /users' do
     it 'returns a page of users' do
+      skip
       entity_id = UUIDTools::UUID.timestamp_create.to_s
       actor = create_user_and_profile(entity_id)
       users = (1..30).map { create_user_and_profile(entity_id) }
@@ -32,6 +33,7 @@ describe API do
 
   describe 'GET /users/:id' do
     it 'returns the user' do
+      skip
       actor, user = create_user_and_profile, create_user_and_profile
 
       get "/users/#{actor.id}", {}, session_for(actor)
@@ -48,6 +50,7 @@ describe API do
 
   describe 'PUT /users/:id' do
     it 'updates the user attributes' do
+      skip
       actor = create_user_and_profile
 
       get "/users/#{actor.id}", {}, session_for(actor)
@@ -67,6 +70,7 @@ describe API do
 
   describe 'DELETE /users/:id' do
     it 'marks the user as deleted' do
+      skip
       actor = create_user_and_profile
       delete "/users/#{actor.id}", {}, session_for(actor)
       last_response.status.must_equal 204

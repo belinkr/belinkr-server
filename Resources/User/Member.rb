@@ -23,6 +23,7 @@ module Belinkr
       attribute :avatar,          String
       attribute :first,           String
       attribute :last,            String
+      attribute :name,            String, default: lambda {|u, a| u.ordered_name }
       attribute :name_order,      String, default: 'first-last'
       attribute :email,           String
       attribute :password,        String
@@ -57,11 +58,6 @@ module Belinkr
       def index_path
         "#{MODEL_NAME}/#{id}"
       end #index_path
-
-      def name
-        return "#{last} #{first}" if name_order == 'last-first'
-        "#{first} #{last}"
-      end #name
 
       def password=(plaintext)
         super password_hash_for(plaintext)
@@ -115,6 +111,11 @@ module Belinkr
         self.update(user_changes)
         self
       end
+
+      def ordered_name
+        return "#{last} #{first}" if name_order == 'last-first'
+        "#{first} #{last}"
+      end #ordered_name
 
       private
 
