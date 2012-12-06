@@ -7,6 +7,7 @@ module Belinkr
           autocomplete
         }
 
+        attr_reader :users
         def initialize
           @users = {}
         end
