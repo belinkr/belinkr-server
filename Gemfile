@@ -19,6 +19,7 @@ group :production do
   gem 'sanitize'
   gem 'tinto'
   gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
+  gem 'tire'
 end
 
 group :test do 
