@@ -2,13 +2,19 @@
 require 'minitest/autorun'
 require 'ostruct'
 require_relative '../../Services/Searcher'
+require_relative '../../Services/Searcher/RedisBackend'
+require 'redis'
 
 include Belinkr
 
 describe Searcher do
+  $redis ||= Redis.new
+  $redis.select 8
+ 
   before do
     @searcher = Searcher.new Searcher::MemoryBackend.new "users"
     @es_searcher = Searcher.new Searcher::ESBackend.new "users"
+    @redis_searcher = Searcher.new Searcher::RedisBackend.new "users"
   end
 
   describe '#initialize' do
@@ -54,6 +60,14 @@ describe Searcher do
         .must_equal({id: 1, name:"Jack Web"})
     end
 
+    it "#store then search user in RedisBackend" do
+      redis_store_fake_users
+      @redis_searcher.autocomplete("users","J").size.must_equal 2
+      @redis_searcher.autocomplete("users","J").fetch("users:1")
+        .must_equal({id: 1, name:"Jack Web"})
+    end
+
+
   end
 
   def store_fake_users
@@ -66,6 +80,12 @@ describe Searcher do
     @es_searcher.store_user('users:2', {id:2,name:"Tom Rad"})
     @es_searcher.store_user('users:3', {id:3,name:"Jerry Feb"})
   end
+  def redis_store_fake_users
+    @redis_searcher.store_user('users:1', {id:1,name:"Jack Web"})
+    @redis_searcher.store_user('users:2', {id:2,name:"Tom Rad"})
+    @redis_searcher.store_user('users:3', {id:3,name:"Jerry Feb"})
+  end
+
 
 
 end
