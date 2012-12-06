@@ -2,8 +2,8 @@
 require 'forwardable'
 require 'virtus'
 require 'aequitas'
-require_relative '../Polymorphic/Polymorphic'
 require 'Tinto/Member'
+require_relative '../Polymorphic/Polymorphic'
 #require_relative '../reply/collection'
 
 module Belinkr
@@ -20,7 +20,7 @@ module Belinkr
       attribute :text,              String
       attribute :author,            Polymorphic
       attribute :forwarder,         Polymorphic
-      attribute :context,           Polymorphic
+      attribute :scope,             Polymorphic
       attribute :files,             Array, default: []
       #attribute :replies,           Array[Reply::Member], default: []
       attribute :created_at,        Time 
@@ -41,8 +41,12 @@ module Belinkr
       #  Reply::Collection.new(super)
       #end
 
+      def files?
+        !files.empty?
+      end #files?
+
       def storage_key
-        "#{context.storage_key}:#{context.id}:statuses"
+        "#{scope.storage_key}:#{scope.id}:statuses"
       end
     end # Member
   end # Status

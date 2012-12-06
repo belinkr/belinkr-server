@@ -23,3 +23,4 @@ describe Status::Collection do
     end #kind
   end # validations
 end # Status::Collection
+

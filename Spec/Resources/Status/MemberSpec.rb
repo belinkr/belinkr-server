@@ -74,3 +74,4 @@ describe Status::Member do
     end
   end #replies
 end # Status::Member
+
