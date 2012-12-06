@@ -7,8 +7,8 @@ include Belinkr::User
 
 describe Searcher do
   before do
-    @searcher = Searcher.new
-    @es_searcher = Searcher.new Searcher::ESBackend.new
+    @searcher = Searcher.new Searcher::MemoryBackend.new
+    @es_searcher = Searcher.new
   end
 
   describe '#initialize' do
