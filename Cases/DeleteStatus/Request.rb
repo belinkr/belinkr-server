@@ -4,7 +4,7 @@ require_relative '../../Resources/Status/Scope'
 require_relative '../../Services/Timeliner'
 
 module Belinkr
-  module CreateStatus
+  module DeleteStatus
     class Request
       def initialize(payload, actor, entity)
         @payload    = payload
@@ -27,11 +27,11 @@ module Belinkr
       attr_reader :payload, :actor, :entity
 
       def status
-        Status::Member.new(payload.merge jail)
+        @status ||= Status::Member.new(payload.merge jail).fetch
       end #status
 
       def jail
-        { author: actor, scope: scope.resource }
+        { scope: scope.resource }
       end #jail
 
       def scope
@@ -42,6 +42,6 @@ module Belinkr
         @timelines ||= Timeliner.new.timelines_for(status)
       end #timelines
     end # Request
-  end # CreateStatus
+  end # DeleteStatus
 end # Belinkr
 

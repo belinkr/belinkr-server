@@ -28,7 +28,7 @@ module Belinkr
       end
 
       def instantiate_member(attributes={})
-        User::Member.new(attributes).fetch
+        User::Member.new(attributes)
       end
 
       def storage_key

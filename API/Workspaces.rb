@@ -46,12 +46,24 @@ module Belinkr
     end # get /workspaces
 
     get '/workspaces/own' do
+      dispatch :collection do
+        Workspace::Tracker.new.workspaces_for(current_user, :member)
+          .page(params.fetch('page', 0))
+      end
     end # get /workspaces/own
 
     get '/workspaces/autoinvited' do
+      dispatch :collection do
+        Workspace::Tracker.new.workspaces_for(current_user, :autoinvited)
+          .page(params.fetch('page', 0))
+      end
     end # get /workspaces/autoinvited
 
     get '/workspaces/invited' do
+      dispatch :collection do
+        Workspace::Tracker.new.workspaces_for(current_user, :invited)
+          .page(params.fetch('page', 0))
+      end
     end # get /workspaces/invited
 
     get '/workspaces/:workspace_id' do

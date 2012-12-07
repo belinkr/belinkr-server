@@ -71,15 +71,15 @@ module Belinkr
 
       def actor_timeline
         Status::Collection.new(
-          kind:     'general',
-          scope:  actor_profile
+          kind:   'general',
+          scope:  actor
         )
       end #actor_timeline
 
       def latest_statuses
         @latest_statuses ||= Status::Collection.new(
-          kind:     'own',
-          scope:  followed_profile
+          kind:   'own',
+          scope:  followed
         ).page
       end #latest_statuses
     end # Request

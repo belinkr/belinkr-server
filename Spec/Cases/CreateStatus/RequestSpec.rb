@@ -15,31 +15,33 @@ describe 'request model for CreateStatus' do
     before do
       @entity   = OpenStruct.new(id: 1)
       @actor    = OpenStruct.new(id: 2)
-      @profile  = Profile::Member.new(id: 3)
     end
 
     it 'returns a workspace as scope if payload has a workspace_id' do
       payload = { 'workspace_id' => 5 }
-      data    = CreateStatus::Request.new(payload, @actor, @profile, @entity)
+      data    = CreateStatus::Request.new(payload, @actor, @entity)
                   .prepare
 
-      data.fetch(:enforcer).must_be_instance_of Workspace::Enforcer
+      data.fetch(:enforcer)   .must_be_instance_of Workspace::Enforcer
+      data.fetch(:scope)      .must_be_instance_of Workspace::Member
     end
 
     it 'returns a scrapbook as scope if payload has a scrapbook_id' do
       payload = { 'scrapbook_id' => 5 }
-      data    = CreateStatus::Request.new(payload, @actor, @profile, @entity)
+      data    = CreateStatus::Request.new(payload, @actor, @entity)
                   .prepare
 
-      data.fetch(:enforcer).must_be_instance_of Scrapbook::Enforcer
+      data.fetch(:enforcer)   .must_be_instance_of Scrapbook::Enforcer
+      data.fetch(:scope)      .must_be_instance_of Scrapbook::Member
     end
 
-    it 'returns a profile as scope by default' do
+    it 'returns a user as scope by default' do
       payload = {}
-      data    = CreateStatus::Request.new(payload, @actor, @profile, @entity)
+      data    = CreateStatus::Request.new(payload, @actor, @entity)
                   .prepare
 
       data.fetch(:enforcer)   .must_be_instance_of User::Enforcer
+      data.fetch(:scope)      .must_equal @actor
       data.fetch(:status)     .must_be_instance_of Status::Member
       data.fetch(:timelines)  .wont_be_empty
       data.fetch(:actor)      .must_equal @actor
