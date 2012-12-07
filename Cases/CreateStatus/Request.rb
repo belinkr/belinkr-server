@@ -39,7 +39,7 @@ module Belinkr
       end #scope
 
       def timelines
-        @timelines ||= Timeliner.new.timelines_for(status)
+        @timelines ||= Timeliner.new(status).timelines_for(scope)
       end #timelines
     end # Request
   end # CreateStatus

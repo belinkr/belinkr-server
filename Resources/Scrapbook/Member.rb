@@ -11,8 +11,8 @@ module Belinkr
       include Virtus
       include Aequitas
 
-      MODEL_NAME = 'scrapbook'
-      WHITELIST  = %w{ name }
+      MODEL_NAME  = 'scrapbook'
+      WHITELIST   = %w{ name }
 
       attribute :id,              String
       attribute :name,            String
@@ -33,11 +33,6 @@ module Belinkr
 
       def storage_key
         "users:#{user_id}:scrapbooks"
-      end
-
-      def update(scrapbook_changes)
-        @member.update(scrapbook_changes)
-        validate!
       end
 
       def link_to(user)

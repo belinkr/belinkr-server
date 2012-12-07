@@ -5,42 +5,51 @@ require_relative '../Scrapbook/Enforcer'
 require_relative '../Scrapbook/Member'
 require_relative '../User/Enforcer'
 require_relative '../User/Member'
+require_relative '../Follower/Collection'
+require_relative '../../Services/Tracker'
+
 module Belinkr
   module Status
     class Scope
-      def initialize(payload, actor, entity)
+      def initialize(payload, user, entity)
         @payload  = payload
-        @actor    = actor
+        @user     = user
         @entity   = entity
       end #initialize
 
       def enforcer
-        @enforcer ||= enforcer_klass.new(resource)
+        resource_module.const_get('Enforcer').new resource
       end #enforcer
 
       def resource
-        @resource ||= send resource_method
+        @resource ||= send kind_from(payload)
       end # resource
 
-      private
+      def followers
+        send :"#{kind_from(payload)}_followers"
+      end
 
-      attr_reader :payload, :actor, :entity
+      def resource_timelines
+        { 
+          workspace:  %w{ general files },
+          scrapbook:  %w{ general files },
+          user:       %w{ own general files }
+        }.fetch(kind_from(payload))
+      end #resource_timelines
 
-      def resource_method
+      def follower_timelines
         {
-          workspace:  :workspace,
-          scrapbook:  :scrapbook,
-          user:       :actor
-        }.fetch kind_from(payload)
-      end #resource_method
+          workspace: %w{ workspaces files },
+          scrapbook: [],
+          user:      %w{ geral files }
+        }.fetch(kind_from(payload))
+      end #follower_timelines
 
-      def enforcer_klass
-        {
-          workspace: Workspace::Enforcer,
-          scrapbook: Scrapbook::Enforcer,
-          user:      User::Enforcer
-        }.fetch kind_from(payload)
-      end #enforcer_klass
+      attr_reader :payload, :user, :entity
+
+      def resource_module
+        Belinkr.const_get kind_from(payload).capitalize
+      end
 
       def kind_from(payload)
         return :workspace if payload.include?('workspace_id')
@@ -58,9 +67,24 @@ module Belinkr
       def scrapbook
         Scrapbook::Member.new(
           id:       payload.fetch('scrapbook_id'),
-          user_id:  actor.id
+          user_id:  user.id
         )
       end #scrapbook
+
+      def workspace_followers
+        Workspace::Tracker.new.users_for(resource, :member)
+      end #workspace_followers
+
+      def user_followers
+        Follower::Collection.new(
+          user_id:    user.id,
+          entity_id:  entity.id
+        )
+      end #user_followers
+
+      def scrapbook_followers
+        []
+      end #scrapbook_followers
     end # Scope
   end # Status
 end # Belinkr
