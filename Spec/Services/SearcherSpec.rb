@@ -10,6 +10,7 @@ include Belinkr
 describe Searcher do
   $redis ||= Redis.new
   $redis.select 8
+  $redis.flushdb
  
   before do
     @searcher = Searcher.new Searcher::MemoryBackend.new "users"

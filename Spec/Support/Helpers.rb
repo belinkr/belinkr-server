@@ -1,4 +1,5 @@
 # encoding: utf-8
+require 'pry'
 require_relative '../Factories/User'
 require_relative '../Factories/Profile'
 require_relative '../Factories/Entity'
