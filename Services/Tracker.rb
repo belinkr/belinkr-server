@@ -19,6 +19,7 @@ module Belinkr
       def track_collaborator(workspace, user)
         KINDS.each { |kind| untrack(workspace, user, kind) }
         track(workspace, user, :collaborator)
+        track(workspace, user, :member)
         track_relationship(workspace, user, :collaborator)
         self
       end #track_collaborator
@@ -26,6 +27,7 @@ module Belinkr
       def track_administrator(workspace, user)
         KINDS.each { |kind| untrack(workspace, user, kind) }
         track(workspace, user, :administrator)
+        track(workspace, user, :member)
         track_relationship(workspace, user, :administrator)
         self
       end #track_administrator
@@ -60,6 +62,7 @@ module Belinkr
       def remove(workspace, user)
         untrack(workspace, user, :collaborator)
         untrack(workspace, user, :administrator)
+        untrack(workspace, user, :member)
         untrack_relationship(workspace, user)
         self
       end #remove

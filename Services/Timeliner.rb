@@ -16,7 +16,7 @@ module Belinkr
     end #resource_timelines
 
     def member_timelines_for(members, kinds)
-      @member_timelines ||= members.each do |member|
+      @member_timelines ||= members.flat_map do |member|
         applicable_member_kinds_for(kinds).map do |kind| 
           timeline_klass.new(kind: kind, scope: member)
         end
@@ -32,7 +32,7 @@ module Belinkr
         kinds.select { |kind| applicable_for?(status, kind) }
     end #applicable_resource_kinds
 
-    def applicable_member_kinds
+    def applicable_member_kinds_for(kinds)
       @member_kinds ||= 
         kinds.select { |kind| applicable_for?(status, kind) }
     end #applicable_member_kinds

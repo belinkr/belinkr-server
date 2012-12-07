@@ -34,7 +34,7 @@ module Belinkr
       end #timelines
 
       def members
-        tracker.users_for(resource)
+        tracker.users_for(resource, :member)
       end #members
 
       private

@@ -6,32 +6,34 @@ require_relative '../../Services/Timeliner'
 include Belinkr
 
 describe Timeliner do
-  before { @timeliner = Timeliner.new }
-
-  describe '#timelines_for' do
-    it 'returns an array of timelines for a status in this context' do
+  describe '#resource_timelines_for' do
+    it 'returns an array of resource timelines for a status in this scope' do
       kinds   = %w{ own general files }
-      context = OpenStruct.new(timeline_kinds: kinds)
-      status  = OpenStruct.new(files?: ['1'])
+      scope   = OpenStruct.new
+      user    = OpenStruct.new
+      status  = OpenStruct.new(files?: true)
       
-      @timeliner.timelines_for(context, status).map do |timeline|
+      timeliner = Timeliner.new(status)
+
+      timeliner.resource_timelines_for(user, kinds).map do |timeline|
         timeline    .must_be_instance_of Status::Collection
         kinds       .must_include timeline.kind
       end
     end
   end #timelines_for
 
-  describe '#follower_timelines_for' do
-    it 'returns an array of follower timelines for a status in this context' do
-      kinds     = %w{ own general }
-      follower  = OpenStruct.new(follower_timeline_kinds: kinds)
-      context   = OpenStruct.new
-      followers = [follower, follower]
+  describe '#member_timelines_for' do
+    it 'returns an array of member timelines for a status in this scope' do
+      kinds   = %w{ own general files }
+      scope   = OpenStruct.new
+      user    = OpenStruct.new
+      status  = OpenStruct.new(files?: true)
       
-      @timeliner.follower_timelines_for(followers, context).map do |timeline|
-        timeline          .must_be_instance_of Status::Collection
-        timeline.context  .must_equa context
-        kinds             .must_include timeline.kind
+      timeliner = Timeliner.new(status)
+
+      timeliner.member_timelines_for([user, user], kinds).map do |timeline|
+        timeline    .must_be_instance_of Status::Collection
+        kinds       .must_include timeline.kind
       end
     end
   end #follower_timelines_for

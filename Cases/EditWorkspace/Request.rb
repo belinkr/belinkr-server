@@ -22,7 +22,7 @@ module Belinkr
 
       private
 
-      attr_accessor :payload, :actor, :entity
+      attr_reader :payload, :actor, :entity
 
       def workspace
         @workspace ||= Workspace::Member.new(

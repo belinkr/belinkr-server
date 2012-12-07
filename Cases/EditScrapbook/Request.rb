@@ -21,7 +21,7 @@ module Belinkr
 
       private
       
-      attr_accessor :payload, :actor
+      attr_reader :payload, :actor
 
       def scrapbook
         @scrapbook ||= Scrapbook::Member.new(

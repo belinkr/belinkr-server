@@ -30,7 +30,7 @@ module Belinkr
 
       private
 
-      attr_accessor :payload, :actor, :actor_profile, :entity
+      attr_reader :payload, :actor, :actor_profile, :entity
 
       def enforcer
         Follower::Enforcer.new(followed)

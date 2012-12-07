@@ -25,7 +25,7 @@ module Belinkr
 
       private
       
-      attr_accessor :payload, :actor, :entity
+      attr_reader :payload, :actor, :entity
 
       def target_user
         @target_user ||= User::Member.new(id: payload.fetch('user_id')).fetch

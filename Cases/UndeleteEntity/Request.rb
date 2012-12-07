@@ -21,7 +21,9 @@ module Belinkr
         }
       end # prepare
 
-      private :payload, :actor, :entity
+      private 
+      
+      attr_reader :payload, :actor, :entity
 
       def scrapbook
         @scrapbook ||=

@@ -20,7 +20,7 @@ module Belinkr
 
       private 
       
-      attr_accessor :payload, :actor
+      attr_reader :payload, :actor
 
       def scrapbook
         Scrapbook::Member.new(payload.merge scope)

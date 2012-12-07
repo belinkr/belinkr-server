@@ -33,7 +33,7 @@ module Belinkr
 
       private
 
-      attr_accessor :payload, :actor, :actor_profile, :entity
+      attr_reader :payload, :actor, :actor_profile, :entity
 
       def enforcer
         Follower::Enforcer.new(followed)
@@ -72,14 +72,14 @@ module Belinkr
       def actor_timeline
         Status::Collection.new(
           kind:     'general',
-          context:  actor_profile
+          scope:  actor_profile
         )
       end #actor_timeline
 
       def latest_statuses
         @latest_statuses ||= Status::Collection.new(
           kind:     'own',
-          context:  followed_profile
+          scope:  followed_profile
         ).page
       end #latest_statuses
     end # Request

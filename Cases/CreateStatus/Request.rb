@@ -20,7 +20,7 @@ module Belinkr
           actor:      actor,
           status:     status,
           timelines:  scope.timelines,
-        }.merge! follower_timelines
+        }
       end #prepare
 
       private
@@ -32,7 +32,7 @@ module Belinkr
       end #status
 
       def jail
-        { author: actor, scope: scope.resource }
+        { author: actor }
       end #jail
 
       def scope
@@ -42,15 +42,15 @@ module Belinkr
       end #scope
 
       def workspace_scope
-        Workspace::Scope.new(payload, entity)
+        Workspace::Scope.new(payload, status, entity)
       end #workspace_scope
 
       def scrapbook_scope
-        Scrapbook::Scope.new(payload, actor)
+        Scrapbook::Scope.new(payload, status, actor)
       end #scrapbook_scope
 
-      def workspace_scope
-        User::Scope.new(payload, entity)
+      def user_scope
+        User::Scope.new(payload, status, actor, entity)
       end #user_scope
     end # Request
   end # CreateStatus

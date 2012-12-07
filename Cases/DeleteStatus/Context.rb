@@ -22,7 +22,7 @@ module Belinkr
 
       private
 
-      attr_accessor :enforcer, :actor, :status, :timelines
+      attr_reader :enforcer, :actor, :status, :timelines
     end # Context
   end # DeleteStatus
 end # Belinkr
