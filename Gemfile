@@ -32,5 +32,6 @@ group :test do
   gem 'rb-fsevent', require: false
   gem 'rb-fchange', require: false
   gem 'pry'
+  gem 'pry-debugger'
 end
 

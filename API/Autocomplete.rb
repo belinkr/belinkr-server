@@ -4,6 +4,7 @@ require_relative '../Resources/User/Member'
 require_relative '../Services/Searcher'
 require_relative '../Services/Searcher/RedisBackend'
 require_relative '../Cases/AutocompleteUser/Request'
+require_relative '../Cases/AutocompleteWorkspace/Request'
 
 module Belinkr
   class API < Sinatra::Base
@@ -14,6 +15,17 @@ module Belinkr
       dispatch :collection do
         request.prepare.fetch(:users)
       end
+    end
+
+    get '/autocomplete/workspaces' do
+      searcher = Searcher.new Searcher::RedisBackend.new "workspaces"
+      request = AutocompleteWorkspace::Request.new(
+        params, searcher, "entities:#{current_entity.id}:workspaces")
+
+      dispatch :collection do
+        request.prepare.fetch(:workspaces)
+      end
+
     end
   end
 end
