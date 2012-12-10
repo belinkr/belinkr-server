@@ -43,10 +43,30 @@ describe API do
     end
   end
 
+  describe "GET /autocomplete/scrapbooks" do
+    it "returns scrapbook list matches parameter" do
+      user, profile, entity = create_user_and_profile
+      scrapbook = scrapbook_by(profile)
+      query = scrapbook.fetch 'name'
+      uri = URI.escape "/autocomplete/scrapbooks?q=#{query}"
+      get uri, {}, session_for(profile)
+      scrapbooks = JSON.parse(last_response.body)
+      scrapbooks.first.fetch("name")
+      last_response.status.must_equal 200
+    end
+  end
+
   def workspace_by(profile)
     name = Factory.random_string
     post "/workspaces", { name: name }.to_json, session_for(profile)
     JSON.parse(last_response.body)
   end
+
+  def scrapbook_by(profile)
+    name = Factory.random_string
+    post "/scrapbooks", { name: name }.to_json, session_for(profile)
+    JSON.parse(last_response.body)
+  end
+
 
 end

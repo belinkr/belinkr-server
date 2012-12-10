@@ -1,7 +1,6 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'redis'
-require 'pry'
 
 require_relative '../../Factories/Entity'
 require_relative '../../Factories/User'
