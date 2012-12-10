@@ -26,8 +26,8 @@ describe "searcher request model" do
     request = AutocompleteUser::Request.new(payload, searcher, "users")
     data = request.prepare 
 
-    data.size.must_equal 2
-    data.first.name.must_equal "Jack Web"
+    data.fetch(:users).size.must_equal 2
+    data.fetch(:users).first.name.must_equal "Jack Web"
     
   end
   

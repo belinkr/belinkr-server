@@ -3,18 +3,16 @@ require_relative '../API'
 require_relative '../Resources/User/Member'
 require_relative '../Services/Searcher'
 require_relative '../Services/Searcher/RedisBackend'
+require_relative '../Cases/AutocompleteUser/Request'
 
 module Belinkr
   class API < Sinatra::Base
     get '/autocomplete/users' do
+      searcher = Searcher.new Searcher::RedisBackend.new "users"
+      request = AutocompleteUser::Request.new(params, searcher, 'users')
+
       dispatch :collection do
-        searcher = Searcher.new Searcher::RedisBackend.new "users"
-        results = searcher.autocomplete 'users', params.fetch('q')
-        list = []
-        results.each_pair do |redis_key,user_hash|
-          list.push User::Member.new user_hash
-        end
-        list
+        request.prepare.fetch(:users)
       end
     end
   end

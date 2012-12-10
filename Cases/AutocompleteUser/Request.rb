@@ -16,7 +16,7 @@ module Belinkr
         results.each_pair do |redis_key,user_hash|
           list.push User::Member.new user_hash
         end
-        list
+        {users: list}
 
       end
     end

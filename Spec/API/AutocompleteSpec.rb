@@ -24,11 +24,9 @@ describe API do
       
       uri = URI.escape "/autocomplete/users?q=#{query}"
       get uri, {}, session_for(profile)
-      puts last_response.status
       users = JSON.parse(last_response.body)
       users.first.fetch("name").must_equal user.name
       last_response.status.must_equal 200
-     
     end
   end
 
