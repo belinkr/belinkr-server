@@ -45,9 +45,20 @@ module Belinkr
         !files.empty?
       end #files?
 
+      def scope=(new_scope)
+        return unless new_scope.respond_to? :storage_key
+
+        @base_storage_key = "#{new_scope.storage_key}:#{new_scope.id}"
+        super new_scope
+      end #scope=
+
       def storage_key
-        "#{scope.storage_key}:#{scope.id}:statuses"
+        "#{base_storage_key}:statuses"
       end
+
+      private
+      
+      attr_reader :base_storage_key
     end # Member
   end # Status
 end # Belinkr

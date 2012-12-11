@@ -4,7 +4,6 @@ require 'redis'
 require 'ostruct'
 require_relative '../../../Cases/CreateStatus/Request'
 
-
 $redis ||= Redis.new
 $redis.select 8
 

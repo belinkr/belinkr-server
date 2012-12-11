@@ -6,10 +6,11 @@ require_relative '../../Services/Timeliner'
 module Belinkr
   module DeleteStatus
     class Request
-      def initialize(payload, actor, entity)
+      def initialize(payload, actor, entity, resource=nil)
         @payload    = payload
         @actor      = actor
         @entity     = entity
+        @resource   = resource
       end #initialize
 
       def prepare
@@ -17,7 +18,7 @@ module Belinkr
           enforcer:   scope.enforcer,
           actor:      actor,
           status:     status,
-          scope:      scope.resource,
+          scope:      resource,
           timelines:  timelines
         }
       end #prepare
@@ -27,19 +28,22 @@ module Belinkr
       attr_reader :payload, :actor, :entity
 
       def status
-        @status ||= Status::Member.new(payload.merge jail).fetch
+        @status ||= Status::Member.new(
+          id:     payload.fetch('status_id'),
+          scope:  @resource
+        ).fetch
       end #status
 
-      def jail
-        { scope: scope.resource }
-      end #jail
+      def resource
+        @resource || scope.resource
+      end #resource
 
       def scope
         Status::Scope.new(payload, actor, entity)
       end #scope
 
       def timelines
-        @timelines ||= Timeliner.new.timelines_for(status)
+        @timelines ||= Timeliner.new(status).timelines_for(scope)
       end #timelines
     end # Request
   end # DeleteStatus
