@@ -22,7 +22,6 @@ describe 'request model for CreateStatus' do
                   .prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Workspace::Enforcer
-      data.fetch(:scope)      .must_be_instance_of Workspace::Member
     end
 
     it 'returns a scrapbook as scope if payload has a scrapbook_id' do
@@ -31,7 +30,6 @@ describe 'request model for CreateStatus' do
                   .prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Scrapbook::Enforcer
-      data.fetch(:scope)      .must_be_instance_of Scrapbook::Member
     end
 
     it 'returns a user as scope by default' do
@@ -40,7 +38,6 @@ describe 'request model for CreateStatus' do
                   .prepare
 
       data.fetch(:enforcer)   .must_be_instance_of User::Enforcer
-      data.fetch(:scope)      .must_equal @actor
       data.fetch(:status)     .must_be_instance_of Status::Member
       data.fetch(:timelines)  .wont_be_empty
       data.fetch(:actor)      .must_equal @actor

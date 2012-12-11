@@ -10,13 +10,11 @@ module Belinkr
         @enforcer           = arguments.fetch(:enforcer)
         @actor              = arguments.fetch(:actor)
         @status             = arguments.fetch(:status)
-        @scope              = arguments.fetch(:scope)
         @timelines          = arguments.fetch(:timelines)
       end #initialize
 
       def call
         enforcer.authorize(actor, :create_status)
-        status.scope = scope
         timelines.each { |timeline| timeline.add status } 
 
         will_sync status, *timelines

@@ -1,12 +1,12 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'ostruct'
-require_relative '../../../Cases/CreateStatus/Context'
+require_relative '../../../Cases/DeleteStatus/Context'
 require_relative '../../Doubles/Enforcer/Double'
 
 include Belinkr
 
-describe 'create status' do
+describe 'delete status' do
   before do
     @enforcer   = Enforcer::Double.new
     @actor      = OpenStruct.new
@@ -19,20 +19,20 @@ describe 'create status' do
 
   it 'authorizes the actor' do
     enforcer  = Minitest::Mock.new
-    context   = CreateStatus::Context.new(
+    context   = DeleteStatus::Context.new(
       enforcer:   enforcer,
       actor:      @actor,
       status:     @status,
       timelines:  @timelines
     )
-    enforcer.expect :authorize, enforcer, [@actor, :create_status]
+    enforcer.expect :authorize, enforcer, [@actor, :delete_status]
     context.call
     enforcer.verify
   end
 
   it 'adds the status to all applicable timelines' do
     timeline  = Minitest::Mock.new
-    context   = CreateStatus::Context.new(
+    context   = DeleteStatus::Context.new(
       enforcer:   @enforcer,
       actor:      @actor,
       status:     @status,
@@ -42,5 +42,5 @@ describe 'create status' do
     context.call
     timeline.verify
   end
-end # create status
+end # delete status
 

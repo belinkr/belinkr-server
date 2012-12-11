@@ -45,7 +45,6 @@ describe 'request model for DeleteStatus' do
                   .prepare
 
       data.fetch(:enforcer)   .must_be_instance_of User::Enforcer
-      data.fetch(:scope)      .must_equal @actor
       data.fetch(:status)     .must_be_instance_of Status::Member
       data.fetch(:timelines)  .wont_be_empty
       data.fetch(:actor)      .must_equal @actor

@@ -18,7 +18,6 @@ module Belinkr
           enforcer:   scope.enforcer,
           actor:      actor,
           status:     status,
-          scope:      resource,
           timelines:  timelines
         }
       end #prepare
@@ -30,12 +29,12 @@ module Belinkr
       def status
         @status ||= Status::Member.new(
           id:     payload.fetch('status_id'),
-          scope:  @resource
+          scope:  resource
         ).fetch
       end #status
 
       def resource
-        @resource || scope.resource
+        @resource ||= scope.resource
       end #resource
 
       def scope
