@@ -11,6 +11,18 @@ require_relative '../../Services/Tracker'
 module Belinkr
   module Status
     class Scope
+      RESOURCE_TIMELINES = { 
+        workspace:  %w{ general files },
+        scrapbook:  %w{ general files },
+        user:       %w{ own general files }
+      }
+
+      FOLLOWER_TIMELINES = {
+        workspace: %w{ workspaces files },
+        scrapbook: [],
+        user:      %w{ general files }
+      }
+
       def initialize(payload, user, entity)
         @payload  = payload
         @user     = user
@@ -27,23 +39,17 @@ module Belinkr
 
       def followers
         send :"#{kind_from(payload)}_followers"
-      end
+      end #followers
 
       def resource_timelines
-        { 
-          workspace:  %w{ general files },
-          scrapbook:  %w{ general files },
-          user:       %w{ own general files }
-        }.fetch(kind_from(payload))
+        RESOURCE_TIMELINES.fetch kind_from(payload)
       end #resource_timelines
 
       def follower_timelines
-        {
-          workspace: %w{ workspaces files },
-          scrapbook: [],
-          user:      %w{ geral files }
-        }.fetch(kind_from(payload))
+        FOLLOWER_TIMELINES.fetch kind_from(payload)
       end #follower_timelines
+
+      private
 
       attr_reader :payload, :user, :entity
 
