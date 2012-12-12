@@ -16,7 +16,9 @@ require_relative './API/Sessions'
 require_relative './API/Followers'
 require_relative './API/Workspaces'
 require_relative './API/Scrapbooks'
+require_relative './API/Files'
 #require_relative './API/Users'
+#require_relative './API/Statuses'
 
 require_relative './Resources/Session/Member'
 require_relative './Resources/User/Member'
@@ -24,7 +26,7 @@ require_relative './Resources/Entity/Member'
 
 $redis ||= Redis.new
 
-CarrierWave.root = File.join(File.dirname(__FILE__), 'public')
+CarrierWave.root = Belinkr::Config::STORAGE_ROOT
 
 module Belinkr
   class API < Sinatra::Base
