@@ -7,7 +7,8 @@ module Belinkr
     class Enforcer
       include Tinto::Exceptions
 
-      ADMINISTRATOR_ACTIONS = %w{update delete undelete promote demote remove}
+      ADMINISTRATOR_ACTIONS = %w{ update delete undelete promote demote 
+                                  remove get_status get_timeline }
       COLLABORATOR_ACTIONS  = %w{create leave}
       ACTIONS               = COLLABORATOR_ACTIONS + ADMINISTRATOR_ACTIONS
 

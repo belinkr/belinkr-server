@@ -31,7 +31,7 @@ module Belinkr
       end
 
       def instantiate_member(attributes={})
-        Member.new attributes.merge!(scope: scope)
+        Member.new attributes.merge!(scope: scope.resource)
       end
 
       def storage_key

@@ -2,7 +2,7 @@
 require 'Tinto/Context'
 
 module Belinkr
-  module DeleteStatus
+  module GetStatus
     class Context
       include Tinto::Context
 
@@ -10,21 +10,16 @@ module Belinkr
         @enforcer           = arguments.fetch(:enforcer)
         @actor              = arguments.fetch(:actor)
         @status             = arguments.fetch(:status)
-        @timelines          = arguments.fetch(:timelines)
       end #initialize
 
       def call
-        enforcer.authorize(actor, :delete_status)
-        status.delete
-        timelines.each { |timeline| timeline.delete status } 
-
-        will_sync status, *timelines
+        enforcer.authorize(actor, :get_status)
       end #call
 
       private
 
-      attr_reader :enforcer, :actor, :status, :timelines
+      attr_reader :enforcer, :actor, :status
     end # Context
-  end # DeleteStatus
+  end # GetStatus
 end # Belinkr
 

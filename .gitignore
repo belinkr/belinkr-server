@@ -1,3 +1,5 @@
 public/*
 files/*
 *.swp
+tmux*
+error.html

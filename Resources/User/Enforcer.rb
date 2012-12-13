@@ -11,13 +11,24 @@ module Belinkr
       end #user
 
       def authorize(actor, action)
-        raise NotAllowed unless user.id == actor.id
+        raise_if_deleted_resource
+
+        return true       if get_status_or_timeline?(action)
+        raise NotAllowed  unless user.id == actor.id
         return true
       end #authorize
 
       private
 
       attr_reader :user
+
+      def raise_if_deleted_resource
+        raise NotFound if user.deleted_at
+      end #raise_if_deleted_resource
+
+      def get_status_or_timeline?(action)
+        action =~ /get/
+      end #get_status_or_timeline?
     end # Enforcer
   end # User
 end # Belinkr

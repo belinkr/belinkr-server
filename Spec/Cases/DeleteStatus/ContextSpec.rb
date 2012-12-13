@@ -2,6 +2,8 @@
 require 'minitest/autorun'
 require 'ostruct'
 require_relative '../../../Cases/DeleteStatus/Context'
+require_relative '../../Doubles/Collection/Double'
+require_relative '../../Doubles/Status/Double'
 require_relative '../../Doubles/Enforcer/Double'
 
 include Belinkr
@@ -10,11 +12,11 @@ describe 'delete status' do
   before do
     @enforcer   = Enforcer::Double.new
     @actor      = OpenStruct.new
-    @status     = OpenStruct.new
-    @timeline   = OpenStruct.new
+    @status     = Status::Double.new
+    @timeline   = Collection::Double.new
     @timelines  = [@timeline]
 
-    def @timeline.add(*args); true; end
+    def @timeline.delete(*args); true; end
   end
 
   it 'authorizes the actor' do
@@ -30,7 +32,20 @@ describe 'delete status' do
     enforcer.verify
   end
 
-  it 'adds the status to all applicable timelines' do
+  it 'marks the status as deleted' do
+    status    = Minitest::Mock.new
+    context   = DeleteStatus::Context.new(
+      enforcer:   @enforcer,
+      actor:      @actor,
+      status:     status,
+      timelines:  @timelines
+    )
+    status.expect :delete, status
+    context.call
+    status.verify
+  end
+
+  it 'deletes the status to all applicable timelines' do
     timeline  = Minitest::Mock.new
     context   = DeleteStatus::Context.new(
       enforcer:   @enforcer,
@@ -38,7 +53,7 @@ describe 'delete status' do
       status:     @status,
       timelines:  [timeline]
     )
-    timeline.expect :add, timeline, [@status]
+    timeline.expect :delete, timeline, [@status]
     context.call
     timeline.verify
   end

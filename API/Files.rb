@@ -1,6 +1,4 @@
 # encoding: utf-8
-require 'rack'
-require 'sinatra'
 require_relative '../API'
 require_relative '../Resources/StoredFile/Presenter'
 
