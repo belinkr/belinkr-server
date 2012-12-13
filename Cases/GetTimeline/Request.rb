@@ -1,6 +1,6 @@
 # encoding: utf-8
 require_relative '../../Resources/Status/Scope'
-require_relative '../../Resources/Status/Scope'
+require_relative '../../Resources/Status/Collection'
 
 module Belinkr
   module GetTimeline
