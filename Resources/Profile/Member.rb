@@ -13,9 +13,6 @@ module Belinkr
 
       MODEL_NAME          = 'profile'
       WHITELIST           = 'mobile landline fax position department'
-      TIMELINES           = %w{ own general replies files workspaces
-                                forwarded_by_you forwarded_by_others }
-      FOLLOWER_TIMELINES  = %w{ general files }
 
       attribute :id,                String
       attribute :mobile,            String
