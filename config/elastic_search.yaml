@@ -1,0 +1,23 @@
+default_index_setting:
+  settings:
+    index:
+      number_of_shards : 5
+
+index_mapping:
+  users:
+    mappings:
+      user:
+        properties:
+          name:
+            type: "string"
+            store: "yes"
+
+  statuses:
+    mappings:
+      status:
+  workspaces:
+    mappings:
+      workspace:
+  scrapbooks:
+    mappings:
+      scrapbook:
