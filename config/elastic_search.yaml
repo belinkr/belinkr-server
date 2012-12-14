@@ -10,14 +10,18 @@ index_mapping:
         properties:
           name:
             type: "string"
-            store: "yes"
-
   statuses:
     mappings:
       status:
+
   workspaces:
     mappings:
       workspace:
+
   scrapbooks:
     mappings:
       scrapbook:
+
+  profiles:
+    mappings:
+      profile:

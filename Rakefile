@@ -3,15 +3,23 @@ task :default => [:reset_elasticsearch]
 
 desc "reset all elasticsearch index"
 task :reset_elasticsearch do
-  ESConfig::Index.delete_index_list
-  ESConfig::Index.put_settings
-  ESConfig::Index.get_settings
+  esindex = ESConfig::Index.new
+  esindex.delete_index_list
+  esindex.put_settings
+  esindex.get_settings
 
 end
+
 desc "config elasticsearch index"
-task :config_es_index_map, [:index] do |t, args|
-  ESConfig::Index.put_mappings(args.index)
-  ESConfig::Index.get_mappings(args.index)
+task :config_es_index_map do 
+  unless ENV['INDEX']
+    raise "Need to Provide an INDEX: rake config_es_index_map INDEX=workspaces"
+  end
+
+  index = ENV['INDEX']
+  esindex = ESConfig::Index.new
+  esindex.put_mappings(index)
+  esindex.get_mappings(index)
 end
 
 
