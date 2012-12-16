@@ -5,6 +5,8 @@ module Belinkr
   class API < Sinatra::Base
     get '/users' do
       dispatch :collection do
+        GetCollection::Request.new
+          .new(params, current_user, current_entity, :user).prepare
       end
     end # get /users
 

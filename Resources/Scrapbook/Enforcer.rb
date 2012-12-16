@@ -21,7 +21,7 @@ module Belinkr
       attr_reader :scrapbook
 
       def raise_if_deleted_resource
-        raise NotFound if scrapbook.deleted_at
+        raise NotFound if scrapbook.respond_to?(:deleted_at) && scrapbook.deleted_at
       end #raise_if_deleted_resource
     end # Enforcer
   end # Scrapbook

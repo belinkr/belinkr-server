@@ -20,7 +20,8 @@ describe 'log out request model' do
                 profile_id: 0,
                 entity_id:  0
               ).sync
-    data    = LogOut::Request.new(id: session.id).prepare
+    payload = { id: session.id }
+    data    = LogOut::Request.new(payload: payload).prepare
 
     data.fetch(:session)      .must_equal session
     data.fetch(:sessions)     .must_be_instance_of Session::Collection

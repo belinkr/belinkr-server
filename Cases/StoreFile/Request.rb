@@ -4,9 +4,9 @@ require_relative '../../Resources/StoredFile/Member'
 module Belinkr
   module StoreFile
     class Request
-      def initialize(payload, actor)
-        @payload  = payload.fetch('file')
-        @actor    = actor
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload).fetch('file')
+        @actor    = arguments.fetch(:actor)
       end #initialize
 
       def prepare

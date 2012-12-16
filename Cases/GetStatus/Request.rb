@@ -5,11 +5,11 @@ require_relative '../../Resources/Status/Scope'
 module Belinkr
   module GetStatus
     class Request
-      def initialize(payload, actor, entity, resource=nil)
-        @payload    = payload
-        @actor      = actor
-        @entity     = entity
-        @resource   = resource
+      def initialize(arguments)
+        @payload    = arguments.fetch(:payload)
+        @actor      = arguments.fetch(:actor)
+        @entity     = arguments.fetch(:entity)
+        @resource   = arguments.fetch(:resource, nil)
       end #initialize
 
       def prepare

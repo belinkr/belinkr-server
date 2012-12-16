@@ -9,10 +9,10 @@ require_relative '../../Services/Tracker'
 module Belinkr
   module AutoinviteToWorkspace
     class Request
-      def initialize(payload, actor, entity)
-        @payload  = payload
-        @actor    = actor
-        @entity   = entity
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
+        @actor    = arguments.fetch(:actor)
+        @entity   = arguments.fetch(:entity)
       end #initialize
 
       def prepare

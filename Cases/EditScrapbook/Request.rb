@@ -5,9 +5,9 @@ require_relative '../../Resources/Scrapbook/Enforcer'
 module Belinkr
   module EditScrapbook
     class Request
-      def initialize(payload, actor)
-        @payload  = payload
-        @actor    = actor
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
+        @actor    = arguments.fetch(:actor)
       end #initialize
 
       def prepare

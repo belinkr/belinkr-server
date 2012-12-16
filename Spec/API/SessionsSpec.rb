@@ -98,8 +98,8 @@ describe API do
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
         .must_be_empty
 
-      #get '/statuses'
-      #last_response.status.must_equal 401
+      get '/scrapbooks'
+      last_response.status.must_equal 401
 
       unregister_redis_session_extension
     end
@@ -107,7 +107,6 @@ describe API do
 
   describe 'auth_token HTTP params' do
     it 'gets the auth_token from params for Flash uploads' do
-      skip
       user, password = create_account
       post '/sessions', { email: user.email, password: password }.to_json
       token = rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]

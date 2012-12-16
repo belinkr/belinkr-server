@@ -19,8 +19,9 @@ describe GetStoredFile::Request do
       File.open(File.join(File.dirname(__FILE__), '../../Support/foo.txt'))
     ).sync
 
-    payload = { 'stored_file_id' => stored_file.id }
-    data    = GetStoredFile::Request.new(payload, actor).prepare
+    payload   = { 'stored_file_id' => stored_file.id }
+    arguments = { payload: payload, actor: actor }
+    data      = GetStoredFile::Request.new(arguments).prepare
 
     data.fetch(:stored_file_path).must_match /#{stored_file.id}/
   end
@@ -33,13 +34,15 @@ describe GetStoredFile::Request do
     ).sync
 
     payload = { 'stored_file_id' => stored_file.id }
-    data    = GetStoredFile::Request.new(payload, actor).prepare
+    arguments = { payload: payload, actor: actor }
+    data      = GetStoredFile::Request.new(arguments).prepare
 
     data.fetch(:http_options).wont_include :disposition
     data.fetch(:http_options).must_include :filename
 
-    payload = { 'stored_file_id' => stored_file.id, 'inline' => true }
-    data    = GetStoredFile::Request.new(payload, actor).prepare
+    payload   = { 'stored_file_id' => stored_file.id, 'inline' => true }
+    arguments = { payload: payload, actor: actor }
+    data      = GetStoredFile::Request.new(arguments).prepare
 
     data.fetch(:http_options).must_include :disposition
     data.fetch(:http_options).wont_include :filename

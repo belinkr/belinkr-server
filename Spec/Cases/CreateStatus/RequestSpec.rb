@@ -17,25 +17,25 @@ describe 'request model for CreateStatus' do
     end
 
     it 'returns a workspace as scope if payload has a workspace_id' do
-      payload = { 'workspace_id' => 5 }
-      data    = CreateStatus::Request.new(payload, @actor, @entity)
-                  .prepare
+      payload   = { 'workspace_id' => 5 }
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+      data      = CreateStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Workspace::Enforcer
     end
 
     it 'returns a scrapbook as scope if payload has a scrapbook_id' do
-      payload = { 'scrapbook_id' => 5 }
-      data    = CreateStatus::Request.new(payload, @actor, @entity)
-                  .prepare
+      payload   = { 'scrapbook_id' => 5 }
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+      data      = CreateStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Scrapbook::Enforcer
     end
 
     it 'returns a user as scope by default' do
-      payload = {}
-      data    = CreateStatus::Request.new(payload, @actor, @entity)
-                  .prepare
+      payload   = {}
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+      data      = CreateStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of User::Enforcer
       data.fetch(:status)     .must_be_instance_of Status::Member

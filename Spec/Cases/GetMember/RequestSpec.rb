@@ -17,9 +17,10 @@ describe 'request model for GetMember' do
     actor         = double
     actor_profile = double
     entity        = double
-    data          = GetMember::Request
-                      .new(payload, actor, actor_profile,entity, :user)
-                      .prepare
+    arguments     = { payload: payload, actor: actor, entity: entity }
+
+    arguments.merge!(kind: :user)
+    data          = GetMember::Request.new(arguments).prepare
 
     data.fetch(:actor)    .must_equal actor
     data.fetch(:member)   .must_be_instance_of User::Member

@@ -5,11 +5,11 @@ require_relative '../../Resources/Status/Collection'
 module Belinkr
   module GetTimeline
     class Request
-      def initialize(payload, actor, entity, resource=nil)
-        @payload    = payload
-        @actor      = actor
-        @entity     = entity
-        @resource   = resource
+      def initialize(arguments)
+        @payload    = arguments.fetch(:payload)
+        @actor      = arguments.fetch(:actor)
+        @entity     = arguments.fetch(:entity)
+        @resource   = arguments.fetch(:resource)
       end #initialize
 
       def prepare

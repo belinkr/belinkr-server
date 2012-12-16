@@ -22,8 +22,10 @@ describe 'request model for GetTimeline' do
       workspace = double
       timeline  = timeline_for(workspace)
       payload   = { 'workspace_id' => workspace.id }
-      data      = GetTimeline::Request
-                  .new(payload, @actor, @entity, workspace).prepare
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: workspace)
+      data      = GetTimeline::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Workspace::Enforcer
     end
@@ -32,17 +34,20 @@ describe 'request model for GetTimeline' do
       scrapbook = double
       timeline  = timeline_for(scrapbook)
       payload   = { 'scrapbook_id' => 5 }
-      data      = GetTimeline::Request
-                  .new(payload, @actor, @entity, scrapbook).prepare
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: scrapbook)
+      data      = GetTimeline::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Scrapbook::Enforcer
     end
 
     it 'returns a user as scope by default' do
       timeline  = timeline_for(@actor)
-      payload   = {}
-      data      = GetTimeline::Request.new(payload, @actor, @entity, @actor)
-                    .prepare
+      arguments = { payload: {}, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: @actor)
+      data      = GetTimeline::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of User::Enforcer
       data.fetch(:timeline)   .must_be_instance_of Status::Collection

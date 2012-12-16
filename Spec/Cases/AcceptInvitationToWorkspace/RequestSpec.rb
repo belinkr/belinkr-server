@@ -32,9 +32,8 @@ describe 'accept invitation to workspace request model' do
                   }.to_json
 
     payload     = JSON.parse(payload)
-    request     = AcceptInvitationToWorkspace::Request
-                    .new(payload, actor, entity)
-    data        = request.prepare
+    arguments   = { payload: payload, actor: actor, entity: entity }
+    data        = AcceptInvitationToWorkspace::Request.new(arguments).prepare
 
     data.fetch(:actor).id       .must_equal actor.id
     data.fetch(:enforcer)       

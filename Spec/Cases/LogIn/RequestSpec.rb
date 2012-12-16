@@ -26,8 +26,7 @@ describe 'log out request model' do
     }.to_json
     payload = JSON.parse(payload)
 
-    request = LogIn::Request.new(payload)
-    data    = request.prepare
+    data    = LogIn::Request.new(payload: payload).prepare
 
     data.fetch(:actor).id   .must_equal actor.id
     data.fetch(:plaintext)  .must_equal payload.fetch('password')

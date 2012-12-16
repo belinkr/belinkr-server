@@ -4,9 +4,9 @@ require_relative '../../Resources/StoredFile/Member'
 module Belinkr
   module DeleteStoredFile
     class Request
-      def initialize(payload, actor)
-        @payload  = payload
-        @actor    = actor
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
+        @actor    = arguments.fetch(:actor)
       end #initialize
 
       def prepare

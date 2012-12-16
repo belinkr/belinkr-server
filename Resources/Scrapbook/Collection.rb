@@ -17,7 +17,7 @@ module Belinkr
       KINDS       = %w{ own others }
 
       attribute :user_id,         String
-      attribute :kind,            String
+      attribute :kind,            String, default: 'own'
 
       validates_presence_of       :user_id, :kind
       validates_within            :kind, set: KINDS

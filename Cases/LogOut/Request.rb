@@ -5,8 +5,8 @@ require_relative '../../Resources/Session/Collection'
 module Belinkr
   module LogOut
     class Request
-      def initialize(payload)
-        @payload  = payload
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
       end #initialize
 
       def prepare

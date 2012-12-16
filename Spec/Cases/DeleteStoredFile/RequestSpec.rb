@@ -17,8 +17,9 @@ describe DeleteStoredFile::Request do
       File.open(File.join(File.dirname(__FILE__), '../../Support/foo.txt'))
     ).sync
 
-    payload = { 'stored_file_id' => stored_file.id }
-    data    = DeleteStoredFile::Request.new(payload, actor).prepare
+    payload   = { 'stored_file_id' => stored_file.id }
+    arguments = { payload: payload, actor: actor }
+    data      = DeleteStoredFile::Request.new(arguments).prepare
 
     data.fetch(:stored_file).must_be_instance_of StoredFile::Member
   end

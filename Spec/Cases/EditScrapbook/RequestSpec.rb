@@ -16,13 +16,14 @@ describe 'request model for EditScrapbook' do
     actor     = OpenStruct.new(id: 0)
     scrapbook = Factory.scrapbook(user_id: actor.id).sync
 
-    payload = { 
-      scrapbook_id: scrapbook.id,
-      name:         'changed'
-    }
+    payload   = { 
+                  scrapbook_id: scrapbook.id,
+                  name:         'changed'
+                }
 
-    payload = JSON.parse(payload.to_json)
-    data    = EditScrapbook::Request.new(payload, actor).prepare
+    payload   = JSON.parse(payload.to_json)
+    arguments = { payload: payload, actor: actor }
+    data      = EditScrapbook::Request.new(arguments).prepare
 
     data.fetch(:actor)        .must_equal actor
     data.fetch(:enforcer)     .must_be_instance_of Scrapbook::Enforcer

@@ -18,10 +18,12 @@ describe 'request model for FollowUserInProfile' do
     actor, actor_profile        = factory(entity)
     followed, followed_profile  = factory(entity)
 
-    payload = { followed_id: followed.id }
-    payload = JSON.parse(payload.to_json)
-    data    = FollowUserInEntity::Request
-              .new(payload, actor, actor_profile, entity).prepare
+    payload   = { followed_id: followed.id }
+    payload   = JSON.parse(payload.to_json)
+    arguments = { payload: payload, actor: actor, entity: entity }
+
+    arguments.merge!(actor_profile: actor_profile)
+    data    = FollowUserInEntity::Request.new(arguments).prepare
     
     data.fetch(:enforcer)             .must_be_instance_of Follower::Enforcer
     data.fetch(:actor)                .must_equal actor

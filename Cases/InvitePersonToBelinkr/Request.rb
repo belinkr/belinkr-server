@@ -6,10 +6,10 @@ require_relative '../../Resources/Message/Member'
 module Belinkr
   module InvitePersonToBelinkr
     class Request
-      def initialize(payload, actor, entity)
-        @payload  = payload
-        @actor    = actor
-        @entity   = entity
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
+        @actor    = arguments.fetch(:actor)
+        @entity   = arguments.fetch(:entity)
       end #initialize
 
       def prepare

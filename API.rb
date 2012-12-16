@@ -51,9 +51,13 @@ module Belinkr
       end
 
       def payload
-        @payload ||= 
-          Tinto::Sanitizer.sanitize_hash(JSON.parse(request.body.read.to_s))
-      end
+        return @payload = {} if request_body.empty?
+        @payload ||= Tinto::Sanitizer.sanitize_hash(JSON.parse(request_body))
+      end #payload
+
+      def request_body
+        @request_body ||= (request.body.read.to_s || "{}")
+      end #request_body
 
       def combined_input
         payload.to_hash.merge(params)
@@ -97,6 +101,14 @@ module Belinkr
         @current_profile ||= Profile::Member.new(id: current_session.profile_id,
                                 entity_id: current_session.entity_id).fetch
       end
+
+      def request_data
+        @request_data ||= { 
+          payload:  combined_input,
+          actor:    current_user,
+          entity:   current_entity
+        }
+      end #request_data
       
       def auth_token_cookie
         token = request.cookies[Config::AUTH_TOKEN_COOKIE] 
@@ -109,7 +121,7 @@ module Belinkr
       end
 
       def public_path?
-        request.path_info =~ %r{sessions|login|resets|invitations/\w+}
+        request.path_info =~ %r{sessions|resets|invitations/\w+}
       end
     end
   end # API

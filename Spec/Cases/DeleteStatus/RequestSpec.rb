@@ -22,8 +22,11 @@ describe 'request model for DeleteStatus' do
       workspace = double
       status    = status_for(workspace)
       payload   = { 'status_id' => status.id, 'workspace_id' => workspace.id }
-      data      = DeleteStatus::Request
-                  .new(payload, @actor, @entity, workspace).prepare
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: workspace)
+
+      data      = DeleteStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Workspace::Enforcer
     end
@@ -32,17 +35,21 @@ describe 'request model for DeleteStatus' do
       scrapbook = double
       status    = status_for(scrapbook)
       payload   = { 'status_id' => status.id, 'scrapbook_id' => 5 }
-      data      = DeleteStatus::Request
-                  .new(payload, @actor, @entity, scrapbook).prepare
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: scrapbook)
+      data      = DeleteStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Scrapbook::Enforcer
     end
 
     it 'returns a user as scope by default' do
-      status  = status_for(@actor)
-      payload = { 'status_id' => status.id }
-      data    = DeleteStatus::Request.new(payload, @actor, @entity, @actor)
-                  .prepare
+      status    = status_for(@actor)
+      payload   = { 'status_id' => status.id }
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: @actor)
+      data      = DeleteStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of User::Enforcer
       data.fetch(:status)     .must_be_instance_of Status::Member

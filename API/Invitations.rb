@@ -2,6 +2,7 @@
 require_relative '../API'
 require_relative '../Resources/User/Presenter'
 require_relative '../Resources/Invitation/Presenter'
+require_relative '../Cases/GetMember/Request'
 require_relative '../Cases/InvitePersonToBelinkr/Request'
 require_relative '../Cases/InvitePersonToBelinkr/Context'
 require_relative '../Cases/AcceptInvitationAndJoin/Request'
@@ -10,14 +11,12 @@ require_relative '../Cases/AcceptInvitationAndJoin/Context'
 module Belinkr
   class API < Sinatra::Base
     get '/invitations/:invitation_id' do
-      invitation = Invitation::Member.new(id: params.fetch('invitation_id'))
-                     .fetch
+      GetMember::Request.new(request_data.merge(kind: :invitation)).prepare
       200
     end # GET /invitations/:invitation_id
 
     post '/invitations' do
-      data        = InvitePersonToBelinkr::Request
-                      .new(payload, current_user, current_entity).prepare
+      data        = InvitePersonToBelinkr::Request.new(request_data).prepare
       invitation  = data.fetch(:invitation)
 
       dispatch :create, invitation do
@@ -27,7 +26,7 @@ module Belinkr
     end # POST /invitations
 
     put '/invitations/:invitation_id' do
-      data  = AcceptInvitationAndJoin::Request.new(combined_input).prepare
+      data  = AcceptInvitationAndJoin::Request.new(request_data).prepare
       actor = data.fetch(:actor)
 
       dispatch :update, actor do

@@ -30,7 +30,6 @@ describe Belinkr::API do
     end
   end # POST /scrapbooks
 
-
   describe "GET /scrapooks/:id" do
     it "returns the scrapbook" do
       user, profile = create_user_and_profile

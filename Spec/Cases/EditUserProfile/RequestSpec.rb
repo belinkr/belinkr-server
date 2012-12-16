@@ -12,10 +12,12 @@ describe 'request model for EditUserProfile' do
     actor         = OpenStruct.new(id: 2)
     actor_profile = OpenStruct.new(id: 3)
 
-    payload = { first: 'changed', mobile: 'changed' }
-    payload = JSON.parse(payload.to_json)
-    data    = EditUserProfile::Request
-                .new(payload, actor, actor_profile, entity).prepare 
+    payload   = { first: 'changed', mobile: 'changed' }
+    payload   = JSON.parse(payload.to_json)
+    arguments = { payload: payload, actor: actor, entity: entity }
+
+    arguments.merge!(actor_profile: actor_profile)
+    data      = EditUserProfile::Request.new(arguments).prepare
 
     data.fetch(:actor)                            .must_equal actor
     data.fetch(:user)                             .must_equal actor
@@ -26,3 +28,4 @@ describe 'request model for EditUserProfile' do
       .must_be_instance_of User::Enforcer
   end
 end # request model for EditUserProfile
+

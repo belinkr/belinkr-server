@@ -24,8 +24,9 @@ describe 'request model for AssignAdministratorRoleInWorkspace' do
                     workspace_id: workspace.id 
                   }
     payload     = JSON.parse(payload.to_json)
-    data        = AssignAdministratorRoleInWorkspace::Request 
-                    .new(payload, actor, entity).prepare
+    arguments   = { payload: payload, actor: actor, entity: entity }
+    data        = AssignAdministratorRoleInWorkspace::Request.new(arguments)
+                    .prepare
 
     data.fetch(:actor)          .must_equal actor
     data.fetch(:target_user).id .must_equal target_user.id

@@ -12,12 +12,11 @@ require_relative '../../Resources/Workspace/Enforcer'
 module Belinkr
   module GetCollection
     class Request
-      def initialize(payload, actor, actor_profile, entity, kind)
-        @payload        = payload
-        @actor          = actor
-        @actor_profile  = actor_profile
-        @entity         = entity
-        @kind           = kind
+      def initialize(arguments)
+        @payload = arguments.fetch(:payload)
+        @actor   = arguments.fetch(:actor)
+        @entity  = arguments.fetch(:entity)
+        @kind    = arguments.fetch(:kind)
       end #initialize
 
       def prepare
@@ -30,12 +29,12 @@ module Belinkr
 
       private
 
-      attr_reader :payload, :actor, :actor_profile, :entity, :kind
+      attr_reader :payload, :actor, :entity, :kind
 
       def collection
         @resource ||= resource_module.const_get('Collection')
           .new(jail.merge payload)
-          .fetch
+          .page(payload.fetch('page', 0))
       end #collection
 
       def enforcer
@@ -47,7 +46,10 @@ module Belinkr
       end #resource_module
 
       def jail
-        { entity_id: entity.id }
+        @jail = {}
+        @jail.merge!(entity_id: entity.id)  if entity
+        @jail.merge!(user_id: actor.id)     if kind =~ /scrapbook/
+        @jail
       end #jail
     end # Request
   end # GetCollection

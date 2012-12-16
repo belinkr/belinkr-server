@@ -4,11 +4,11 @@ require_relative '../../Resources/User/Enforcer'
 module Belinkr
   module EditUserProfile
     class Request
-      def initialize(payload, actor, actor_profile, entity)
-        @payload        = payload
-        @actor          = actor
-        @actor_profile  = actor_profile
-        @entity         = entity
+      def initialize(arguments)
+        @payload        = arguments.fetch(:payload)
+        @actor          = arguments.fetch(:actor)
+        @actor_profile  = arguments.fetch(:actor_profile)
+        @entity         = arguments.fetch(:entity)
       end #initialize
 
       def prepare

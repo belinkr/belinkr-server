@@ -8,8 +8,8 @@ require_relative '../../Resources/Profile/Collection'
 module Belinkr
   module AcceptInvitationAndJoin
     class Request
-      def initialize(payload)
-        @payload  = payload
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
       end #initialize
 
       def prepare

@@ -8,8 +8,8 @@ require_relative '../../Resources/Message/Member'
 module Belinkr
   module RequestPasswordReset
     class Request
-      def initialize(payload)
-        @payload = payload
+      def initialize(arguments)
+        @payload = arguments.fetch(:payload)
       end #initialize
 
       def prepare

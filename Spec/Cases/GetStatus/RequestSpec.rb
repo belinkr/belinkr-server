@@ -22,8 +22,10 @@ describe 'request model for GetStatus' do
       workspace = double
       status    = status_for(workspace)
       payload   = { 'status_id' => status.id, 'workspace_id' => workspace.id }
-      data      = GetStatus::Request
-                  .new(payload, @actor, @entity, workspace).prepare
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: workspace)
+      data      = GetStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Workspace::Enforcer
     end
@@ -32,17 +34,21 @@ describe 'request model for GetStatus' do
       scrapbook = double
       status    = status_for(scrapbook)
       payload   = { 'status_id' => status.id, 'scrapbook_id' => 5 }
-      data      = GetStatus::Request
-                  .new(payload, @actor, @entity, scrapbook).prepare
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: scrapbook)
+      data      = GetStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of Scrapbook::Enforcer
     end
 
     it 'returns a user as scope by default' do
-      status  = status_for(@actor)
-      payload = { 'status_id' => status.id }
-      data    = GetStatus::Request.new(payload, @actor, @entity, @actor)
-                  .prepare
+      status    = status_for(@actor)
+      payload   = { 'status_id' => status.id }
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: @actor)
+      data      = GetStatus::Request.new(arguments).prepare
 
       data.fetch(:enforcer)   .must_be_instance_of User::Enforcer
       data.fetch(:status)     .must_be_instance_of Status::Member
@@ -50,9 +56,12 @@ describe 'request model for GetStatus' do
     end
 
     it 'raises if status is deleted' do
-      status  = status_for(@actor)
-      payload = { 'status_id' => status.id }
-      request = GetStatus::Request.new(payload, @actor, @entity, @actor)
+      status    = status_for(@actor)
+      payload   = { 'status_id' => status.id }
+      arguments = { payload: payload, actor: @actor, entity: @entity }
+
+      arguments.merge!(resource: @actor)
+      request   = GetStatus::Request.new(arguments)
 
       status.delete
       status.sync

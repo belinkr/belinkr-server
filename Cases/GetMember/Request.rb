@@ -4,6 +4,7 @@ require_relative '../../Resources/User/Enforcer'
 require_relative '../../Resources/Scrapbook/Member'
 require_relative '../../Resources/Scrapbook/Enforcer'
 require_relative '../../Resources/Status/Member'
+require_relative '../../Resources/Reset/Member'
 require_relative '../../Resources/Invitation/Member'
 require_relative '../../Resources/Invitation/Enforcer'
 require_relative '../../Resources/Workspace/Member'
@@ -12,12 +13,11 @@ require_relative '../../Resources/Workspace/Enforcer'
 module Belinkr
   module GetMember
     class Request
-      def initialize(payload, actor, actor_profile, entity, kind)
-        @payload        = payload
-        @actor          = actor
-        @actor_profile  = actor_profile
-        @entity         = entity
-        @kind           = kind
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
+        @actor    = arguments.fetch(:actor)
+        @entity   = arguments.fetch(:entity)
+        @kind     = arguments.fetch(:kind)
       end #initialize
 
       def prepare
@@ -30,10 +30,10 @@ module Belinkr
 
       private
 
-      attr_reader :payload, :actor, :actor_profile, :entity, :kind
+      attr_reader :payload, :actor, :entity, :kind
 
       def member
-        @resource ||= resource_module.const_get('Member')
+        @member ||= resource_module.const_get('Member')
           .new(jail.merge payload)
           .fetch
       end #member
@@ -47,7 +47,10 @@ module Belinkr
       end #resource_module
 
       def jail
-        { id: payload.fetch("#{kind}_id"), entity_id: entity.id }
+        @jail = { id: payload.fetch("#{kind}_id") }
+        @jail.merge!(entity_id: entity.id)  if entity
+        @jail.merge!(user_id: actor.id)     if kind =~ /scrapbook/
+        @jail
       end #jail
     end # Request
   end # GetMember

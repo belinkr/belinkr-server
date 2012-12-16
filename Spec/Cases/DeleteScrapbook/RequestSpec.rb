@@ -16,9 +16,9 @@ describe 'request model for DeleteScrapbook' do
     actor     = OpenStruct.new(id: 0)
     scrapbook = Factory.scrapbook(user_id: actor.id).sync
 
-    payload = { scrapbook_id: scrapbook.id }
-    payload = JSON.parse(payload.to_json)
-    data    = DeleteScrapbook::Request.new(payload, actor).prepare
+    payload   = { scrapbook_id: scrapbook.id }
+    arguments = { payload: JSON.parse(payload.to_json), actor: actor }
+    data      = DeleteScrapbook::Request.new(arguments).prepare
 
     data.fetch(:actor)        .must_equal actor
     data.fetch(:enforcer)     .must_be_instance_of Scrapbook::Enforcer

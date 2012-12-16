@@ -15,7 +15,8 @@ describe StoreFile::Request do
         tempfile: File.join(File.dirname(__FILE__), '../../Support/logo.png')
       }
     }
-    data = StoreFile::Request.new(payload, actor).prepare
+    arguments = { payload: payload, actor: actor }
+    data      = StoreFile::Request.new(arguments).prepare
 
     data.fetch(:stored_file).must_be_instance_of StoredFile::Member
     data.fetch(:stored_file).mime_type.must_equal 'image/png'
