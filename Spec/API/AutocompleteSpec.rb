@@ -4,6 +4,7 @@ require 'rack/test'
 require 'json'
 require_relative '../Support/Helpers'
 require_relative '../../API/Autocomplete'
+require_relative '../../Services/Searcher/TireWrapper'
 require 'uri'
 
 include Belinkr
@@ -15,12 +16,16 @@ describe API do
   include Rack::Test::Methods
   include Spec::API::Helpers
 
-  before { $redis.flushdb }
+  before do
+    $redis.flushdb 
+    @tire_obj = Object.new.extend TireWrapper
+  end
 
   describe 'GET /autocomplete/users' do
     it "returns user list matches parameter" do
       user, profile, enity = create_user_and_profile
       query = user.first 
+      @tire_obj.index_store 'users', user.attributes
       
       uri = URI.escape "/autocomplete/users?q=#{query}"
       get uri, {}, session_for(profile)
@@ -34,6 +39,7 @@ describe API do
     it "returns workspace list matches parameter" do
       user, profile, entity = create_user_and_profile
       workspace = workspace_by(profile)
+      @tire_obj.index_store 'workspaces',({'type'=>'workspace'}.merge workspace)
       query = workspace.fetch 'name'
       uri = URI.escape "/autocomplete/workspaces?q=#{query}"
       get uri, {}, session_for(profile)
@@ -47,10 +53,13 @@ describe API do
     it "returns scrapbook list matches parameter" do
       user, profile, entity = create_user_and_profile
       scrapbook = scrapbook_by(profile)
+      @tire_obj.index_store 'scrapbooks',({'type'=>'scrapbook'}.merge scrapbook)
       query = scrapbook.fetch 'name'
       uri = URI.escape "/autocomplete/scrapbooks?q=#{query}"
+      # if call fetch in Tinto::Precenter::Collection#as_poro, it would fail
       get uri, {}, session_for(profile)
       scrapbooks = JSON.parse(last_response.body)
+
       scrapbooks.first.fetch("name")
       last_response.status.must_equal 200
     end
@@ -67,6 +76,7 @@ describe API do
     post "/scrapbooks", { name: name }.to_json, session_for(profile)
     JSON.parse(last_response.body)
   end
+
 
 
 end
