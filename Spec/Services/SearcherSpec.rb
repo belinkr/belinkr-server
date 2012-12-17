@@ -14,7 +14,7 @@ describe Searcher do
  
   before do
     @searcher = Searcher.new Searcher::MemoryBackend.new "users"
-    @es_searcher = Searcher.new Searcher::ESBackend.new "users"
+    @es_searcher = Searcher.new Searcher::ESBackend.new "test_users"
     @redis_searcher = Searcher.new Searcher::RedisBackend.new "users"
   end
 
@@ -56,9 +56,9 @@ describe Searcher do
 
     it "#store then search user in ESBackend" do
       es_store_fake_users
-      @es_searcher.autocomplete("users","J").size.must_equal 2
-      @es_searcher.autocomplete("users","J").fetch("users:1")
-        .must_equal({id: 1, name:"Jack Web"})
+      @es_searcher.autocomplete("test_users","J").size.must_equal 2
+      @es_searcher.autocomplete("test_users","J").fetch("test_users:1")
+        .must_equal({id: 1, type: "test_user", name:"Jack Web"})
     end
 
     it "#store then search user in RedisBackend" do
@@ -77,17 +77,15 @@ describe Searcher do
     @searcher.store('users:3', {id:3,name:"Jerry Feb"})
   end
   def es_store_fake_users
-    @es_searcher.store('users:1', {id:1,name:"Jack Web"})
-    @es_searcher.store('users:2', {id:2,name:"Tom Rad"})
-    @es_searcher.store('users:3', {id:3,name:"Jerry Feb"})
+    @es_searcher.store('test_users:1', {id:1,name:"Jack Web"})
+    @es_searcher.store('test_users:2', {id:2,name:"Tom Rad"})
+    @es_searcher.store('test_users:3', {id:3,name:"Jerry Feb"})
   end
   def redis_store_fake_users
     @redis_searcher.store('users:1', {id:1,name:"Jack Web"})
     @redis_searcher.store('users:2', {id:2,name:"Tom Rad"})
     @redis_searcher.store('users:3', {id:3,name:"Jerry Feb"})
   end
-
-
 
 end
 
