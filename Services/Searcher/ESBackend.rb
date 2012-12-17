@@ -1,5 +1,7 @@
 require 'json'
 require_relative './TireWrapper'
+require 'active_support/inflector'
+
 module Belinkr
   class Searcher
     class ESBackend
@@ -11,8 +13,9 @@ module Belinkr
       end
 
       def store(key, value)
-        index_name, hash = transform_input(key, value)
-        index_store(index_name, hash)
+        index_name, type, hash = transform_input(key, value)
+        typed_hash = {:type => type}.merge hash
+        index_store(index_name, typed_hash)
       end
 
       def autocomplete(index_name, chars)
@@ -26,9 +29,10 @@ module Belinkr
       #to:
       #index_name = "users"
       #hash={id:1,name:'aaa'}
-      def transform_input(key,value)
+      def transform_input(key, value)
         index_name = key.split(':')[0..-2].join(':')
-        [index_name, value]
+        type = value[:type] || index_name.singularize
+        [index_name, type, value]
       end
       
       #from: <Item ...>
