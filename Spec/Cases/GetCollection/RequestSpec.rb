@@ -19,7 +19,7 @@ describe 'request model for GetCollection' do
     entity        = double
     arguments     = { payload: payload, actor: actor, entity: entity }
 
-    arguments.merge!(actor_profile: actor_profile, kind: :user)
+    arguments.merge!(actor_profile: actor_profile, type: :user)
     data          = GetCollection::Request.new(arguments).prepare
 
     data.fetch(:actor)      .must_equal actor

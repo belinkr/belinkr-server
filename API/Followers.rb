@@ -28,7 +28,7 @@ module Belinkr
 
     post '/following/:followed_id' do
       data      = FollowUserInEntity::Request.new(
-                    params, current_user, current_profile, current_entity
+                    request_data.merge(actor_profile: current_profile)
                   ).prepare
       followed  = data.fetch(:followed)
 
@@ -40,7 +40,7 @@ module Belinkr
 
     delete '/following/:followed_id' do
       data      = UnfollowUserInEntity::Request.new(
-                    params, current_user, current_profile, current_entity
+                    request_data.merge(actor_profile: current_profile)
                   ).prepare
       followed = data.fetch(:followed)
 

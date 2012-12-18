@@ -16,7 +16,7 @@ module Belinkr
         @payload = arguments.fetch(:payload)
         @actor   = arguments.fetch(:actor)
         @entity  = arguments.fetch(:entity)
-        @kind    = arguments.fetch(:kind)
+        @type    = arguments.fetch(:type)
       end #initialize
 
       def prepare
@@ -29,11 +29,11 @@ module Belinkr
 
       private
 
-      attr_reader :payload, :actor, :entity, :kind
+      attr_reader :payload, :actor, :entity, :type
 
       def collection
         @resource ||= resource_module.const_get('Collection')
-          .new(jail.merge payload)
+          .new(defaults.merge payload)
           .page(payload.fetch('page', 0))
       end #collection
 
@@ -42,15 +42,12 @@ module Belinkr
       end #enforcer
 
       def resource_module
-        Belinkr.const_get(kind.capitalize)
+        Belinkr.const_get(type.capitalize)
       end #resource_module
 
-      def jail
-        @jail = {}
-        @jail.merge!(entity_id: entity.id)  if entity
-        @jail.merge!(user_id: actor.id)     if kind =~ /scrapbook/
-        @jail
-      end #jail
+      def defaults
+        @defaults ||= { entity_id: entity.id, user_id: actor.id, kind: 'own' }
+      end #defaults
     end # Request
   end # GetCollection
 end # Belinkr

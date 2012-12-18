@@ -19,7 +19,7 @@ describe 'request model for GetMember' do
     entity        = double
     arguments     = { payload: payload, actor: actor, entity: entity }
 
-    arguments.merge!(kind: :user)
+    arguments.merge!(type: :user)
     data          = GetMember::Request.new(arguments).prepare
 
     data.fetch(:actor)    .must_equal actor

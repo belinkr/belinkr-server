@@ -26,7 +26,7 @@ describe API do
       status = JSON.parse(last_response.body)
 
       get '/timelines', {}, session_for(profile)
-
+      dump
       last_response.status.must_equal 200
       statuses = JSON.parse(last_response.body)
       statuses.first.fetch('id').must_equal status.fetch('id')

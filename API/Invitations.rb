@@ -11,7 +11,7 @@ require_relative '../Cases/AcceptInvitationAndJoin/Context'
 module Belinkr
   class API < Sinatra::Base
     get '/invitations/:invitation_id' do
-      GetMember::Request.new(request_data.merge(kind: :invitation)).prepare
+      GetMember::Request.new(request_data.merge(type: :invitation)).prepare
       200
     end # GET /invitations/:invitation_id
 

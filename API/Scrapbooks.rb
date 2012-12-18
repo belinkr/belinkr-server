@@ -20,7 +20,7 @@ module Belinkr
   class API < Sinatra::Base
     get "/scrapbooks" do
       dispatch :collection do
-        request_data.merge!(kind: :scrapbook)
+        request_data.merge!(type: :scrapbook)
         data = GetCollection::Request.new(request_data).prepare
         GetCollection::Context.new(data).run
         data.fetch(:collection)
@@ -29,7 +29,7 @@ module Belinkr
 
     get "/scrapbooks/:scrapbook_id" do
       dispatch :read do
-        request_data.merge!(kind: :scrapbook)
+        request_data.merge!(type: :scrapbook)
         data = GetMember::Request.new(request_data).prepare
         GetMember::Context.new(data).run
         data.fetch(:member)

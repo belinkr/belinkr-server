@@ -9,7 +9,7 @@ module Belinkr
         @payload    = arguments.fetch(:payload)
         @actor      = arguments.fetch(:actor)
         @entity     = arguments.fetch(:entity)
-        @resource   = arguments.fetch(:resource)
+        @resource   = arguments.fetch(:resource, nil)
       end #initialize
 
       def prepare

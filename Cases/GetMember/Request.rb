@@ -17,7 +17,7 @@ module Belinkr
         @payload  = arguments.fetch(:payload)
         @actor    = arguments.fetch(:actor)
         @entity   = arguments.fetch(:entity)
-        @kind     = arguments.fetch(:kind)
+        @type     = arguments.fetch(:type)
       end #initialize
 
       def prepare
@@ -30,11 +30,11 @@ module Belinkr
 
       private
 
-      attr_reader :payload, :actor, :entity, :kind
+      attr_reader :payload, :actor, :entity, :type
 
       def member
         @member ||= resource_module.const_get('Member')
-          .new(jail.merge payload)
+          .new(defaults.merge payload)
           .fetch
       end #member
 
@@ -43,15 +43,16 @@ module Belinkr
       end #enforcer
 
       def resource_module
-        Belinkr.const_get(kind.capitalize)
+        Belinkr.const_get(type.capitalize)
       end #resource_module
 
-      def jail
-        @jail = { id: payload.fetch("#{kind}_id") }
-        @jail.merge!(entity_id: entity.id)  if entity
-        @jail.merge!(user_id: actor.id)     if kind =~ /scrapbook/
-        @jail
-      end #jail
+      def defaults
+        @defaults ||= { 
+          id:         payload.fetch("#{type}_id"), 
+          entity_id:  entity.id,
+          user_id:    actor.id
+        }
+      end #defaults
     end # Request
   end # GetMember
 end # Belinkr

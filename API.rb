@@ -87,19 +87,21 @@ module Belinkr
       end
 
       def current_entity
-        return false unless current_session
+        return Entity::Member.new unless current_session
         @current_entity ||= Entity::Member.new(id: current_session.entity_id).fetch
       end
 
       def current_user
-        return false unless current_session
+        return User::Member.new unless current_session
         @current_user ||= User::Member.new(id: current_session.user_id).fetch
       end
       
       def current_profile
-        return false unless current_session
-        @current_profile ||= Profile::Member.new(id: current_session.profile_id,
-                                entity_id: current_session.entity_id).fetch
+        return Profile::Member.new unless current_session
+        @current_profile ||= Profile::Member.new(
+          id: current_session.profile_id,
+          entity_id: current_session.entity_id
+        ).fetch
       end
 
       def request_data

@@ -14,8 +14,7 @@ module Belinkr
   class API < Sinatra::Base
     get '/timelines' do
       dispatch :collection do
-        data  = GetTimeline::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetTimeline::Request.new(request_data).prepare
         GetTimeline::Context.new(data).run
         data.fetch(:timeline)
       end
@@ -23,16 +22,14 @@ module Belinkr
 
     get '/timelines/:kind' do
       dispatch :collection do
-        data  = GetTimeline::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetTimeline::Request.new(request_data).prepare
         GetTimeline::Context.new(data).run
         data.fetch(:timeline)
       end
     end # get /timelines/:kind
 
     post '/statuses' do
-      data    = CreateStatus::Request
-                  .new(payload, current_user, current_entity).prepare
+      data    = CreateStatus::Request.new(request_data).prepare
       status  = data.fetch(:status)
 
       dispatch :create, status do
@@ -43,8 +40,7 @@ module Belinkr
 
     get '/statuses/:status_id' do
       dispatch :read do
-        data  = GetStatus::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetStatus::Request.new(request_data).prepare
         GetStatus::Context.new(data).run
         data.fetch(:status)
       end
@@ -52,8 +48,7 @@ module Belinkr
 
     delete '/statuses/:status_id' do
       dispatch :delete do
-        data    = DeleteStatus::Request
-                    .new(params, current_user, current_entity).prepare
+        data    = DeleteStatus::Request.new(request_data).prepare
         DeleteStatus::Context.new(data).run
         data.fetch(:status)
       end
@@ -65,8 +60,7 @@ module Belinkr
 
     get '/workspaces/:workspace_id/timelines' do
       dispatch :collection do
-        data  = GetTimeline::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetTimeline::Request.new(request_data).prepare
         GetTimeline::Context.new(data).run
         data.fetch(:timeline)
       end
@@ -74,16 +68,14 @@ module Belinkr
 
     get '/workspaces/:workspace_id/timelines/files' do
       dispatch :collection do
-        data  = GetTimeline::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetTimeline::Request.new(request_data).prepare
         GetTimeline::Context.new(data).run
         data.fetch(:timeline)
       end
     end # get /workspaces/:workspace_id/timelines/files
 
     post '/workspaces/:workspace_id/statuses' do
-      data    = CreateStatus::Request
-                  .new(payload, current_user, current_entity).prepare
+      data    = CreateStatus::Request.new(request_data).prepare
       status  = data.fetch(:status)
 
       dispatch :create, status do
@@ -94,8 +86,7 @@ module Belinkr
 
     get '/workspaces/:workspace_id/statuses/:status_id' do
       dispatch :read do
-        data  = GetStatus::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetStatus::Request.new(request_data).prepare
         GetStatus::Context.new(data).run
         data.fetch(:status)
       end
@@ -103,8 +94,7 @@ module Belinkr
 
     delete '/workspaces/:workspace_id/statuses/:status_id' do
       dispatch :delete do
-        data    = DeleteStatus::Request
-                    .new(params, current_user, current_entity).prepare
+        data  = DeleteStatus::Request.new(request_data).prepare
         DeleteStatus::Context.new(data).run
         data.fetch(:status)
       end
@@ -116,8 +106,7 @@ module Belinkr
 
     get '/scrapbooks/:scrapbook_id/timelines' do
       dispatch :collection do
-        data  = GetTimeline::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetTimeline::Request.new(request_data).prepare
         GetTimeline::Context.new(data).run
         data.fetch(:timeline)
       end
@@ -125,16 +114,14 @@ module Belinkr
 
     get '/scrapbooks/:scrapbook_id/timelines/files' do
       dispatch :collection do
-        data  = GetTimeline::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetTimeline::Request.new(request_data).prepare
         GetTimeline::Context.new(data).run
         data.fetch(:timeline)
       end
     end # get /scrapbooks/:scrapbook_id/timelines/files
 
     post '/scrapbooks/:scrapbook_id/statuses' do
-      data    = CreateStatus::Request
-                  .new(payload, current_user, current_entity).prepare
+      data    = CreateStatus::Request.new(request_data).prepare
       status  = data.fetch(:status)
 
       dispatch :create, status do
@@ -145,8 +132,7 @@ module Belinkr
 
     get '/scrapbook/:scrapbook_id/statuses/:status_id' do
       dispatch :read do
-        data  = GetStatus::Request
-                  .new(params, current_user, current_entity).prepare
+        data  = GetStatus::Request.new(request_data).prepare
         GetStatus::Context.new(data).run
         data.fetch(:status)
       end
@@ -154,8 +140,7 @@ module Belinkr
 
     delete '/scrapbooks/:scrapbook_id/statuses/:status_id' do
       dispatch :delete do
-        data    = DeleteStatus::Request
-                    .new(params, current_user, current_entity).prepare
+        data    = DeleteStatus::Request.new(request_data).prepare
         DeleteStatus::Context.new(data).run
         data.fetch(:status)
       end
