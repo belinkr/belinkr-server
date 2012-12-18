@@ -39,8 +39,20 @@ describe API do
     it "returns workspace list matches parameter" do
       user, profile, entity = create_user_and_profile
       workspace = workspace_by(profile)
-      @tire_obj.index_store 'workspaces',({'type'=>'workspace'}.merge workspace)
-      query = workspace.fetch 'name'
+      #neeed to sync to redis db because in presenter, it will call fetch and
+      #read it from redis db
+      workspace.sync
+      hash= workspace.attributes
+      # elastic default date parser not accept ruby's date format, it has
+      # error:
+      # MapperParsingException[failed to parse date field [2012-12-18 11:32:26
+      # +0800], tried both date format [dateOptionalTime], and timestamp
+      # number]; nested: IllegalArgumentException
+      [:updated_at, :created_at, :deleted_at].each do |timestamp|
+        hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
+      end
+      @tire_obj.index_store 'workspaces', hash
+      query = workspace.name
       uri = URI.escape "/autocomplete/workspaces?q=#{query}"
       get uri, {}, session_for(profile)
       workspaces = JSON.parse(last_response.body)
@@ -53,28 +65,36 @@ describe API do
     it "returns scrapbook list matches parameter" do
       user, profile, entity = create_user_and_profile
       scrapbook = scrapbook_by(profile)
-      @tire_obj.index_store 'scrapbooks',({'type'=>'scrapbook'}.merge scrapbook)
-      query = scrapbook.fetch 'name'
+      scrapbook.sync
+      hash = scrapbook.attributes
+
+      [:updated_at, :created_at, :deleted_at].each do |timestamp|
+        hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
+      end
+      @tire_obj.index_store 'scrapbooks', hash
+      query = scrapbook.name
       uri = URI.escape "/autocomplete/scrapbooks?q=#{query}"
       # if call fetch in Tinto::Precenter::Collection#as_poro, it would fail
       get uri, {}, session_for(profile)
       scrapbooks = JSON.parse(last_response.body)
 
-      scrapbooks.first.fetch("name")
+      scrapbooks.first.fetch("name").must_equal scrapbook.name
       last_response.status.must_equal 200
     end
   end
 
   def workspace_by(profile)
     name = Factory.random_string
-    post "/workspaces", { name: name }.to_json, session_for(profile)
-    JSON.parse(last_response.body)
+    workspace = Factory.workspace name: name, user_id: profile.user_id
+    #post "/workspaces", { name: name }.to_json, session_for(profile)
+    #JSON.parse(last_response.body)
   end
 
   def scrapbook_by(profile)
     name = Factory.random_string
-    post "/scrapbooks", { name: name }.to_json, session_for(profile)
-    JSON.parse(last_response.body)
+    scrapbook = Factory.scrapbook name: name, user_id: profile.user_id
+    #post "/scrapbooks", { name: name }.to_json, session_for(profile)
+    #JSON.parse(last_response.body)
   end
 
 

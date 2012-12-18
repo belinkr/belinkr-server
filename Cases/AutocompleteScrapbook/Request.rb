@@ -11,7 +11,7 @@ module Belinkr
       end
 
       def prepare
-        results = @searcher_service .autocomplete(
+        results = @searcher_service.autocomplete(
           @index_name, @payload.fetch('q'))
 
         list = []
