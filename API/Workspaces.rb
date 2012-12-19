@@ -125,7 +125,7 @@ module Belinkr
     end # get /workspaces/:workspace_id/invitations/:invitation_id
 
     post '/workspaces/:workspace_id/invitations' do
-      data        = InviteUserToWorkspace::Request new(request_data).prepare
+      data        = InviteUserToWorkspace::Request.new(request_data).prepare
       invitation  = data.fetch(:invitation)
 
       dispatch :create, invitation do

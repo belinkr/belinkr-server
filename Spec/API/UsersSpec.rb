@@ -41,10 +41,6 @@ describe API do
 
       json_user = JSON.parse(last_response.body)
       json_user['id'] .must_equal actor.id
-      #json_user['counters'].keys.must_include 'following'
-      #json_user['counters'].keys.must_include 'followers'
-      #json_user['counters'].keys.must_include 'statuses'
-      #json_user.keys.must_include 'relationship'
     end
   end # GET /users/:id
 
