@@ -117,6 +117,10 @@ module Belinkr
         "#{first} #{last}"
       end #ordered_name
 
+      def profile_for(entity)
+        profiles.find { |profile| profile.entity_id == entity.id }
+      end #profile
+
       private
 
       def password_matches?(plaintext)

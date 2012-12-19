@@ -7,9 +7,9 @@ module Belinkr
       include Tinto::Context
 
       def initialize(arguments)
-        @actor    = arguments.fetch(:actor)
-        @collection   = arguments.fetch(:collection)
-        @enforcer = arguments.fetch(:enforcer)
+        @actor      = arguments.fetch(:actor)
+        @collection = arguments.fetch(:collection)
+        @enforcer   = arguments.fetch(:enforcer)
       end
 
       def call

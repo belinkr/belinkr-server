@@ -5,7 +5,7 @@ require 'Tinto/Presenter'
 module Belinkr
   module User
     class Presenter
-      def initialize(user, actor=nil)
+      def initialize(user, actor=nil, actor_profile=nil)
         @user   = user
         @actor  = actor
       end #initialize
@@ -17,7 +17,10 @@ module Belinkr
       def as_poro
         {
           id:         user.id,
-          name:       user.name
+          name:       user.name,
+          first:      user.first,
+          last:       user.last,
+          #mobile:     user.profile.mobile
         }
           .merge! Tinto::Presenter.timestamps_for(user)
           .merge! Tinto::Presenter.errors_for(user)

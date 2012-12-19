@@ -1,6 +1,8 @@
 # encoding: utf-8
 require_relative '../../Resources/User/Collection'
 require_relative '../../Resources/User/Enforcer'
+require_relative '../../Resources/Profile/Collection'
+require_relative '../../Resources/Profile/Enforcer'
 require_relative '../../Resources/Scrapbook/Collection'
 require_relative '../../Resources/Scrapbook/Enforcer'
 require_relative '../../Resources/Status/Collection'
