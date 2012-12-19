@@ -10,6 +10,12 @@ require 'uri'
 include Belinkr
 $redis ||= Redis.new
 $redis.select 8
+module Belinkr
+  class API
+    use PryRescue::Rack
+  end
+end
+
 
 describe API do
   def app; API.new; end
@@ -22,9 +28,13 @@ describe API do
   end
 
   describe 'GET /autocomplete/users' do
+    before do
+      @tire_obj.index_delete 'users'
+    end
+
     it "returns user list matches parameter" do
-      user, profile, enity = create_user_and_profile
-      query = user.first 
+      user, profile, entity = create_user_and_profile
+      query = user.first[0..1]
       @tire_obj.index_store 'users', user.attributes
       
       uri = URI.escape "/autocomplete/users?q=#{query}"
@@ -33,16 +43,42 @@ describe API do
       users.first.fetch("name").must_equal user.name
       last_response.status.must_equal 200
     end
+
+    it "returns user in all entities" do
+      user, profile, entity = create_user_and_profile
+      user2, profile2, entity2 = create_user_and_profile
+      @tire_obj.index_store 'users', user.attributes
+      @tire_obj.index_store 'users', user2.attributes
+      uri = URI.escape "/autocomplete/users?q=*"
+      get uri, {}, session_for(profile)
+      users = JSON.parse(last_response.body)
+
+      users.size.must_equal 2
+      users.first.fetch("name").must_equal user.name
+
+      get uri, {}, session_for(profile2)
+      users = JSON.parse(last_response.body)
+      users.size.must_equal 2
+    end
   end
 
   describe "GET /autocomplete/workspaces" do
-    it "returns workspace list matches parameter" do
-      user, profile, entity = create_user_and_profile
-      workspace = workspace_by(profile)
+    before do
+      @tire_obj.index_delete 'workspaces'
+      @tire_obj.index_refresh 'workspaces'
+      @user, @profile, @entity = create_user_and_profile
+      @user2, @profile2, @entity2 = create_user_and_profile
+      @workspace = workspace_by(@profile)
+      @workspace2 = workspace_by(@profile2)
       #neeed to sync to redis db because in presenter, it will call fetch and
       #read it from redis db
-      workspace.sync
-      hash= workspace.attributes
+      @workspace.sync
+      @workspace2.sync
+
+    end
+
+    it "returns workspace list matches parameter" do
+      hash= @workspace.attributes
       # elastic default date parser not accept ruby's date format, it has
       # error:
       # MapperParsingException[failed to parse date field [2012-12-18 11:32:26
@@ -52,16 +88,43 @@ describe API do
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
       @tire_obj.index_store 'workspaces', hash
-      query = workspace.name
+      query = @workspace.name
       uri = URI.escape "/autocomplete/workspaces?q=#{query}"
-      get uri, {}, session_for(profile)
+      get uri, {}, session_for(@profile)
       workspaces = JSON.parse(last_response.body)
       workspaces.first.fetch("name")
       last_response.status.must_equal 200
     end
+    
+    it "only search the workspaces in the same entity" do
+      hash= @workspace.attributes
+      [:updated_at, :created_at, :deleted_at].each do |timestamp|
+        hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
+      end
+      @tire_obj.index_store 'workspaces', hash
+
+      hash= @workspace2.attributes
+      [:updated_at, :created_at, :deleted_at].each do |timestamp|
+        hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
+      end
+      @tire_obj.index_store 'workspaces', hash
+ 
+      query = @workspace.name
+      uri = URI.escape "/autocomplete/workspaces?q=*"
+      get uri, {}, session_for(@profile)
+      workspaces = JSON.parse(last_response.body)
+      workspaces.size.must_equal 1
+      workspaces.first.fetch("name")
+      last_response.status.must_equal 200
+      
+    end
   end
 
   describe "GET /autocomplete/scrapbooks" do
+    before do
+      @tire_obj.index_delete 'scrapbooks'
+      @tire_obj.index_refresh 'scrapbooks'
+    end
     it "returns scrapbook list matches parameter" do
       user, profile, entity = create_user_and_profile
       scrapbook = scrapbook_by(profile)
@@ -81,11 +144,37 @@ describe API do
       scrapbooks.first.fetch("name").must_equal scrapbook.name
       last_response.status.must_equal 200
     end
+    it "only return scrapbook belong to this user" do
+      user, profile, entity = create_user_and_profile
+      user2, profile2, entity2 = create_user_and_profile
+      scrapbook = scrapbook_by(profile)
+      scrapbook2 = scrapbook_by(profile2)
+      scrapbook.sync
+      scrapbook2.sync
+      hash = scrapbook.attributes
+      [:updated_at, :created_at, :deleted_at].each do |timestamp|
+        hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
+      end
+      @tire_obj.index_store 'scrapbooks', hash
+ 
+      hash = scrapbook2.attributes
+      [:updated_at, :created_at, :deleted_at].each do |timestamp|
+        hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
+      end
+      @tire_obj.index_store 'scrapbooks', hash
+
+      uri = URI.escape "/autocomplete/scrapbooks?q=*"
+      # if call fetch in Tinto::Precenter::Collection#as_poro, it would fail
+      get uri, {}, session_for(profile)
+      scrapbooks = JSON.parse(last_response.body)
+      scrapbooks.size.must_equal 1
+
+    end
   end
 
   def workspace_by(profile)
     name = Factory.random_string
-    workspace = Factory.workspace name: name, user_id: profile.user_id
+    workspace = Factory.workspace name: name, user_id: profile.user_id, entity_id: profile.entity_id
     #post "/workspaces", { name: name }.to_json, session_for(profile)
     #JSON.parse(last_response.body)
   end

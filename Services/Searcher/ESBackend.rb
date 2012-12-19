@@ -18,8 +18,8 @@ module Belinkr
         index_store(index_name, typed_hash)
       end
 
-      def autocomplete(index_name, chars)
-        result_items = index_search(index_name, chars)
+      def autocomplete(index_name, chars, filter_hash=nil)
+        result_items = index_search(index_name, chars, filter_hash)
         transform_output result_items
 
       end

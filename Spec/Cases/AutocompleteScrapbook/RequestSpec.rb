@@ -19,12 +19,12 @@ describe "searcher request model" do
 
     searcher = Searcher.new Searcher::MemoryBackend.new "scrapbooks"
 
-    searcher.store('scrapbooks:1', {id:1,name:"Jack Web"})
-    searcher.store('scrapbooks:2', {id:2,name:"Tom Rad"})
-    searcher.store('scrapbooks:3', {id:3,name:"Jerry Feb"})
+    searcher.store('scrapbooks:1', {id:1, user_id:1,name:"Jack Web"})
+    searcher.store('scrapbooks:2', {id:2, user_id:1,name:"Tom Rad"})
+    searcher.store('scrapbooks:3', {id:3, user_id:1,name:"Jerry Feb"})
 
     request = AutocompleteScrapbook::Request.new(
-      payload, searcher, "scrapbooks")
+      payload, 1, searcher, "scrapbooks")
     data = request.prepare 
 
     data.fetch(:scrapbooks).size.must_equal 2

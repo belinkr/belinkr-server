@@ -11,7 +11,7 @@ module Belinkr
 
       end
 
-      def autocomplete(index_name, chars)
+      def autocomplete(index_name, chars, filter_hash=nil)
         keys = $redis.keys index_name + ':*'
         results ={}
         keys.each do |key|

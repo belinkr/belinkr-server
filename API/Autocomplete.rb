@@ -23,7 +23,7 @@ module Belinkr
       searcher = Searcher.new Searcher::ESBackend.new "workspaces"
       # for ES backend
       request = AutocompleteWorkspace::Request.new(
-        params, searcher, "workspaces")
+        params, current_session.entity_id, searcher, "workspaces")
       # for Redis Backend
       #request = AutocompleteWorkspace::Request.new(
       #  params, searcher, "entities:#{current_entity.id}:workspaces")
@@ -42,7 +42,7 @@ module Belinkr
 
       # for ES Backend
       request = AutocompleteScrapbook::Request.new(
-        params, searcher, "scrapbooks")
+        params, current_user.id, searcher, "scrapbooks")
       dispatch :collection do
         request.prepare.fetch(:scrapbooks)
       end

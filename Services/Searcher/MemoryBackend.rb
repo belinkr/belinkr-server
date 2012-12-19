@@ -17,7 +17,7 @@ module Belinkr
         @storage.fetch(@index_name).store(key,value)
       end
 
-      def autocomplete(index_name, chars)
+      def autocomplete(index_name, chars, filter_hash=nil)
         @storage.fetch(@index_name).select do |k,v|
           v.fetch(:name).match chars
         end
