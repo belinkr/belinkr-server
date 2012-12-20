@@ -7,9 +7,9 @@ module Belinkr
     class Presenter
       BASE_PATH = '/scrapbooks'
 
-      def initialize(scrapbook, actor)
+      def initialize(scrapbook, scope={})
         @scrapbook  = scrapbook
-        @actor      = actor
+        @actor      = scope.fetch(:actor)
       end #initialize
 
       def as_poro

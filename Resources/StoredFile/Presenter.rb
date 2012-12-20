@@ -6,9 +6,8 @@ module Belinkr
     class Presenter
       BASE_PATH = "/files"
 
-      def initialize(stored_file, actor=nil)
+      def initialize(stored_file, scope={})
         @stored_file  = stored_file
-        @actor        = actor
       end #initialize
 
       def as_json
@@ -27,12 +26,11 @@ module Belinkr
 
       private
 
-      attr_accessor :stored_file, :actor
+      attr_accessor :stored_file
 
       def links
         {
-          links: {
-            self:  "#{BASE_PATH}/#{stored_file.id}"
+          links: { self:  "#{BASE_PATH}/#{stored_file.id}"
           }.merge!(thumbnail_links)
         }
       end #links

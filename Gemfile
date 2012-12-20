@@ -8,7 +8,7 @@ group :production do
   gem 'bcrypt-ruby'
   gem 'rack' 
   gem 'sinatra', require: 'sinatra/base' 
-  gem 'virtus' 
+  gem 'virtus', '0.5.4'
   gem 'aequitas' 
   gem 'statemachine'
   gem 'redis' 
@@ -17,7 +17,7 @@ group :production do
   gem 'mini_magick'
   gem 'pony'
   gem 'sanitize'
-  gem 'tinto'
+  gem 'tinto', '3.0.3'
   gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
   gem 'tire'
 end

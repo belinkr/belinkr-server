@@ -1,13 +1,14 @@
 # encoding: utf-8
 require 'json'
+require 'ostruct'
 require 'Tinto/Presenter'
 
 module Belinkr
   module User
     class Presenter
-      def initialize(user, actor=nil, actor_profile=nil)
+      def initialize(user, scope={})
         @user   = user
-        @actor  = actor
+        @entity = scope.fetch(:entity)
       end #initialize
 
       def as_json
@@ -20,7 +21,7 @@ module Belinkr
           name:       user.name,
           first:      user.first,
           last:       user.last,
-          #mobile:     user.profile.mobile
+          mobile:     profile.mobile
         }
           .merge! Tinto::Presenter.timestamps_for(user)
           .merge! Tinto::Presenter.errors_for(user)
@@ -28,7 +29,11 @@ module Belinkr
 
       private
       
-      attr_reader :user, :actor
+      attr_reader :user, :entity
+
+      def profile
+        @profile ||= user.profile_for(entity).fetch
+      end #profile
     end # Presenter
   end # User
 end # Belinkr

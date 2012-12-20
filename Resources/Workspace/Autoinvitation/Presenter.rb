@@ -6,9 +6,8 @@ module Belinkr
   module Workspace
     module Autoinvitation
       class Presenter
-        def initialize(autoinvitation, actor=nil)
+        def initialize(autoinvitation, scope={})
           @autoinvitation = autoinvitation
-          @actor          = actor
         end #initialize
 
         def as_json
@@ -17,9 +16,9 @@ module Belinkr
 
         def as_poro
           {
-            id:                 autoinvitation.id,
-            state:              autoinvitation.state,
-            rejected_at:        autoinvitation.rejected_at
+            id:           autoinvitation.id,
+            state:        autoinvitation.state,
+            rejected_at:  autoinvitation.rejected_at
           }
            .merge! Tinto::Presenter.timestamps_for(autoinvitation)
            .merge! Tinto::Presenter.errors_for(autoinvitation)
@@ -27,7 +26,7 @@ module Belinkr
 
         private
 
-        attr_reader :autoinvitation, :actor
+        attr_reader :autoinvitation
       end # Presenter
     end # Autoinvitation
   end # Workspace

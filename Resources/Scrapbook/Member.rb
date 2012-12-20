@@ -27,7 +27,7 @@ module Belinkr
       def_delegators :@member,    *Tinto::Member::INTERFACE
 
       def initialize(attributes={})
-        super attributes
+        self.attributes = attributes
         @member = Tinto::Member.new self
       end
 

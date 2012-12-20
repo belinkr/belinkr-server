@@ -7,9 +7,8 @@ module Belinkr
     class Presenter
       BASE_PATH = '/resets'
 
-      def initialize(resource, actor=nil)
+      def initialize(resource, scope={})
         @resource = resource
-        @actor    = @actor
       end #initialize
 
       def as_json
@@ -27,3 +26,4 @@ module Belinkr
     end # Presenter
   end # Reset
 end # Belinkr
+

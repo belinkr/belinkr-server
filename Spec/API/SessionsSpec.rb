@@ -77,6 +77,7 @@ describe API do
         .wont_be_nil
 
       delete '/sessions/1'
+
       last_response.status.must_equal 204
       last_response.body.must_be_empty
 
@@ -130,7 +131,7 @@ describe API do
   end
 
   def create_account
-    entity    = Factory.entity
+    entity    = Factory.entity.sync
     user      = Factory.user(password: 'test')
     profile   = Factory.profile
     profiles  = Profile::Collection.new(entity_id: entity.id)

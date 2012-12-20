@@ -68,7 +68,6 @@ describe API do
       last_response.status.must_equal 204
 
       get "/users/#{actor.id}", {}, session_for(profile)
-      dump
       last_response.status.must_equal 404
     end
   end # DELETE /users/:id

@@ -5,9 +5,8 @@ require 'Tinto/Presenter'
 module Belinkr
   module Workspace
     class Presenter
-      def initialize(workspace, actor=nil)
+      def initialize(workspace, scope={})
         @workspace  = workspace
-        @actor      = actor
       end #initialize
 
       def as_json
@@ -28,7 +27,7 @@ module Belinkr
 
       private
 
-      attr_reader :actor, :workspace
+      attr_reader :workspace
 
       def counters
         { 

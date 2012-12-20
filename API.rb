@@ -17,8 +17,8 @@ require_relative './API/Followers'
 require_relative './API/Workspaces'
 require_relative './API/Scrapbooks'
 require_relative './API/Files'
-require_relative './API/Users'
-require_relative './API/Statuses'
+#require_relative './API/Users'
+#require_relative './API/Statuses'
 
 require_relative './Resources/Session/Member'
 require_relative './Resources/User/Member'
@@ -47,8 +47,12 @@ module Belinkr
 
     helpers do
       def dispatch(action, resource=nil, &block)
-        Tinto::Dispatcher.new(current_user, resource, &block).send(action)
+        Tinto::Dispatcher.new(resource, scope, &block).send(action)
       end
+
+      def scope
+        { actor:  current_user, entity: current_entity }
+      end #scope
 
       def payload
         return @payload = {} if request_body.empty?
@@ -64,8 +68,8 @@ module Belinkr
       end #combined_input
 
       def sanitize_params!
-        self.params = 
-          send(:indifferent_params, Tinto::Sanitizer.sanitize_hash(params))
+        params
+        #self.params = indifferent_params(Tinto::Sanitizer.sanitize_hash params)
       end
 
       def current_session

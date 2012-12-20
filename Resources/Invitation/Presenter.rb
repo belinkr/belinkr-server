@@ -7,7 +7,7 @@ module Belinkr
     class Presenter
       BASE_PATH = '/invitations'
 
-      def initialize(invitation, actor=nil)
+      def initialize(invitation, scope={})
         @invitation = invitation
       end #initialize
 

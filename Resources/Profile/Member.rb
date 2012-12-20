@@ -42,9 +42,9 @@ module Belinkr
 
       def_delegators :@member,      *Tinto::Member::INTERFACE
 
-      def initialize(attrs={})
-        super attrs
-        @member = Tinto::Member.new self
+      def initialize(attributes={})
+        self.attributes = attributes
+        @member         = Tinto::Member.new self
       end #initialize
 
       def storage_key
@@ -61,27 +61,27 @@ module Belinkr
       end #link_to
 
       def increment_followers_counter
-        self.followers_counter = self.followers_counter + 1
+        self.followers_counter += 1
       end #increment_followers_counter
 
       def decrement_followers_counter
-        self.followers_counter = self.followers_counter - 1
+        self.followers_counter -= 1
       end #decrement_followers_counter
 
       def increment_following_counter
-        self.following_counter = self.following_counter + 1
+        self.following_counter += 1
       end #increment_following_counter
 
       def decrement_following_counter
-        self.following_counter = self.following_counter - 1
+        self.following_counter -= 1
       end #decrement_following_counter
 
       def increment_status_counter
-        self.status_counter = self.status_counter + 1
+        self.status_counter += 1
       end #increment_status_counter
 
       def decrement_status_counter
-        self.status_counter = self.status_counter - 1
+        self.status_counter -= 1
       end #decrement_status_counter
     end # Member
   end # Profile

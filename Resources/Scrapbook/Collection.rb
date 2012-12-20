@@ -25,8 +25,8 @@ module Belinkr
       def_delegators :@set,       *Tinto::Set::INTERFACE
 
       def initialize(attributes={})
-        super attributes
-        @set = Tinto::Set.new self
+        self.attributes = attributes
+        @set            = Tinto::Set.new self
       end
 
       def instantiate_member(attributes={})

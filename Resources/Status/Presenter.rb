@@ -5,9 +5,8 @@ require 'Tinto/Presenter'
 module Belinkr
   module Status
     class Presenter
-      def initialize(status, actor=nil)
+      def initialize(status, scope={})
         @status = status
-        @actor  = actor
       end
 
       def as_json
@@ -18,19 +17,16 @@ module Belinkr
         {
           id:         status.id,
           text:       status.text,
+          files:      status.files
         }
          .merge! Tinto::Presenter.timestamps_for(status)
          .merge! Tinto::Presenter.errors_for(status)
-         .merge! files
       end #as_poro
 
       private
 
-      attr_reader :status, :actor
-
-      def files
-        { files: @status.files }
-      end
+      attr_reader :status
     end # Presenter
   end # Status
 end # Belinkr
+

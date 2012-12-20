@@ -7,9 +7,8 @@ module Belinkr
     class Presenter
       BASE_PATH = '/sessions'
 
-      def initialize(resource, actor=nil)
+      def initialize(resource, scope={})
         @resource = resource
-        @actor    = actor
       end #initialize
 
       def as_json
