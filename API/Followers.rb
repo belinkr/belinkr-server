@@ -1,8 +1,10 @@
 # encoding: utf-8
 require_relative '../API'
 require_relative '../Resources/User/Presenter'
+
 require_relative '../Cases/FollowUserInEntity/Context'
 require_relative '../Cases/FollowUserInEntity/Request'
+
 require_relative '../Cases/UnfollowUserInEntity/Context'
 require_relative '../Cases/UnfollowUserInEntity/Request'
 

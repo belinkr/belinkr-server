@@ -18,6 +18,8 @@ module Belinkr
       end #initialize
 
       def authorize(actor, action)
+        return true if action =~ /collection/
+
         raise NotAllowed unless is_in?(actor)
         raise NotAllowed if evil_collaborator?(actor, action)
         return true

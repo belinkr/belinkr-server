@@ -28,7 +28,7 @@ module Belinkr
 
       def initialize(attributes={})
         self.attributes = attributes
-        @member = Tinto::Member.new self
+        @member         = Tinto::Member.new self
       end
 
       def storage_key

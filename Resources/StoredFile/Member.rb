@@ -30,23 +30,23 @@ module Belinkr
         @descriptor     = descriptor
         @uploader       = uploader || Uploader.new(self)
         @member         = Tinto::Member.new self #, !@descriptor
-      end
+      end #initialize
 
       def sync
         uploader.store! @descriptor
         @member.sync
-      end
+      end #sync
 
       def delete
         uploader.retrieve_from_store!(id)
         uploader.remove!
         @member.delete
-      end
+      end #delete
 
       def path(version=nil)
         uploader.retrieve_from_store!(id)
         url_for(version)
-      end
+      end #path
 
       def url_for(version=nil)
         return uploader.url unless version

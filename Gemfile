@@ -17,7 +17,7 @@ group :production do
   gem 'mini_magick'
   gem 'pony'
   gem 'sanitize'
-  gem 'tinto', '3.0.3'
+  gem 'tinto'
   gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
   gem 'tire'
 end

@@ -1,8 +1,8 @@
 # encoding: utf-8
 require 'forwardable'
 require 'aequitas'
-require_relative './Member'
 require 'Tinto/Set'
+require_relative './Member'
 
 module Belinkr
   module Session
@@ -15,15 +15,15 @@ module Belinkr
 
       def initialize
         @set = Tinto::Set.new self
-      end
+      end #initialize
 
       def instantiate_member(attributes={})
         Member.new attributes
-      end
+      end #instantiate_member
 
       def storage_key
         'sessions'
-      end
+      end #storage_key
     end # Collection
   end # Session
 end # Belinkr

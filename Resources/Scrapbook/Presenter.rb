@@ -22,8 +22,8 @@ module Belinkr
           .merge! links
       end #as_poro
 
-      def as_json
-        as_poro.to_json
+      def as_json(*args)
+        as_poro.to_json(*args)
       end #as_json
      
       private
@@ -33,9 +33,8 @@ module Belinkr
       def links
         {
           _links: {
-            self:   "#{BASE_PATH}/#{scrapbook.id}",
-            user:   "/users/#{actor.id}",
-            scraps: "#{BASE_PATH}/#{scrapbook.id}/scraps"
+            self:   "/scrapbooks/#{scrapbook.id}",
+            user:   "/users/#{actor.id}"
           }
         }
       end #links

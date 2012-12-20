@@ -13,7 +13,7 @@ module Belinkr
       def authorize(actor, action)
         return true if action =~ /collection/
 
-        raise NotFound    if user.deleted_at || !has_profile_in_current_entity?
+        raise NotFound    if user.deleted? || !has_profile_in_current_entity?
         raise NotAllowed  if action =~ /update/ && user.id != actor.id
         return true
       end #authorize

@@ -24,7 +24,7 @@ module Belinkr
 
       def initialize(attributes={})
         self.attributes = attributes
-        @set = Tinto::Set.new self
+        @set            = Tinto::Set.new self
       end #initialize
 
       def instantiate_member(attributes={})

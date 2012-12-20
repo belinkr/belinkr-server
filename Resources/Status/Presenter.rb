@@ -9,8 +9,8 @@ module Belinkr
         @status = status
       end
 
-      def as_json
-        as_poro.to_json
+      def as_json(*args)
+        as_poro.to_json(*args)
       end
 
       def as_poro

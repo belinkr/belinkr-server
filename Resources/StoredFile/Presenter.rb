@@ -4,14 +4,12 @@ require 'json'
 module Belinkr
   module StoredFile
     class Presenter
-      BASE_PATH = "/files"
-
       def initialize(stored_file, scope={})
         @stored_file  = stored_file
       end #initialize
 
-      def as_json
-        as_poro.to_json
+      def as_json(*args)
+        as_poro.to_json(*args)
       end #as_json
 
       def as_poro
@@ -30,16 +28,15 @@ module Belinkr
 
       def links
         {
-          links: { self:  "#{BASE_PATH}/#{stored_file.id}"
-          }.merge!(thumbnail_links)
+          _links: { self:  "/files/#{stored_file.id}" }.merge!(thumbnail_links)
         }
       end #links
 
       def thumbnail_links
         return {} unless stored_file.image?
         return {
-          mini:   "#{BASE_PATH}/#{stored_file.id}?version=mini&inline=true",
-          small:  "#{BASE_PATH}/#{stored_file.id}?version=small&inline=true"
+          mini:   "#/files/#{stored_file.id}?version=mini&inline=true",
+          small:  "#/files/#{stored_file.id}?version=small&inline=true"
         }
       end #thumbnail_links
     end # Presenter

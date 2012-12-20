@@ -5,14 +5,12 @@ require 'Tinto/Presenter'
 module Belinkr
   module Invitation
     class Presenter
-      BASE_PATH = '/invitations'
-
       def initialize(invitation, scope={})
         @invitation = invitation
       end #initialize
 
-      def as_json
-        as_poro.to_json
+      def as_json(*args)
+        as_poro.to_json(*args)
       end #as_json
 
       def as_poro
@@ -31,10 +29,11 @@ module Belinkr
       attr_reader :invitation
 
       def links
-        invitation_base_path = "#{BASE_PATH}/#{invitation.id}"
-        {
+        invitation_base_path = "/invitations/#{invitation.id}"
+        { _links: {
             self:       invitation_base_path,
             inviter:    "/users/#{invitation.inviter_id}"
+          }
         }
       end #links
     end # Presenter

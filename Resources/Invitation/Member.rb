@@ -40,7 +40,7 @@ module Belinkr
 
       def initialize(attributes={})
         self.attributes = attributes
-        @member  = Tinto::Member.new self
+        @member         = Tinto::Member.new self
 
         @fsm = Statemachine.build do
           state :pending

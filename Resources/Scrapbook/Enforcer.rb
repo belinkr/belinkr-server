@@ -11,18 +11,16 @@ module Belinkr
       end #scrapbook
 
       def authorize(actor, action)
-        raise_if_deleted_resource
-        raise unless actor.id == scrapbook.user_id
+        return true if action =~ /collection/
+
+        raise NotFound    if scrapbook.deleted?
+        raise NotAllowed  unless actor.id == scrapbook.user_id
         return true
       end #authorize
 
       private
 
       attr_reader :scrapbook
-
-      def raise_if_deleted_resource
-        raise NotFound if scrapbook.respond_to?(:deleted_at) && scrapbook.deleted_at
-      end #raise_if_deleted_resource
     end # Enforcer
   end # Scrapbook
 end # Belinkr

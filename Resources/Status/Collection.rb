@@ -26,18 +26,18 @@ module Belinkr
       def_delegators :@zset,    *Tinto::SortedSet::INTERFACE
 
       def initialize(attributes={})
-        super attributes
-        @zset = Tinto::SortedSet.new self
-      end
+        self.attributes = attributes
+        @zset           = Tinto::SortedSet.new self
+      end #initialize
 
       def instantiate_member(attributes={})
         Member.new attributes.merge!(scope: scope.resource)
-      end
+      end #instantiate_member
 
       def storage_key
         return unless scope
         "#{scope.storage_key}:#{scope.id}:timelines:#{kind}"
-      end
+      end #storage_key
     end # Collection
   end # Status
 end # Belinkr
