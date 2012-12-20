@@ -18,8 +18,8 @@ module Belinkr
 
       attribute :id,                String
       attribute :text,              String
-      attribute :author,            Polymorphic
-      attribute :forwarder,         Polymorphic
+      attribute :author,            Polymorphic # User::Member?
+      attribute :forwarder,         Polymorphic # User::Member?
       attribute :scope,             Polymorphic
       attribute :files,             Array, default: []
       #attribute :replies,           Array[Reply::Member], default: []

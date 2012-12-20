@@ -28,6 +28,7 @@ module Belinkr
     put '/invitations/:invitation_id' do
       data  = AcceptInvitationAndJoin::Request.new(request_data).prepare
       actor = data.fetch(:actor)
+      @current_entity = data.fetch(:entity)
 
       dispatch :update, actor do
         AcceptInvitationAndJoin::Context.new(data).run

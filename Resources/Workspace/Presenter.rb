@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'json'
 require 'Tinto/Presenter'
+require_relative '../../Services/Tracker'
 
 module Belinkr
   module Workspace
@@ -32,8 +33,10 @@ module Belinkr
       def counters
         { 
           counters: {
-            users:    workspace.user_counter,
-            statuses: workspace.status_counter
+            users:          workspace.user_counter,
+            collaborators:  collaborators_counter,
+            administrators: administrators_counter,
+            statuses:       workspace.status_counter
           }
         }
       end #counters
@@ -41,6 +44,14 @@ module Belinkr
       def links
         { _links: { } }
       end #links
+
+      def collaborators_counter
+        Tracker.new.users_for(workspace, :collaborator).size
+      end #collaborators_counter
+
+      def administrators_counter
+        Tracker.new.users_for(workspace, :administrator).size
+      end #administrators_counter
     end # Presenter
   end # Workspace
 end # Belinkr

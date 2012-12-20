@@ -27,7 +27,7 @@ describe API do
 
   describe 'POST /sessions' do
     it 'authenticates the user and creates a new session' do
-      user, password = create_account
+      user, profile, password = create_account
       post '/sessions', { email: user.email, password: password }.to_json
       last_response.status.must_equal 201
 
@@ -38,7 +38,7 @@ describe API do
     end
 
     it 'stores the session token in a persistent cookie if "remember" option' do
-      user, password = create_account
+      user, profile, password = create_account
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
         .must_be_nil
       post '/sessions', 
@@ -52,7 +52,7 @@ describe API do
     end
 
     it 'sets a non-persistent cookie marking the user-agent as "logged in"' do
-      user, password = create_account
+      user, profile, password = create_account
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
         .must_be_nil
       post '/sessions', 
@@ -68,7 +68,7 @@ describe API do
 
   describe 'DELETE /sessions/:id' do
     it 'clears the session' do
-      user, password = create_account
+      user, profile, password = create_account
 
       post '/sessions', { email: user.email, password: password }.to_json
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
@@ -76,7 +76,7 @@ describe API do
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
         .wont_be_nil
 
-      delete '/sessions/1'
+      delete '/sessions/1', {}, session_for(profile)
 
       last_response.status.must_equal 204
       last_response.body.must_be_empty
@@ -86,14 +86,14 @@ describe API do
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
         .must_be_empty
 
-      user, password = create_account
+      user, profile, password = create_account
       post '/sessions', 
         { email: user.email, password: password, remember: true }.to_json
       
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
         .wont_be_nil
 
-      delete '/sessions/1'
+      delete '/sessions/1', {}.to_json, session_for(user.profiles.first)
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
         .must_be_empty
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
@@ -108,7 +108,7 @@ describe API do
 
   describe 'auth_token HTTP params' do
     it 'gets the auth_token from params for Flash uploads' do
-      user, password = create_account
+      user, profile, password = create_account
       post '/sessions', { email: user.email, password: password }.to_json
       token = rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
 
@@ -121,7 +121,7 @@ describe API do
 
   describe 'general settings in cookies' do
     it 'sets a cookie for the locale' do
-      user, password = create_account
+      user, profile, password = create_account
       rack_mock_session.cookie_jar[Belinkr::Config::LOCALE_COOKIE].must_be_nil
       post '/sessions', { email: user.email, password: password }.to_json
       rack_mock_session.cookie_jar[Belinkr::Config::LOCALE_COOKIE]
@@ -132,7 +132,7 @@ describe API do
 
   def create_account
     entity    = Factory.entity.sync
-    user      = Factory.user(password: 'test')
+    user      = Factory.user(password: 'test', profiles: [])
     profile   = Factory.profile
     profiles  = Profile::Collection.new(entity_id: entity.id)
     context   = CreateProfileInEntity::Context.new(
@@ -143,7 +143,7 @@ describe API do
                 )
     context.call
     context.sync
-    [user, 'test']
+    [user, profile, 'test']
   end
 
   def unregister_redis_session_extension

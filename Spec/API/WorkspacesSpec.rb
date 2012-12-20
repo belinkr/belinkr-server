@@ -74,11 +74,23 @@ describe API do
     end
 
     it 'returns the number of administrators in the workspace' do
-      skip
+      actor, profile, entity = create_user_and_profile
+      workspace = workspace_by(profile)
+      get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
+
+      last_response.status        .must_equal 200
+      json_workspace = JSON.parse(last_response.body)
+      json_workspace.fetch('counters').fetch('administrators').must_equal 1
     end
 
     it 'returns the number of collaborators in the workspace' do
-      skip
+      actor, profile, entity = create_user_and_profile
+      workspace = workspace_by(profile)
+      get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
+
+      last_response.status        .must_equal 200
+      json_workspace = JSON.parse(last_response.body)
+      json_workspace.fetch('counters').fetch('collaborators').must_equal 0
     end
   end # GET /workspaces/:workspace_id
 

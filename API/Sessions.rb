@@ -37,10 +37,10 @@ module Belinkr
       data        = LogOut::Request.new(payload: payload).prepare
       persisted_session = data.fetch(:session)
 
+      session[:auth_token] = nil
+
       dispatch :delete do
         LogOut::Context.new(data).run
-
-        session[:auth_token] = nil
 
         if request.cookies[Config::AUTH_TOKEN_COOKIE]
           response.delete_cookie Config::AUTH_TOKEN_COOKIE, path: '/'
@@ -55,3 +55,4 @@ module Belinkr
     end # DELETE /sessions/:id
   end # API
 end # Belinkr
+
