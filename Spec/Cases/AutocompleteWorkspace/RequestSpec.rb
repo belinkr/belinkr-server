@@ -19,12 +19,12 @@ describe "searcher request model" do
 
     searcher = Searcher.new Searcher::MemoryBackend.new "workspaces"
 
-    searcher.store('workspaces:1', {id:1,name:"Jack Web"})
-    searcher.store('workspaces:2', {id:2,name:"Tom Rad"})
-    searcher.store('workspaces:3', {id:3,name:"Jerry Feb"})
+    searcher.store('workspaces:1', {id:1,entity_id: 1, name:"Jack Web"})
+    searcher.store('workspaces:2', {id:2,entity_id: 1, name:"Tom Rad"})
+    searcher.store('workspaces:3', {id:3,entity_id: 1, name:"Jerry Feb"})
 
     request = AutocompleteWorkspace::Request.new(
-      payload, searcher, "workspaces")
+      payload, 1, searcher, "workspaces")
     data = request.prepare 
 
     data.fetch(:workspaces).size.must_equal 2
