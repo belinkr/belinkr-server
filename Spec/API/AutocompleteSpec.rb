@@ -30,6 +30,7 @@ describe API do
   describe 'GET /autocomplete/users' do
     before do
       @tire_obj.index_delete 'users'
+
     end
 
     it "returns user list matches parameter" do
@@ -70,6 +71,23 @@ describe API do
     before do
       @tire_obj.index_delete 'workspaces'
       @tire_obj.index_refresh 'workspaces'
+      workspaces_mapping_hash = {
+        workspace: {
+          properties: {
+            entity_id: {
+              type: 'string',
+              index: 'not_analyzed'
+            },
+            name: {
+              type: 'string'
+            }
+          }
+        }
+
+      }
+
+      @tire_obj.index_create 'workspaces', workspaces_mapping_hash
+
       @user, @profile, @entity = create_user_and_profile
       @user2, @profile2, @entity2 = create_user_and_profile
       @workspace = workspace_by(@profile)
@@ -128,6 +146,22 @@ describe API do
     before do
       @tire_obj.index_delete 'scrapbooks'
       @tire_obj.index_refresh 'scrapbooks'
+      scrapbooks_mapping_hash = {
+        scrapbook: {
+          properties: {
+            user_id: {
+              type: 'string',
+              index: 'not_analyzed'
+            },
+            name: {
+              type: 'string'
+            }
+          }
+        }
+
+      }
+
+      @tire_obj.index_create 'scrapbooks', scrapbooks_mapping_hash
     end
     it "returns scrapbook list matches parameter" do
       user, profile, entity = create_user_and_profile

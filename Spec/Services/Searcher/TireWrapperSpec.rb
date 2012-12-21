@@ -1,11 +1,39 @@
 require 'minitest/autorun'
+require 'tire'
+require_relative '../../Support/Helpers'
 require_relative '../../../Services/Searcher/TireWrapper'
 include Belinkr
 
 describe TireWrapper do
   before  do
     @backend = Object.new.extend TireWrapper
+    @backend.index_delete 'test_users'
     @backend.index_create 'test_users'
+  end
+
+  describe "#index_create" do
+    it "set mapping if given a mapping_hash" do
+      @backend.index_delete 'test_users2'
+      hash = {
+        user: {
+          properties: {
+            id: {
+              type: 'string',
+              index: 'not_analyzed'
+            },
+            name: {
+              type: 'string'
+            }
+          }
+        }
+
+      }
+
+      @backend.index_create 'test_users2', hash
+      index = Tire.index 'test_users2'
+      index.mapping['user']["properties"]["id"]["index"]
+        .must_equal "not_analyzed"
+    end
   end
 
   describe "#index_store #index_search" do
