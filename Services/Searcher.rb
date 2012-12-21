@@ -17,8 +17,8 @@ module Belinkr
       @backlog          = []
     end #initialize
 
-    def autocomplete(index, chars)
-      @backend.autocomplete(index, chars)
+    def autocomplete(index, chars, filter_hash = nil)
+      @backend.autocomplete(index, chars, filter_hash)
     end
 
   end # Searcher

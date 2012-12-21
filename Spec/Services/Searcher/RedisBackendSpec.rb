@@ -5,6 +5,7 @@ include Belinkr
 describe Searcher::RedisBackend do
   $redis ||= Redis.new
   $redis.select 8
+  $redis.flushdb
   before  do
     @backend = Searcher::RedisBackend.new "users"
   end

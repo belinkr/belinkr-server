@@ -1,11 +1,15 @@
 # encoding: utf-8
+require 'pry'
+require 'pry-rescue'
+require 'pry-stack_explorer'
 require_relative '../Factories/User'
 require_relative '../Factories/Profile'
 require_relative '../Factories/Entity'
+require_relative '../Factories/Scrapbook'
+require_relative '../Factories/Workspace'
 require_relative '../../Resources/Session/Member'
 require_relative '../../Resources/Profile/Collection'
 require_relative '../../Cases/CreateProfileInEntity/Context'
-
 module Belinkr
   module Spec
     module API
