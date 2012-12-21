@@ -35,7 +35,7 @@ describe API do
     it "returns user list matches parameter" do
       user, profile, entity = create_user_and_profile
       query = user.first[0..1]
-      @tire_obj.index_store 'users', user.attributes
+      @tire_obj.index_store_with_type 'users', user.attributes
       
       uri = URI.escape "/autocomplete/users?q=#{query}"
       get uri, {}, session_for(profile)
@@ -47,14 +47,18 @@ describe API do
     it "returns user in all entities" do
       user, profile, entity = create_user_and_profile
       user2, profile2, entity2 = create_user_and_profile
-      @tire_obj.index_store 'users', user.attributes
-      @tire_obj.index_store 'users', user2.attributes
+      @tire_obj.index_store_with_type 'users', user.attributes
+      @tire_obj.index_store_with_type 'users', user2.attributes
       uri = URI.escape "/autocomplete/users?q=*"
       get uri, {}, session_for(profile)
       users = JSON.parse(last_response.body)
 
       users.size.must_equal 2
-      users.first.fetch("name").must_equal user.name
+      user_names = users.map do |user|
+        user.fetch("name")
+      end
+      user_names.must_include user.name
+      user_names.must_include user2.name
 
       get uri, {}, session_for(profile2)
       users = JSON.parse(last_response.body)
@@ -87,7 +91,7 @@ describe API do
       [:updated_at, :created_at, :deleted_at].each do |timestamp|
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
-      @tire_obj.index_store 'workspaces', hash
+      @tire_obj.index_store_with_type 'workspaces', hash
       query = @workspace.name
       uri = URI.escape "/autocomplete/workspaces?q=#{query}"
       get uri, {}, session_for(@profile)
@@ -101,13 +105,13 @@ describe API do
       [:updated_at, :created_at, :deleted_at].each do |timestamp|
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
-      @tire_obj.index_store 'workspaces', hash
+      @tire_obj.index_store_with_type 'workspaces', hash
 
       hash= @workspace2.attributes
       [:updated_at, :created_at, :deleted_at].each do |timestamp|
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
-      @tire_obj.index_store 'workspaces', hash
+      @tire_obj.index_store_with_type 'workspaces', hash
  
       query = @workspace.name
       uri = URI.escape "/autocomplete/workspaces?q=*"
@@ -134,7 +138,7 @@ describe API do
       [:updated_at, :created_at, :deleted_at].each do |timestamp|
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
-      @tire_obj.index_store 'scrapbooks', hash
+      @tire_obj.index_store_with_type 'scrapbooks', hash
       query = scrapbook.name
       uri = URI.escape "/autocomplete/scrapbooks?q=#{query}"
       # if call fetch in Tinto::Precenter::Collection#as_poro, it would fail
@@ -155,13 +159,13 @@ describe API do
       [:updated_at, :created_at, :deleted_at].each do |timestamp|
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
-      @tire_obj.index_store 'scrapbooks', hash
+      @tire_obj.index_store_with_type 'scrapbooks', hash
  
       hash = scrapbook2.attributes
       [:updated_at, :created_at, :deleted_at].each do |timestamp|
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
-      @tire_obj.index_store 'scrapbooks', hash
+      @tire_obj.index_store_with_type 'scrapbooks', hash
 
       uri = URI.escape "/autocomplete/scrapbooks?q=*"
       # if call fetch in Tinto::Precenter::Collection#as_poro, it would fail

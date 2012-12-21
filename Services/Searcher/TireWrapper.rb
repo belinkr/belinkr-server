@@ -1,4 +1,5 @@
 require 'tire'
+require 'active_support/inflector'
 module Belinkr
   module TireWrapper
     Tire.configure {wrapper Hash}
@@ -7,6 +8,11 @@ module Belinkr
         store hash
         refresh
       end
+    end
+    def index_store_with_type(name, hash)
+        type = hash[:type] || name.singularize
+        typed_hash = {:type => type}.merge hash
+        index_store(name, typed_hash)
     end
     def index_create(name)
       Tire::Index.new(name).create
