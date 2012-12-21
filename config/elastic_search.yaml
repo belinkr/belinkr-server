@@ -17,7 +17,11 @@ index_mapping:
   workspaces:
     mappings:
       workspace:
-
+        properties:
+          id:
+            type: "string"
+            index: "not_analyzed"
+ 
   scrapbooks:
     mappings:
       scrapbook:

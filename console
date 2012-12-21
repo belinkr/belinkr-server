@@ -18,14 +18,19 @@ require 'mini_magick'
 require 'pony'
 require 'sanitize'
 
-require_relative 'API'
+#require_relative 'API'
 #$redis = Redis.new host: "localhost", port: 6379
 
 %w{Resources Cases Services}.each do |dir|
   Dir.glob("#{dir}/**/*").each do |file|
-    puts file
     next if file.include? 'Workspace'
-    require_relative file if File.file? file
+    next if file.include? 'Undelete'
+    begin
+      puts file
+      require_relative file if File.file? file
+    rescue LoadError => e
+      puts e
+    end
   end
 end
 pry
