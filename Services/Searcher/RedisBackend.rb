@@ -11,10 +11,11 @@ module Belinkr
 
       end
 
-      def autocomplete(index_name, chars)
-        keys = $redis.keys index_name + '*'
+      def autocomplete(index_name, chars, filter_hash=nil)
+        keys = $redis.keys index_name + ':*'
         results ={}
         keys.each do |key|
+          next unless $redis.type(key) == 'string'
           value = JSON.parse $redis.get(key), :symbolize_names => true
           results[key]= value if value.fetch(:name).match chars
         end

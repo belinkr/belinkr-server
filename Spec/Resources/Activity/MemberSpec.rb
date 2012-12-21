@@ -10,14 +10,6 @@ include Belinkr
 
 describe Activity::Member do
   describe 'validations' do
-    describe 'entity_id' do
-      it "must be present" do
-        activity = Activity::Member.new
-        activity.valid?.must_equal false
-        activity.errors[:entity_id].must_include "entity must not be blank"
-      end
-    end #entity_id
-
     describe 'actor' do
       it 'must be present' do
         activity = Activity::Member.new

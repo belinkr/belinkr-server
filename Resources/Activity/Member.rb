@@ -28,8 +28,7 @@ module Belinkr
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
 
-
-      validates_presence_of       :entity_id, :actor, :action, :object, :scope
+      validates_presence_of       :actor, :action, :object
       validates_within            :action, set: ACTIONS
       validates_length_of         :description, max: 250
 
@@ -41,7 +40,7 @@ module Belinkr
       end #initialize
 
       def storage_key
-        "#{scope.storage_key}:activities"
+        "activities"
       end #storage_key
     end # Member
   end # Activity
