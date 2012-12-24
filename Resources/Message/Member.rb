@@ -14,7 +14,6 @@ module Belinkr
       include Aequitas
       include Tinto::Exceptions
 
-
       QUEUE_KEY       = 'sendmail'
       MODEL_NAME      = 'message'
       TEMPLATE_KINDS  = Config::MAILER_TEMPLATES.keys.map(&:to_s)
@@ -32,8 +31,8 @@ module Belinkr
       validates_within          :locale,   
                                   set: I18n.available_locales.map(&:to_s)
 
-      def initialize(*args)
-        super(*args)
+      def initialize(attributes={})
+        self.attributes = attributes
       end #initialize
 
       def prepare(method, *args)

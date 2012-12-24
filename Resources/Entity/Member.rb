@@ -25,17 +25,14 @@ module Belinkr
 
       def_delegators :@member,    *Tinto::Member::INTERFACE
 
-      def initialize(attrs={})
-        super attrs
-        @member = Tinto::Member.new self
-      end
+      def initialize(attributes={})
+        self.attributes = attributes
+        @member         = Tinto::Member.new self
+      end #initialize
 
       def storage_key
         'entities'
-      end
-
-      alias_method :search_index, :storage_key
-
+      end #storage_key
     end # Member
   end # Entity
 end # Belinkr

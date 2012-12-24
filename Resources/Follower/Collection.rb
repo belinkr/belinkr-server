@@ -23,17 +23,17 @@ module Belinkr
       def_delegators :@set,   *Tinto::Set::INTERFACE
 
       def initialize(attributes={})
-        super attributes
-        @set = Tinto::Set.new self
-      end
+        self.attributes = attributes
+        @set            = Tinto::Set.new self
+      end #initialize
 
       def instantiate_member(attributes={})
-        User::Member.new(attributes).fetch
-      end
+        User::Member.new(attributes)
+      end #instantiate_member
 
       def storage_key
         "entities:#{entity_id}:users:#{user_id}:followers"
-      end
+      end #storage_key
     end # Collection
   end # Follower
 end # Belinkr

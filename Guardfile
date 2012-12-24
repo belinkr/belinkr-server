@@ -1,5 +1,4 @@
 # encoding: utf-8
-gem 'tinto'
 
 group :unit do
   guard :minitest, test_folders: ["Spec"], 

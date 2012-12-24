@@ -26,8 +26,8 @@ describe 'autoinvite to workspace request model' do
                   }
 
     payload     = JSON.parse(payload.to_json)
-    request     = AutoinviteToWorkspace::Request.new(payload, actor, entity)
-    data        = request.prepare
+    arguments   = { payload: payload, actor: actor, entity: entity }
+    data        = AutoinviteToWorkspace::Request.new(arguments).prepare
 
     data.fetch(:actor).id                       .must_equal actor.id
     data.fetch(:workspace).id                   .must_equal workspace.id

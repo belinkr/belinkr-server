@@ -2,9 +2,9 @@
 require 'forwardable'
 require 'virtus'
 require 'aequitas'
-require_relative '../Polymorphic/Polymorphic'
 require 'Tinto/Member'
-#require_relative '../reply/collection'
+require_relative '../Polymorphic/Polymorphic'
+require_relative '../Reply/Member'
 
 module Belinkr
   module Status
@@ -20,9 +20,9 @@ module Belinkr
       attribute :text,              String
       attribute :author,            Polymorphic
       attribute :forwarder,         Polymorphic
-      attribute :context,           Polymorphic
-      attribute :files,             Array, default: []
-      #attribute :replies,           Array[Reply::Member], default: []
+      attribute :scope,             Polymorphic
+      attribute :files,             Set[String], default: Set.new
+      attribute :replies,           Set[Reply::Member]
       attribute :created_at,        Time 
       attribute :updated_at,        Time 
       attribute :deleted_at,        Time
@@ -34,16 +34,33 @@ module Belinkr
 
       def initialize(attributes={})
         self.attributes = attributes
-        @member = Tinto::Member.new self
-      end
+        @member         = Tinto::Member.new self
+      end #initialize
 
-      #def replies
-      #  Reply::Collection.new(super)
-      #end
+      def files?
+        !files.empty?
+      end #files?
+
+      def to_json(*args)
+        attributes.to_hash
+          .merge!( files: files.to_a, replies: replies.to_a)
+          .to_json
+      end #to_json
+
+      def scope=(new_scope)
+        return unless new_scope.respond_to? :storage_key
+
+        @base_storage_key = "#{new_scope.storage_key}:#{new_scope.id}"
+        super new_scope
+      end #scope=
 
       def storage_key
-        "#{context.storage_key}:#{context.id}:statuses"
-      end
+        "#{base_storage_key}:statuses"
+      end #storage_key
+
+      private
+      
+      attr_reader :base_storage_key
     end # Member
   end # Status
 end # Belinkr

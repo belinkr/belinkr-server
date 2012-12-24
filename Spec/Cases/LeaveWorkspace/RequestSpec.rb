@@ -20,7 +20,8 @@ describe 'request model for LeaveWorkspace' do
 
     payload     = { workspace_id: workspace.id }
     payload     = JSON.parse(payload.to_json)
-    data        = LeaveWorkspace::Request.new(payload, actor, entity).prepare
+    arguments   = { payload: payload, actor: actor, entity: entity }
+    data        = LeaveWorkspace::Request.new(arguments).prepare
 
     data.fetch(:actor)          .must_equal actor
     data.fetch(:workspace).id   .must_equal workspace.id

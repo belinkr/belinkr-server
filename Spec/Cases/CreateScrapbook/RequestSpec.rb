@@ -8,10 +8,9 @@ include Belinkr
 
 describe 'request model for CreateScrapbook' do
   it 'prepares data objects for the context' do
-    actor   = OpenStruct.new(id: 0)
-    payload = { }
-    payload = JSON.parse(payload.to_json)
-    data    = CreateScrapbook::Request.new(payload, actor).prepare
+    actor     = OpenStruct.new(id: 0)
+    arguments = { payload: {}, actor: actor }
+    data      = CreateScrapbook::Request.new(arguments).prepare
 
     data.fetch(:actor)        .must_equal actor
     data.fetch(:scrapbook)    .must_be_instance_of Scrapbook::Member

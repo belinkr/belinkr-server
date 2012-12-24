@@ -11,7 +11,8 @@ module Belinkr
       end #followed
 
       def authorize(actor, action)
-        #raise NotAllowed if actor.id == followed.id
+        return true if action =~ /collection/
+        raise NotAllowed if actor.id == followed.id
         return true
       end #authorize
 

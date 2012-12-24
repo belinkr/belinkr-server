@@ -6,13 +6,12 @@ module Belinkr
   module Workspace
     module Invitation
       class Presenter
-        def initialize(invitation, actor=nil)
+        def initialize(invitation, scope={})
           @invitation = invitation
-          @actor      = actor
         end #initialize
 
-        def as_json
-          as_poro.to_json
+        def as_json(*args)
+          as_poro.to_json(*args)
         end #as_json
 
         def as_poro
@@ -27,7 +26,7 @@ module Belinkr
 
         private
 
-        attr_reader :invitation, :actor
+        attr_reader :invitation
       end # Presenter
     end # Invitation
   end # Workspace

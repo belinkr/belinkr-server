@@ -29,9 +29,9 @@ describe 'accept autoinvitation to workspace request model' do
                         workspace_id:       workspace.id
                       }
     payload         = JSON.parse(payload.to_json)
-    request         = RejectAutoinvitationToWorkspace::Request
-                        .new(payload, actor, entity)
-    data            = request.prepare
+    arguments       = { payload: payload, actor: actor, entity: entity }
+    data            = RejectAutoinvitationToWorkspace::Request.new(arguments)
+                        .prepare
 
     data.fetch(:actor).id           .must_equal actor.id
     data.fetch(:workspace).id       .must_equal workspace.id

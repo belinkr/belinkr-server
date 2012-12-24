@@ -29,7 +29,7 @@ describe Status::Member do
       it 'is an Array' do
         status = Status::Member.new
         status.valid?.must_equal false
-        status.files.must_be_kind_of Array
+        status.files.must_be_kind_of Enumerable
         status.files.must_be_empty
       end
     end #files
@@ -67,10 +67,10 @@ describe Status::Member do
   end #forwarder
 
   describe '#replies' do
-    it 'returns a Reply::Collection' do
-      skip
+    it 'returns a set' do
       status = Status::Member.new
-      status.replies.class.must_equal Reply::Collection
+      status.replies.class.must_equal Set
     end
   end #replies
 end # Status::Member
+

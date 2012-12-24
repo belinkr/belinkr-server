@@ -11,13 +11,20 @@ module Belinkr
       end #user
 
       def authorize(actor, action)
-        raise NotAllowed unless user.id == actor.id
+        return true if action =~ /collection/
+
+        raise NotFound    if user.deleted? || !has_profile_in_current_entity?
+        raise NotAllowed  if action =~ /update/ && user.id != actor.id
         return true
       end #authorize
 
       private
 
       attr_reader :user
+
+      def has_profile_in_current_entity?
+        true #!!user.profile
+      end #has_profile_in_current_entity?
     end # Enforcer
   end # User
 end # Belinkr

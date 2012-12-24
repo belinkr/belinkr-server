@@ -79,7 +79,7 @@ module Belinkr
 
         def autoinvitation_for(workspace, user)
           Workspace::Autoinvitation::Member.new(
-            id:           $redis.get(autoinvitation_id_for workspace, user),
+            id:           autoinvitation_id_for(workspace, user),
             workspace_id: workspace.id,
             entity_id:    workspace.entity_id
           )
@@ -91,7 +91,7 @@ module Belinkr
 
         def invitation_for(workspace, user)
           Workspace::Invitation::Member.new(
-            id:           $redis.get(invitation_id_for workspace, user),
+            id:           invitation_id_for(workspace, user),
             workspace_id: workspace.id,
             entity_id:    workspace.entity_id
           )
@@ -108,13 +108,15 @@ module Belinkr
         end #untrack_relationship
 
         def invitation_id_for(workspace, user)
-          relationship, id = $redis.get relationship_key_for(workspace, user)
+          relationship      = relationship_for(workspace, user)
+          relationship, id  = relationship.split(':') if relationship
           raise InvalidResource unless relationship == 'invitation'
           id
         end #invitation_id_for
 
         def autoinvitation_id_for(workspace, user)
-          relationship, id = $redis.get relationship_key_for(workspace, user)
+          relationship      = relationship_for(workspace, user)
+          relationship, id  = relationship.split(':') if relationship
           raise InvalidResource unless relationship == 'autoinvitation'
           id
         end #autoinvitation_id_for

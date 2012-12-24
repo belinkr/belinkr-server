@@ -40,6 +40,7 @@ describe API do
 
       invitation = JSON.parse(last_response.body)
       get "/invitations/#{invitation.fetch('id')}"
+
       last_response.status.must_equal 200
     end
   end # GET /invitations/:invitation_id

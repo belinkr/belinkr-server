@@ -8,13 +8,11 @@ include Belinkr
 
 describe 'request model for InvitePersonToBelinkr' do
   it 'prepares data objects for the context' do
-    actor   = OpenStruct.new(id: 1)
-    entity  = OpenStruct.new(id: 2)
-
-    payload = {}
-    payload = JSON.parse(payload.to_json)
-    data    = InvitePersonToBelinkr::Request
-                .new(payload, actor, entity).prepare
+    actor     = OpenStruct.new(id: 1)
+    entity    = OpenStruct.new(id: 2)
+    payload   = JSON.parse({}.to_json)
+    arguments = { payload: payload, entity: entity, actor: actor}
+    data      = InvitePersonToBelinkr::Request.new(arguments).prepare
     
     data.fetch(:actor).id               .must_equal actor.id
     data.fetch(:entity).id              .must_equal entity.id

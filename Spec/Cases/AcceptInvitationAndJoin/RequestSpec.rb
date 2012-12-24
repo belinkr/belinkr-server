@@ -15,9 +15,9 @@ describe 'request model for AcceptInvitationAndJoin' do
     entity      = Factory.entity.sync
     invitation  = Factory.invitation(entity_id: entity.id).sync
 
-    payload = { invitation_id: invitation.id }
-    payload = JSON.parse(payload.to_json)
-    data    = AcceptInvitationAndJoin::Request.new(payload).prepare
+    payload   = { invitation_id: invitation.id }
+    arguments = { payload: JSON.parse(payload.to_json) }
+    data      = AcceptInvitationAndJoin::Request.new(arguments).prepare
 
     data.fetch(:actor)          .must_be_instance_of User::Member
     data.fetch(:invitation).id  .must_equal invitation.id

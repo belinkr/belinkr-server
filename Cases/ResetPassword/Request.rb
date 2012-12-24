@@ -6,8 +6,8 @@ require_relative '../../Resources/Reset/Collection'
 module Belinkr
   module ResetPassword
     class Request
-      def initialize(payload)
-        @payload = payload
+      def initialize(arguments)
+        @payload = arguments.fetch(:payload)
       end #initialize
 
       def prepare

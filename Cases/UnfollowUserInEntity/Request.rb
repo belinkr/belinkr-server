@@ -8,11 +8,11 @@ require_relative '../../Resources/Following/Collection'
 module Belinkr
   module UnfollowUserInEntity
     class Request
-      def initialize(payload, actor, actor_profile, entity)
-        @payload        = payload
-        @actor          = actor
-        @actor_profile  = actor_profile
-        @entity         = entity
+      def initialize(arguments)
+        @payload        = arguments.fetch(:payload)
+        @actor          = arguments.fetch(:actor)
+        @actor_profile  = arguments.fetch(:actor_profile)
+        @entity         = arguments.fetch(:entity)
       end #initialize
 
       def prepare
@@ -30,7 +30,7 @@ module Belinkr
 
       private
 
-      attr_accessor :payload, :actor, :actor_profile, :entity
+      attr_reader :payload, :actor, :actor_profile, :entity
 
       def enforcer
         Follower::Enforcer.new(followed)

@@ -30,8 +30,8 @@ module Belinkr
       def_delegators :@member,    *Tinto::Member::INTERFACE
 
       def initialize(attributes={})
-        super attributes
-        @member = Tinto::Member.new self
+        self.attributes = attributes
+        @member         = Tinto::Member.new self
       end
 
       def storage_key
@@ -44,19 +44,19 @@ module Belinkr
       end #link_to
 
       def increment_user_counter
-        self.user_counter = user_counter + 1
+        self.user_counter += 1
       end #increment_user_counter
 
       def decrement_user_counter
-        self.user_counter = user_counter - 1
+        self.user_counter -= 1
       end #decrement_user_counter
 
       def increment_status_counter
-        self.status_counter = status_counter + 1
+        self.status_counter += 1
       end #increment_status_counter
 
       def decrement_status_counter
-        self.status_counter = status_counter - 1
+        self.status_counter -= 1
       end #decrement_status_counter
     end # Member
   end # Workspace

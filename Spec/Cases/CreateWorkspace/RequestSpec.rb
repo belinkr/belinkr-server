@@ -7,12 +7,10 @@ include Belinkr
 
 describe 'request model for create workspace' do
   it 'returns data objects for the CreateWorkspace context' do
-    entity  = OpenStruct.new(id: 0)
-    actor   = OpenStruct.new(id: 1)
-    payload = {}
-
-    payload   = JSON.parse(payload.to_json)
-    data      = CreateWorkspace::Request.new(payload, actor, entity).prepare
+    entity    = OpenStruct.new(id: 0)
+    actor     = OpenStruct.new(id: 1)
+    arguments = { payload: {}, actor: actor, entity: entity }
+    data      = CreateWorkspace::Request.new(arguments).prepare
 
     data.fetch(:actor)      .must_equal actor
     data.fetch(:entity)     .must_equal entity

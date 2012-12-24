@@ -11,7 +11,10 @@ module Belinkr
       end #scrapbook
 
       def authorize(actor, action)
-        raise unless actor.id == scrapbook.user_id
+        return true if action =~ /collection/
+
+        raise NotFound    if scrapbook.deleted?
+        raise NotAllowed  unless actor.id == scrapbook.user_id
         return true
       end #authorize
 

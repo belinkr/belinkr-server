@@ -2,8 +2,8 @@
 require 'forwardable'
 require 'virtus'
 require 'aequitas'
-require_relative './Member'
 require 'Tinto/SortedSet'
+require_relative './Member'
 
 module Belinkr
   module Activity
@@ -20,18 +20,18 @@ module Belinkr
 
       def_delegators :@zset,  *Tinto::SortedSet::INTERFACE
 
-      def initialize(*args)
-        super *args
-        @zset = Tinto::SortedSet.new self
-      end
+      def initialize(attributes={})
+        self.attributes = attributes
+        @zset           = Tinto::SortedSet.new self
+      end #initialize
 
       def instantiate_member(attributes={})
         Member.new attributes.merge(entity_id: entity_id)
-      end
+      end #instantiate_member
 
       def storage_key
         "entities:#{entity_id}:activities"
-      end
+      end #storage_key
     end # Collection
   end # Activity
 end # Belinkr

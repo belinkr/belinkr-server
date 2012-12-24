@@ -24,7 +24,7 @@ describe 'request model for ResetPassword' do
 
     payload = { reset_id: reset.id, password: 'changeme' }
     payload = JSON.parse(payload.to_json)
-    data    = ResetPassword::Request.new(payload).prepare
+    data    = ResetPassword::Request.new(payload: payload).prepare
     
     data.fetch(:actor).id .must_equal user.id
     data.fetch(:reset).id .must_equal reset.id

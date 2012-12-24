@@ -2,8 +2,8 @@
 require 'forwardable'
 require 'virtus'
 require 'aequitas'
-require_relative '../../Config'
 require 'Tinto/Member'
+require_relative '../../Config'
 require_relative '../Polymorphic/Polymorphic'
 
 module Belinkr
@@ -18,32 +18,30 @@ module Belinkr
                     Config::ACTIVITY_ACTIONS_EXTENSIONS
                     
       attribute :id,              String
-      attribute :entity_id,       String
-      attribute :actor,           Polymorphic
       attribute :action,          String
+      attribute :description,     String
+      attribute :actor,           Polymorphic
       attribute :object,          Polymorphic
       attribute :target,          Polymorphic
-      attribute :clue,            Polymorphic
-      attribute :description,     String
+      attribute :scope,           Polymorphic
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
 
-
-      validates_presence_of       :id, :entity_id, :actor, :action, :object
+      validates_presence_of       :actor, :action, :object
       validates_within            :action, set: ACTIONS
       validates_length_of         :description, max: 250
 
       def_delegators :@member,    *Tinto::Member::INTERFACE
 
-      def initialize(attrs={})
-        super attrs
-        @member = Tinto::Member.new self
-      end
+      def initialize(attributes={})
+        self.attributes = attributes
+        @member         = Tinto::Member.new self
+      end #initialize
 
       def storage_key
-        "entities:#{entity_id}:activities"
-      end
+        "activities"
+      end #storage_key
     end # Member
   end # Activity
 end # Belinkr

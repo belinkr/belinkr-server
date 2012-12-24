@@ -32,8 +32,8 @@ module Belinkr
         def_delegators  :@member,   *Tinto::Member::INTERFACE
 
         def initialize(attributes={})
-          super attributes
-          @member = Tinto::Member.new self
+          self.attributes = attributes
+          @member         = Tinto::Member.new self
 
           @state_machine = Statemachine.build do
             state :pending

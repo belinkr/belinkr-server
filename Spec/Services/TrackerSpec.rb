@@ -26,9 +26,10 @@ describe 'tracker' do
 
       @tracker.track_administrator(workspace, user)
 
-      @tracker.users_for(workspace, kind)         .must_include user
-      @tracker.workspaces_for(entity, user, kind) .must_include workspace
-      @tracker.relationship_for(workspace, user)  .must_equal 'administrator'
+      @tracker.users_for(workspace, kind)           .must_include user
+      @tracker.workspaces_for(entity, user, kind)   .must_include workspace
+      @tracker.workspaces_for(entity, user, :member).must_include workspace
+      @tracker.relationship_for(workspace, user)    .must_equal 'administrator'
     end
   end #track_administrator
 
@@ -43,6 +44,7 @@ describe 'tracker' do
 
       @tracker.users_for(workspace, kind)         .must_include user
       @tracker.workspaces_for(entity, user, kind) .must_include workspace
+      @tracker.workspaces_for(entity, user, :member).must_include workspace
       @tracker.relationship_for(workspace, user)  .must_equal 'collaborator'
     end
   end #track_collaborator
@@ -232,6 +234,15 @@ describe 'tracker' do
       @tracker.users_for(workspace, 'autoinvited')    .must_be_empty
       @tracker.users_for(workspace, 'collaborator')   .must_be_empty
       @tracker.users_for(workspace, 'administrator')  .must_be_empty
+      @tracker.users_for(workspace, 'member')         .must_be_empty
+
+      @tracker.track_collaborator(workspace, user)
+
+      @tracker.users_for(workspace, 'invited')        .must_be_empty
+      @tracker.users_for(workspace, 'autoinvited')    .must_be_empty
+      @tracker.users_for(workspace, 'collaborator')   .wont_be_empty
+      @tracker.users_for(workspace, 'administrator')  .must_be_empty
+      @tracker.users_for(workspace, 'member')         .wont_be_empty
     end
   end #users_for
 
@@ -248,6 +259,14 @@ describe 'tracker' do
       @tracker.workspaces_for(entity, user, 'autoinvited')    .must_be_empty
       @tracker.workspaces_for(entity, user, 'collaborator')   .must_be_empty
       @tracker.workspaces_for(entity, user, 'administrator')  .must_be_empty
+      @tracker.workspaces_for(entity, user, 'member')         .must_be_empty
+
+      @tracker.track_administrator(workspace, user)
+      @tracker.workspaces_for(entity, user, 'invited')        .must_be_empty
+      @tracker.workspaces_for(entity, user, 'autoinvited')    .must_be_empty
+      @tracker.workspaces_for(entity, user, 'collaborator')   .must_be_empty
+      @tracker.workspaces_for(entity, user, 'administrator')  .wont_be_empty
+      @tracker.workspaces_for(entity, user, 'member')         .wont_be_empty
     end
   end #workspaces_for
 
@@ -297,14 +316,14 @@ describe 'tracker' do
     end
   end #invitation_for
 
-  describe '#autoinvitaiton_for' do
+  describe '#autoinvitation_for' do
     it 'returns an autoinvitation member given a user and a workspace' do
       workspace       = double
       autoinvited     = double
       autoinvitation  = double
 
       @tracker.track_autoinvitation(workspace, autoinvited, autoinvitation)
-      @tracker.invitation_for(workspace, autoinvited)
+      @tracker.autoinvitation_for(workspace, autoinvited)
         .id.must_equal autoinvitation.id
     end
 

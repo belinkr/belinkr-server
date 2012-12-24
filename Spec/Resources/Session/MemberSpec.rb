@@ -1,7 +1,11 @@
 # encoding: utf-8
 require 'minitest/autorun'
+require 'redis'
 require_relative '../../../Locales/Loader'
 require_relative '../../../Resources/Session/Member'
+
+$redis ||= Redis.new
+$redis.select 8
 
 include Belinkr
 

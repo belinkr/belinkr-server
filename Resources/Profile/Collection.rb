@@ -21,17 +21,17 @@ module Belinkr
       def_delegators :@set,       *Tinto::Set::INTERFACE
 
       def initialize(attributes={})
-        super attributes
-        @set = Tinto::Set.new self
-      end
+        self.attributes = attributes
+        @set            = Tinto::Set.new self
+      end #initialize
 
       def instantiate_member(attributes={})
-        Member.new attributes.merge(entity_id: entity_id)
-      end
+        Member.new(attributes.merge(entity_id: entity_id)).fetch.user
+      end #instantiate_member
 
       def storage_key
         "entities:#{entity_id}:profiles"
-      end
+      end #storage_key
     end # Collection
   end # Profile
 end # Belinkr

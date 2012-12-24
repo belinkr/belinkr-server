@@ -7,8 +7,8 @@ require_relative '../../Services/Locator'
 module Belinkr
   module LogIn
     class Request
-      def initialize(payload)
-        @payload = payload
+      def initialize(arguments)
+        @payload = arguments.fetch(:payload)
       end #initialize
         
       def prepare

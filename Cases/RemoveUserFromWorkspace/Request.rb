@@ -7,10 +7,10 @@ require_relative '../../Services/Tracker'
 module Belinkr
   module RemoveUserFromWorkspace
     class Request
-      def initialize(payload, actor, entity)
-        @payload  = payload
-        @actor    = actor
-        @entity   = entity
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
+        @actor    = arguments.fetch(:actor)
+        @entity   = arguments.fetch(:entity)
       end #initialize
 
       def prepare
@@ -25,7 +25,7 @@ module Belinkr
 
       private
       
-      attr_accessor :payload, :actor, :entity
+      attr_reader :payload, :actor, :entity
 
       def target_user
         @target_user ||= User::Member.new(id: payload.fetch('user_id')).fetch

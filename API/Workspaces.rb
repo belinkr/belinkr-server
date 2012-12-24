@@ -46,12 +46,24 @@ module Belinkr
     end # get /workspaces
 
     get '/workspaces/own' do
+      dispatch :collection do
+        Workspace::Tracker.new.workspaces_for(current_user, :member)
+          .page(params.fetch('page', 0))
+      end
     end # get /workspaces/own
 
     get '/workspaces/autoinvited' do
+      dispatch :collection do
+        Workspace::Tracker.new.workspaces_for(current_user, :autoinvited)
+          .page(params.fetch('page', 0))
+      end
     end # get /workspaces/autoinvited
 
     get '/workspaces/invited' do
+      dispatch :collection do
+        Workspace::Tracker.new.workspaces_for(current_user, :invited)
+          .page(params.fetch('page', 0))
+      end
     end # get /workspaces/invited
 
     get '/workspaces/:workspace_id' do
@@ -64,8 +76,7 @@ module Belinkr
     end # get /workspaces/:workspace_id
 
     post '/workspaces' do
-      data = CreateWorkspace::Request
-              .new(payload, current_user, current_entity).prepare
+      data      = CreateWorkspace::Request.new(request_data).prepare
       workspace = data.fetch(:workspace)
 
       dispatch :create, workspace do
@@ -75,9 +86,9 @@ module Belinkr
     end # post /workspaces
 
     put '/workspaces/:workspace_id' do
-      data = EditWorkspace::Request
-              .new(combined_input, current_user, current_entity).prepare
+      data      = EditWorkspace::Request.new(request_data).prepare
       workspace = data.fetch(:workspace)
+
       dispatch :update, workspace do
         EditWorkspace::Context.new(data).run
         workspace
@@ -85,8 +96,7 @@ module Belinkr
     end # put /workspaces/:workspace_id
     
     delete '/workspaces/:workspace_id' do
-      data = DeleteWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data      = DeleteWorkspace::Request.new(request_data).prepare
       workspace = data.fetch(:workspace)
 
       dispatch :delete, workspace do
@@ -115,9 +125,8 @@ module Belinkr
     end # get /workspaces/:workspace_id/invitations/:invitation_id
 
     post '/workspaces/:workspace_id/invitations' do
-      data = InviteUserToWorkspace::Request
-              .new(combined_input, current_user, current_entity).prepare
-      invitation = data.fetch(:invitation)
+      data        = InviteUserToWorkspace::Request.new(request_data).prepare
+      invitation  = data.fetch(:invitation)
 
       dispatch :create, invitation do
         InviteUserToWorkspace::Context.new(data).run
@@ -126,8 +135,7 @@ module Belinkr
     end # post /workspaces/:workspace_id/invitations
 
     post '/workspaces/:workspace_id/invitations/accepted/:invitation_id' do
-      data = AcceptInvitationToWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data = AcceptInvitationToWorkspace::Request.new(request_data).prepare
       invitation = data.fetch(:invitation)
 
       dispatch :update, invitation do
@@ -137,8 +145,7 @@ module Belinkr
     end # post /workspaces/:workspace_id/invitations/accepted/:invitation_id
 
     post '/workspaces/:workspace_id/invitations/rejected/:invitation_id' do
-      data = RejectInvitationToWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data = RejectInvitationToWorkspace::Request.new(request_data).prepare
       invitation = data.fetch(:invitation)
 
       dispatch :update, invitation do
@@ -167,8 +174,7 @@ module Belinkr
     end # get /workspaces/:workspace_id/autoinvitations/:autoinvitation_id
 
     post '/workspaces/:workspace_id/autoinvitations' do
-      data = AutoinviteToWorkspace::Request
-              .new(combined_input, current_user, current_entity).prepare
+      data = AutoinviteToWorkspace::Request.new(request_data).prepare
       autoinvitation = data.fetch(:autoinvitation)
 
       dispatch :create, autoinvitation do
@@ -178,8 +184,7 @@ module Belinkr
     end # post /workspaces/:workspace_id/autoinvitations
 
     post '/workspaces/:workspace_id/autoinvitations/accepted/:autoinvitation_id' do
-      data = AcceptAutoinvitationToWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data = AcceptAutoinvitationToWorkspace::Request.new(request_data).prepare
       autoinvitation = data.fetch(:autoinvitation)
 
       dispatch :update, autoinvitation do
@@ -189,8 +194,7 @@ module Belinkr
     end # post /workspaces/:workspace_id/autoinvitations/accepted
 
     post '/workspaces/:workspace_id/autoinvitations/rejected/:autoinvitation_id' do
-      data = RejectAutoinvitationToWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data = RejectAutoinvitationToWorkspace::Request.new(request_data).prepare
       autoinvitation = data.fetch(:autoinvitation)
 
       dispatch :update, autoinvitation do
@@ -200,8 +204,8 @@ module Belinkr
     end # post /workspaces/:workspace_id/autoinvitations/rejected
 
     post '/workspaces/:workspace_id/administrators/:user_id' do
-      data = AssignAdministratorRoleInWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data = AssignAdministratorRoleInWorkspace::Request.new(request_data)
+              .prepare
       target_user = data.fetch(:target_user)
 
       dispatch :update, target_user do
@@ -211,8 +215,8 @@ module Belinkr
     end # post /workspaces/:workspace_id/administrators/:user_id
 
     post '/workspaces/:workspace_id/collaborators/:user_id' do
-      data = AssignCollaboratorRoleInWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data = AssignCollaboratorRoleInWorkspace::Request.new(request_data)
+              .prepare
       target_user = data.fetch(:target_user)
 
       dispatch :update, target_user do
@@ -222,8 +226,7 @@ module Belinkr
     end # post /workspaces/:workspace_id/collaborators/:user_id
 
     delete '/workspaces/:workspace_id/collaborators/:user_id' do
-      data = RemoveUserFromWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data = RemoveUserFromWorkspace::Request.new(request_data).prepare
       target_user = data.fetch(:target_user)
 
       dispatch :update, target_user do
@@ -233,8 +236,7 @@ module Belinkr
     end # delete /workspaces/:workspace_id/collaborators/:user_id
 
     delete '/workspaces/:workspace_id/users/:user_id' do
-      data = LeaveWorkspace::Request
-              .new(params, current_user, current_entity).prepare
+      data = LeaveWorkspace::Request.new(request_data).prepare
       actor = data.fetch(:actor)
 
       dispatch :update, actor do

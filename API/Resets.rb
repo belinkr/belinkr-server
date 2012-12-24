@@ -9,7 +9,7 @@ module Belinkr
   class API < Sinatra::Base
     post '/resets' do
       begin
-        data = RequestPasswordReset::Request.new(payload).prepare
+        data = RequestPasswordReset::Request.new(payload: payload).prepare
         RequestPasswordReset::Context.new(data).run
       rescue Tinto::Exceptions::NotFound
       ensure return 201
@@ -24,7 +24,7 @@ module Belinkr
     end # get /resets/:id
 
     put '/resets/:reset_id' do
-      data  = ResetPassword::Request.new(combined_input).prepare
+      data  = ResetPassword::Request.new(payload: combined_input).prepare
       reset = data.fetch(:reset)
 
       dispatch :update, reset do

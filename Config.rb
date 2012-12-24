@@ -18,6 +18,7 @@ module Belinkr
     XMPP_BOSH_URL             = 'http://www.belinkr.com:5280/http-bind'
     XMPP_HOST                 = 'www.belinkr.com'
     XMPP_QUEUE_KEY            = 'xmpp'
+    STORAGE_ROOT              = File.join(File.dirname(__FILE__), 'public')
 
     # See http://activitystrea.ms/head/activity-schema.html#verbs
     ACTIVITY_ACTIONS = %w{
@@ -60,8 +61,8 @@ module Belinkr
       address:          "smtp.gmail.com",
       port:             587,
       domain:           "belinkr.com",
-      user_name:        ENV.fetch("MAIL_USER"),
-      password:         ENV.fetch("MAIL_PASS"),
+      user_name:        ENV["MAIL_USER"],
+      password:         ENV["MAIL_PASS"],
       authentication:   "plain",
       enable_start_tls: true
     }

@@ -8,7 +8,7 @@ group :production do
   gem 'bcrypt-ruby'
   gem 'rack' 
   gem 'sinatra', require: 'sinatra/base' 
-  gem 'virtus' 
+  gem 'virtus', '0.5.4'
   gem 'aequitas' 
   gem 'statemachine'
   gem 'redis' 

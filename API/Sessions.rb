@@ -10,7 +10,7 @@ require_relative '../Cases/LogOut/Context'
 module Belinkr
   class API < Sinatra::Base
     post '/sessions' do
-      data              = LogIn::Request.new(payload).prepare
+      data              = LogIn::Request.new(payload: payload).prepare
       persisted_session = data.fetch(:session)
 
       dispatch :create do
@@ -33,13 +33,14 @@ module Belinkr
 
     delete '/sessions/:id' do
       session_id  = session['auth_token'] || params.fetch('id')
-      data        = LogOut::Request.new(id: session_id).prepare
+      payload     = { id: session_id }
+      data        = LogOut::Request.new(payload: payload).prepare
       persisted_session = data.fetch(:session)
+
+      session[:auth_token] = nil
 
       dispatch :delete do
         LogOut::Context.new(data).run
-
-        session[:auth_token] = nil
 
         if request.cookies[Config::AUTH_TOKEN_COOKIE]
           response.delete_cookie Config::AUTH_TOKEN_COOKIE, path: '/'
@@ -54,3 +55,4 @@ module Belinkr
     end # DELETE /sessions/:id
   end # API
 end # Belinkr
+

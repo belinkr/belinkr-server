@@ -6,10 +6,10 @@ require_relative '../../Resources/Scrapbook/Enforcer'
 module Belinkr
   module DeleteScrapbook
     class Request
-      def initialize(payload, actor, entity)
-        @payload  = payload
-        @actor    = actor
-        @entity   = entity
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
+        @actor    = arguments.fetch(:actor)
+        @entity   = arguments.fetch(:entity)
       end #initialize
 
       def prepare
@@ -21,7 +21,9 @@ module Belinkr
         }
       end # prepare
 
-      private :payload, :actor, :entity
+      private 
+      
+      attr_reader :payload, :actor, :entity
 
       def scrapbook
         @scrapbook ||=

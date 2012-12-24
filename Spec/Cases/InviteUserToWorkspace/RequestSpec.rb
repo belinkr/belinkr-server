@@ -28,8 +28,8 @@ describe 'invite user to workspace request model' do
                   }
 
     payload     = JSON.parse(payload.to_json)
-    request     = InviteUserToWorkspace::Request.new(payload, actor, entity)
-    data        = request.prepare
+    arguments   = { payload: payload, actor: actor, entity: entity }
+    data        = InviteUserToWorkspace::Request.new(arguments).prepare
 
     data.fetch(:actor).id                 .must_equal actor.id
     data.fetch(:workspace).id             .must_equal workspace.id

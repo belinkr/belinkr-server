@@ -21,7 +21,7 @@ describe 'request model for RequestPasswordReset' do
 
     payload = { email: user.email }
     payload = JSON.parse(payload.to_json)
-    data    = RequestPasswordReset::Request.new(payload).prepare
+    data    = RequestPasswordReset::Request.new(payload: payload).prepare
     
     data.fetch(:actor)    .must_be_instance_of User::Member
     data.fetch(:reset)    .must_be_instance_of Reset::Member

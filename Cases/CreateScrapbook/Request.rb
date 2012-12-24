@@ -5,9 +5,9 @@ require_relative '../../Resources/Scrapbook/Collection'
 module Belinkr
   module CreateScrapbook
     class Request
-      def initialize(payload, actor)
-        @payload  = payload
-        @actor    = actor
+      def initialize(arguments)
+        @payload  = arguments.fetch(:payload)
+        @actor    = arguments.fetch(:actor)
       end #initialize
 
       def prepare
@@ -20,7 +20,7 @@ module Belinkr
 
       private 
       
-      attr_accessor :payload, :actor
+      attr_reader :payload, :actor
 
       def scrapbook
         Scrapbook::Member.new(payload.merge scope)

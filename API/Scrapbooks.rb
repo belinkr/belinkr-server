@@ -2,8 +2,13 @@
 require_relative '../API'
 require_relative '../Resources/Scrapbook/Member'
 require_relative '../Resources/Scrapbook/Collection'
+require_relative '../Resources/Scrapbook/Enforcer'
 require_relative '../Resources/Scrapbook/Presenter'
 
+require_relative '../Cases/GetMember/Request'
+require_relative '../Cases/GetMember/Context'
+require_relative '../Cases/GetCollection/Request'
+require_relative '../Cases/GetCollection/Context'
 require_relative '../Cases/CreateScrapbook/Request'
 require_relative '../Cases/CreateScrapbook/Context'
 require_relative '../Cases/EditScrapbook/Request'
@@ -15,22 +20,24 @@ module Belinkr
   class API < Sinatra::Base
     get "/scrapbooks" do
       dispatch :collection do
-        Scrapbook::Collection.new(user_id: current_user.id, kind: 'own')
-          .page(params.fetch('page', 0))
+        request_data.merge!(type: :scrapbook)
+        data = GetCollection::Request.new(request_data).prepare
+        GetCollection::Context.new(data).run
+        data.fetch(:collection)
       end
     end # get /scrapbooks
 
     get "/scrapbooks/:scrapbook_id" do
       dispatch :read do
-        Scrapbook::Member.new(
-          id:       params.fetch('scrapbook_id'), 
-          user_id:  current_user.id
-        ).fetch
+        request_data.merge!(type: :scrapbook)
+        data = GetMember::Request.new(request_data).prepare
+        GetMember::Context.new(data).run
+        data.fetch(:member)
       end
     end # get /scrapbooks/:scrapbook_id
 
     post "/scrapbooks" do
-      data      = CreateScrapbook::Request.new(payload, current_user).prepare
+      data      = CreateScrapbook::Request.new(request_data).prepare
       scrapbook = data.fetch(:scrapbook)
 
       dispatch :create, scrapbook do
@@ -40,8 +47,7 @@ module Belinkr
     end # post /scrapbooks
 
     put "/scrapbooks/:scrapbook_id" do
-      data      = EditScrapbook::Request.new(combined_input, current_user)
-                    .prepare
+      data      = EditScrapbook::Request.new(request_data).prepare
       scrapbook = data.fetch(:scrapbook)
 
       dispatch :update, scrapbook do
@@ -51,7 +57,7 @@ module Belinkr
     end # put /scrapbooks/:scrapbook_id
     
     delete "/scrapbooks/:scrapbook_id" do
-      data      = DeleteScrapbook::Request.new(params, current_user).prepare
+      data      = DeleteScrapbook::Request.new(request_data).prepare
       scrapbook = data.fetch(:scrapbook)
 
       dispatch :delete do

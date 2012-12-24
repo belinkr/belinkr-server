@@ -2,8 +2,8 @@
 require 'forwardable'
 require 'virtus'
 require 'aequitas'
-require_relative './Member'
 require 'Tinto/SortedSet'
+require_relative './Member'
 
 module Belinkr
   module Status
@@ -17,27 +17,28 @@ module Belinkr
       KINDS       = %w{ own general replies files workspaces
                         forwarded_by_you forwarded_by_others }
 
-      attribute :kind,              String
-      attribute :context,           Polymorphic
+      attribute :kind,          String
+      attribute :scope,         Polymorphic
 
-      validates_presence_of         :kind, :context
-      validates_within              :kind, set: KINDS
+      validates_presence_of     :kind, :scope
+      validates_within          :kind, set: KINDS
 
-      def_delegators :@zset,        *Tinto::SortedSet::INTERFACE
+      def_delegators :@zset,    *Tinto::SortedSet::INTERFACE
 
       def initialize(attributes={})
-        super attributes
-        @zset = Tinto::SortedSet.new self
-      end
+        self.attributes = attributes
+        @zset           = Tinto::SortedSet.new self
+      end #initialize
 
       def instantiate_member(attributes={})
-        Member.new attributes.merge!(context: context)
-      end
+        Member.new attributes.merge!(scope: scope.resource)
+      end #instantiate_member
 
       def storage_key
-        return unless context
-        "#{context.storage_key}:#{context.id}:timelines:#{kind}"
-      end
+        return unless scope
+        "#{scope.storage_key}:#{scope.id}:timelines:#{kind}"
+      end #storage_key
     end # Collection
   end # Status
 end # Belinkr
+

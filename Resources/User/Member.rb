@@ -23,12 +23,14 @@ module Belinkr
       attribute :avatar,          String
       attribute :first,           String
       attribute :last,            String
-      attribute :name,            String, default: lambda {|u, a| u.ordered_name }
+      attribute :name,            String,
+                                    default: lambda {|u, a| u.ordered_name }
       attribute :name_order,      String, default: 'first-last'
       attribute :email,           String
       attribute :password,        String
       attribute :profiles,        Array[Profile::Member], default: []
-      attribute :locale,          String, default: Belinkr::Config::DEFAULT_LOCALE
+      attribute :locale,          String, 
+                                    default: Belinkr::Config::DEFAULT_LOCALE
       attribute :timezone,        String
       attribute :created_at,      Time
       attribute :updated_at,      Time
@@ -44,9 +46,9 @@ module Belinkr
 
       def_delegators :@member,    *Tinto::Member::INTERFACE
 
-      def initialize(attrs={})
-        super attrs
-        @member = Tinto::Member.new self
+      def initialize(attributes={})
+        self.attributes = attributes
+        @member         = Tinto::Member.new self
       end #initialize
 
       def storage_key
@@ -116,6 +118,10 @@ module Belinkr
         return "#{last} #{first}" if name_order == 'last-first'
         "#{first} #{last}"
       end #ordered_name
+
+      def profile_for(entity)
+        profiles.find { |profile| profile.entity_id == entity.id }
+      end #profile
 
       private
 

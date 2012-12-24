@@ -7,13 +7,12 @@ module Belinkr
     class Presenter
       BASE_PATH = '/sessions'
 
-      def initialize(resource, actor=nil)
+      def initialize(resource, scope={})
         @resource = resource
-        @actor    = actor
       end #initialize
 
-      def as_json
-        as_poro.to_json
+      def as_json(*args)
+        as_poro.to_json(*args)
       end #as_json
 
       def as_poro

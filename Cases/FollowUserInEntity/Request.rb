@@ -9,11 +9,11 @@ require_relative '../../Resources/Status/Collection'
 module Belinkr
   module FollowUserInEntity
     class Request
-      def initialize(payload, actor, actor_profile, entity)
-        @payload        = payload
-        @actor          = actor
-        @actor_profile  = actor_profile
-        @entity         = entity
+      def initialize(arguments)
+        @payload        = arguments.fetch(:payload)
+        @actor          = arguments.fetch(:actor)
+        @actor_profile  = arguments.fetch(:actor_profile)
+        @entity         = arguments.fetch(:entity)
       end #initialize
 
       def prepare
@@ -33,7 +33,7 @@ module Belinkr
 
       private
 
-      attr_accessor :payload, :actor, :actor_profile, :entity
+      attr_reader :payload, :actor, :actor_profile, :entity
 
       def enforcer
         Follower::Enforcer.new(followed)
@@ -71,15 +71,15 @@ module Belinkr
 
       def actor_timeline
         Status::Collection.new(
-          kind:     'general',
-          context:  actor_profile
+          kind:   'general',
+          scope:  actor
         )
       end #actor_timeline
 
       def latest_statuses
         @latest_statuses ||= Status::Collection.new(
-          kind:     'own',
-          context:  followed_profile
+          kind:   'own',
+          scope:  followed
         ).page
       end #latest_statuses
     end # Request

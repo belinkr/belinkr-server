@@ -16,7 +16,9 @@ require_relative './API/Sessions'
 require_relative './API/Followers'
 require_relative './API/Workspaces'
 require_relative './API/Scrapbooks'
-#require_relative './API/Users'
+require_relative './API/Files'
+require_relative './API/Users'
+require_relative './API/Statuses'
 
 require_relative './Resources/Session/Member'
 require_relative './Resources/User/Member'
@@ -24,7 +26,7 @@ require_relative './Resources/Entity/Member'
 
 $redis ||= Redis.new
 
-CarrierWave.root = File.join(File.dirname(__FILE__), 'public')
+CarrierWave.root = Belinkr::Config::STORAGE_ROOT
 
 module Belinkr
   class API < Sinatra::Base
@@ -45,21 +47,28 @@ module Belinkr
 
     helpers do
       def dispatch(action, resource=nil, &block)
-        Tinto::Dispatcher.new(current_user, resource, &block).send(action)
+        Tinto::Dispatcher.new(resource, scope, &block).send(action)
       end
 
+      def scope
+        { actor:  current_user, entity: current_entity }
+      end #scope
+
       def payload
-        @payload ||= 
-          Tinto::Sanitizer.sanitize_hash(JSON.parse(request.body.read.to_s))
-      end
+        return {} if request_body.empty?
+        @payload ||= Tinto::Sanitizer.sanitize_hash(JSON.parse(request_body))
+      end #payload
+
+      def request_body
+        @request_body ||= (request.body.read.to_s || "{}")
+      end #request_body
 
       def combined_input
         payload.to_hash.merge(params)
       end #combined_input
 
       def sanitize_params!
-        self.params = 
-          send(:indifferent_params, Tinto::Sanitizer.sanitize_hash(params))
+        self.params = indifferent_params(Tinto::Sanitizer.sanitize_hash params)
       end
 
       def current_session
@@ -81,20 +90,31 @@ module Belinkr
       end
 
       def current_entity
-        return false unless current_session
+        return @current_entity if @current_entity
+        return Entity::Member.new unless current_session
         @current_entity ||= Entity::Member.new(id: current_session.entity_id).fetch
       end
 
       def current_user
-        return false unless current_session
+        return User::Member.new unless current_session
         @current_user ||= User::Member.new(id: current_session.user_id).fetch
       end
       
       def current_profile
-        return false unless current_session
-        @current_profile ||= Profile::Member.new(id: current_session.profile_id,
-                                entity_id: current_session.entity_id).fetch
+        return Profile::Member.new unless current_session
+        @current_profile ||= Profile::Member.new(
+          id:         current_session.profile_id,
+          entity_id:  current_session.entity_id
+        ).fetch
       end
+
+      def request_data
+        @request_data ||= { 
+          payload:    combined_input,
+          actor:      current_user,
+          entity:     current_entity
+        }
+      end #request_data
       
       def auth_token_cookie
         token = request.cookies[Config::AUTH_TOKEN_COOKIE] 
@@ -107,7 +127,7 @@ module Belinkr
       end
 
       def public_path?
-        request.path_info =~ %r{sessions|login|resets|invitations/\w+}
+        request.path_info =~ %r{sessions|resets|invitations/\w+}
       end
     end
   end # API
