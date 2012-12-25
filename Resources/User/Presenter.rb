@@ -21,7 +21,7 @@ module Belinkr
           name:       user.name,
           first:      user.first,
           last:       user.last,
-          mobile:     profile.mobile
+          mobile:     profile ? profile.mobile : nil
         }
           .merge! Tinto::Presenter.timestamps_for(user)
           .merge! Tinto::Presenter.errors_for(user)
@@ -32,7 +32,10 @@ module Belinkr
       attr_reader :user, :entity
 
       def profile
-        @profile ||= user.profile_for(entity).fetch
+        profile_in_same_entity = user.profile_for(entity)
+        if profile_in_same_entity
+          @profile ||= profile_in_same_entity.fetch
+        end
       end #profile
     end # Presenter
   end # User
