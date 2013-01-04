@@ -36,5 +36,6 @@ group :test do
   gem 'pry-debugger'
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
+  gem 'minitest-documenter'
 end
 
