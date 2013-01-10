@@ -12,30 +12,24 @@ module Belinkr
   end
 end
 
-MiniTest::Documenter.configure do |config|                               
-  config.decide_docs_dir(__FILE__)                                       
-  config.ignored_env_keys =['rack.session']
-  config.transform_rack_session = true
-end                                                                             
-def app                                                                         
-  API.new                                                                       
-end                                                                        
 
-include Spec::API::Helpers
-describe 'test' do                  
+
+describe 'Autocomplete' do
+  include Spec::API::Helpers
+  def app; API.new; end
   before do
     @tire_obj = Object.new.extend TireWrapper
     @tire_obj.index_delete 'users'
     @tire_obj.index_delete 'workspaces'
     @tire_obj.index_delete 'scrapbooks'
   end
- 
+
   request 'GET /autocomplete/users' do
     outcome "Get User List Match query" do
       user, profile, entity = create_user_and_profile
       query = user.first[0..1]
       @tire_obj.index_store_with_type 'users', user.attributes
-      
+
       uri = URI.escape "/autocomplete/users?q=#{query}"
       get uri, {}, session_for(profile)
     end
@@ -71,7 +65,7 @@ describe 'test' do
       query = @workspace.name
       uri = URI.escape "/autocomplete/workspaces?q=#{query}"
       get uri, {}, session_for(@profile)
- 
+
     end
   end
   request 'GET /autocomplete/scrapbooks' do
@@ -92,7 +86,7 @@ describe 'test' do
       }
 
       @tire_obj.index_create 'scrapbooks', scrapbooks_mapping_hash
- 
+
       user, profile, entity = create_user_and_profile
       scrapbook = scrapbook_by(profile)
       scrapbook.sync
