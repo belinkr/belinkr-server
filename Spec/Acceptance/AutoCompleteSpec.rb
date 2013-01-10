@@ -1,18 +1,11 @@
 require_relative '../Support/Helpers'
-require_relative '../Support/DocHelpers'
 require_relative '../../API'
 require_relative '../../API/Autocomplete'
 require_relative '../../Services/Searcher/TireWrapper'
+require_relative '../Support/DocHelpers'
 include Belinkr
 $redis ||= Redis.new
 $redis.select 8
-module Belinkr
-  class API
-    use PryRescue::Rack
-  end
-end
-
-
 
 describe 'Autocomplete' do
   include Spec::API::Helpers

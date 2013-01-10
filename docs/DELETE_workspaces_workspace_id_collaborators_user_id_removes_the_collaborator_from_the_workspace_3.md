@@ -1,0 +1,30 @@
+# API Procedure
+DELETE /workspaces/:workspace_id/collaborators/:user_id
+## Expected Outcome
+removes the collaborator from the workspace
+## Sequence Number
+3
+## Request Method
+delete
+## Request Path
+/workspaces/ea668c52-5afa-11e2-8b59-b870f43f7835/collaborators/ea649fc8-5afa-11e2-8b59-b870f43f7835
+## Request Header
+{:auth_token=>"ea725ed8-5afa-11e2-8b59-b870f43f7835"}
+## Request Body
+
+
+## Response Status
+200
+## Response Header
+{"Content-Type":"text/html;charset=utf-8","X-XSS-Protection":"1; mode=block","X-Content-Type-Options":"nosniff","Content-Length":"211"}
+
+## Response Body
+{
+  "id": "ea649fc8-5afa-11e2-8b59-b870f43f7835",
+  "name": "CIRLTCYA SLTFHAFJ",
+  "first": "CIRLTCYA",
+  "last": "SLTFHAFJ",
+  "mobile": "NJNYOGTB",
+  "created_at": "2013-01-10T15:54:09+08:00",
+  "updated_at": "2013-01-10T15:54:09+08:00"
+}

@@ -17,7 +17,7 @@ describe API do
   include Spec::API::Helpers
 
   Belinkr::Config.send :remove_const, 'STORAGE_ROOT'
-  Belinkr::Config::STORAGE_ROOT = 
+  Belinkr::Config::STORAGE_ROOT =
     File.join(File.dirname(__FILE__), '..', '..', 'public')
 
   describe 'POST /files' do
@@ -80,7 +80,7 @@ describe API do
   end
 
   def save_text_file_for(profile)
-    post '/files', 
+    post '/files',
       { file: Rack::Test::UploadedFile.new(text_file_path, "text/plain") },
       session_for(profile)
     id = JSON.parse(last_response.body)["id"]
@@ -88,7 +88,7 @@ describe API do
   end
 
   def save_image_file_for(profile)
-    post '/files', 
+    post '/files',
       { file: Rack::Test::UploadedFile.new(image_file_path, "image/png") },
       session_for(profile)
     id = JSON.parse(last_response.body)["id"]

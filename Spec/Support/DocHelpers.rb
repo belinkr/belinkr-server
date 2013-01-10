@@ -5,4 +5,9 @@ MiniTest::Documenter.configure do |config|
   config.ignored_env_keys =['rack.session']
   config.transform_rack_session = true
 end
+module Belinkr
+  class API
+    use PryRescue::Rack
+  end
+end
 
