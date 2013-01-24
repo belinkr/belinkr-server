@@ -17,7 +17,7 @@ group :production do
   gem 'mini_magick'
   gem 'pony'
   gem 'sanitize'
-  gem 'tinto', git: 'git@bitbucket.org:belinkr/tinto.git'
+  gem 'tinto'
   gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
   gem 'tire'
   gem 'thin'
@@ -37,7 +37,7 @@ group :test do
   gem 'pry-debugger'
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
-  gem 'minitest-documenter', git: 'git@bitbucket.org:belinkr/minitest-documenter.git'
+  gem 'minitest-documenter'
   gem 'rb-readline'
 end
 
