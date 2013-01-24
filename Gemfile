@@ -20,6 +20,7 @@ group :production do
   gem 'tinto'
   gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
   gem 'tire'
+  gem 'thin'
 end
 
 group :test do 
