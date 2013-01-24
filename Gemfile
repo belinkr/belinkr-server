@@ -20,6 +20,7 @@ group :production do
   gem 'tinto'
   gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
   gem 'tire'
+  gem 'thin'
 end
 
 group :test do 
@@ -36,5 +37,6 @@ group :test do
   gem 'pry-debugger'
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
+  gem 'minitest-documenter'
 end
 
