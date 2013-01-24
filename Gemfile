@@ -38,6 +38,6 @@ group :test do
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
   gem 'minitest-documenter', git: 'git@bitbucket.org:belinkr/minitest-documenter.git'
-  #gem 'minitest-documenter', path: 'own_gems'
+  gem 'rb-readline'
 end
 
