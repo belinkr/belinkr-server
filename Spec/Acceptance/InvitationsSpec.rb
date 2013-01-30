@@ -36,7 +36,7 @@ describe API do
       actor, profile  = create_user_and_profile
       invitation = { invited_name: 'foo', invited_email: 'foo@foo.com' }
 
-      post '/invitations', invitation.to_json, session_for(profile)
+      xpost '/invitations', invitation.to_json, session_for(profile)
 
       invitation = JSON.parse(last_response.body)
       get "/invitations/#{invitation.fetch('id')}"
@@ -50,7 +50,7 @@ describe API do
       actor, profile  = create_user_and_profile
       invitation = { invited_name: 'foo', invited_email: 'foo@foo.com' }
 
-      post '/invitations', invitation.to_json, session_for(profile)
+      xpost '/invitations', invitation.to_json, session_for(profile)
 
       invitation = JSON.parse(last_response.body)
 

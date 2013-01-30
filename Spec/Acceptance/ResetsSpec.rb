@@ -37,7 +37,7 @@ describe API do
   request 'GET /resets/:reset_id' do
     outcome 'retrieves a password reset' do
       actor, profile = create_user_and_profile
-      post '/resets', { email: actor.email }.to_json
+      xpost '/resets', { email: actor.email }.to_json
 
       resets  = Reset::Collection.new.fetch
       reset   = resets.first.fetch
@@ -52,7 +52,7 @@ describe API do
   request 'PUT /resets/:reset_id' do
     outcome 'sets a new password' do
       actor, profile = create_user_and_profile
-      post '/resets', { email: actor.email }.to_json
+      xpost '/resets', { email: actor.email }.to_json
 
       resets  = Reset::Collection.new.fetch
       reset   = resets.first.fetch

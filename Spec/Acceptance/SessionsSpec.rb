@@ -31,7 +31,7 @@ describe API do
       post '/sessions', { email: user.email, password: password }.to_json
       last_response.status.must_equal 201
 
-      get '/users'
+      xget '/users'
       last_response.status.wont_equal 401
 
       unregister_redis_session_extension

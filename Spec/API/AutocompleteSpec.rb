@@ -23,7 +23,7 @@ describe API do
   include Spec::API::Helpers
 
   before do
-    $redis.flushdb 
+    $redis.flushdb
     @tire_obj = Object.new.extend TireWrapper
   end
 
@@ -37,7 +37,7 @@ describe API do
       user, profile, entity = create_user_and_profile
       query = user.first[0..1]
       @tire_obj.index_store_with_type 'users', user.attributes
-      
+
       uri = URI.escape "/autocomplete/users?q=#{query}"
       get uri, {}, session_for(profile)
       users = JSON.parse(last_response.body)
@@ -117,7 +117,7 @@ describe API do
       workspaces.first.fetch("name")
       last_response.status.must_equal 200
     end
-    
+
     it "only search the workspaces in the same entity" do
       hash= @workspace.attributes
       [:updated_at, :created_at, :deleted_at].each do |timestamp|
@@ -130,7 +130,7 @@ describe API do
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
       @tire_obj.index_store_with_type 'workspaces', hash
- 
+
       query = @workspace.name
       uri = URI.escape "/autocomplete/workspaces?q=*"
       get uri, {}, session_for(@profile)
@@ -138,7 +138,7 @@ describe API do
       workspaces.size.must_equal 1
       workspaces.first.fetch("name")
       last_response.status.must_equal 200
-      
+
     end
   end
 
@@ -194,7 +194,7 @@ describe API do
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]
       end
       @tire_obj.index_store_with_type 'scrapbooks', hash
- 
+
       hash = scrapbook2.attributes
       [:updated_at, :created_at, :deleted_at].each do |timestamp|
         hash[timestamp] = hash[timestamp].iso8601 if hash[timestamp]

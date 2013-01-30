@@ -64,11 +64,11 @@ describe API do
       post "/following/#{followed.id}", {}, session_for(follower_profile)
       last_response.status.must_equal 201
 
-      get "/following", {}, session_for(follower_profile)
+      xget "/following", {}, session_for(follower_profile)
       following = JSON.parse(last_response.body)
       following.first.fetch('id').must_equal followed.id
 
-      get "/followers", {}, session_for(followed_profile)
+      xget "/followers", {}, session_for(followed_profile)
       followers = JSON.parse(last_response.body)
       followers.first.fetch('id').must_equal follower.id
     end
@@ -80,24 +80,24 @@ describe API do
       follower, follower_profile  = create_user_and_profile(entity)
       followed, followed_profile  = create_user_and_profile(entity)
 
-      post "/following/#{followed.id}", {}, session_for(follower_profile)
+      xpost "/following/#{followed.id}", {}, session_for(follower_profile)
       last_response.status.must_equal 201
 
       delete "/following/#{followed.id}", {}, session_for(follower_profile)
       last_response.status.must_equal 204
 
-      get "/following", {}, session_for(follower_profile)
+      xget "/following", {}, session_for(follower_profile)
       following = JSON.parse(last_response.body)
       following.must_be_empty
 
-      get "/followers", {}, session_for(followed_profile)
+      xget "/followers", {}, session_for(followed_profile)
       followers = JSON.parse(last_response.body)
       followers.must_be_empty
     end
   end # DELETE /following/:follower_id
 
   def follow(follower_profile, followed_profile)
-    post  "/following/#{followed_profile.user_id}",
+    xpost  "/following/#{followed_profile.user_id}",
           {}, session_for(follower_profile)
   end
 end # API

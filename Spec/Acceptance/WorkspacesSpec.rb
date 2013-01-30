@@ -180,7 +180,7 @@ describe API do
       workspace = workspace_by(profile)
       users = (1..50).map do
         invited  = Factory.user.sync
-        post  "/workspaces/#{workspace.fetch('id')}/invitations",
+        xpost  "/workspaces/#{workspace.fetch('id')}/invitations",
               { invited_id: invited.id }.to_json, session_for(profile)
       end
 
@@ -273,7 +273,7 @@ describe API do
       users = (1..50).map do
         autoinvited_actor, autoinvited_profile =
           create_user_and_profile(entity)
-        post  "/workspaces/#{workspace.fetch('id')}/autoinvitations",
+        xpost  "/workspaces/#{workspace.fetch('id')}/autoinvitations",
               { autoinvited_id: autoinvited_actor.id }.to_json,
               session_for(autoinvited_profile)
       end
@@ -388,7 +388,7 @@ describe API do
 
       workspace = workspace_by(administrator_profile)
 
-      post  "/workspaces/#{workspace.fetch('id')}" +
+      xpost  "/workspaces/#{workspace.fetch('id')}" +
             "/collaborators/#{collaborator.id}",
             {}, session_for(administrator_profile)
 
@@ -407,7 +407,7 @@ describe API do
 
       workspace = workspace_by(administrator_profile)
 
-      post  "/workspaces/#{workspace.fetch('id')}" +
+      xpost  "/workspaces/#{workspace.fetch('id')}" +
             "/collaborators/#{collaborator.id}",
             {}, session_for(administrator_profile)
 
@@ -426,7 +426,7 @@ describe API do
 
       25.times do
         collaborator, collaborator_profile = create_user_and_profile(entity)
-        post  "/workspaces/#{workspace.fetch('id')}" +
+        xpost  "/workspaces/#{workspace.fetch('id')}" +
               "/administrators/#{collaborator.id}",
               {}, session_for(administrator_profile)
       end
@@ -447,7 +447,7 @@ describe API do
 
       25.times do
         collaborator, collaborator_profile = create_user_and_profile(entity)
-        post  "/workspaces/#{workspace.fetch('id')}" +
+        xpost  "/workspaces/#{workspace.fetch('id')}" +
               "/collaborators/#{collaborator.id}",
               {}, session_for(administrator_profile)
       end
@@ -463,21 +463,21 @@ describe API do
 
   def invitation_for(workspace, profile, invited)
     invited ||= Factory.user.sync
-    post  "/workspaces/#{workspace.fetch('id')}/invitations",
+    xpost  "/workspaces/#{workspace.fetch('id')}/invitations",
           { invited_id: invited.id }.to_json, session_for(profile)
     invitation = JSON.parse(last_response.body)
   end
 
   def autoinvitation_for(workspace, profile, user)
     user ||= Factory.user.sync
-    post  "/workspaces/#{workspace.fetch('id')}/autoinvitations",
+    xpost  "/workspaces/#{workspace.fetch('id')}/autoinvitations",
           { autoinvited_id: user.id }.to_json, session_for(profile)
     autoinvitation = JSON.parse(last_response.body)
   end
 
   def workspace_by(profile)
     name = Factory.random_string
-    post "/workspaces", { name: name }.to_json, session_for(profile)
+    xpost "/workspaces", { name: name }.to_json, session_for(profile)
     JSON.parse(last_response.body)
   end
 end # API

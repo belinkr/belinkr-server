@@ -45,7 +45,7 @@ describe API do
     outcome 'updates the user attributes' do
       actor, profile, entity = create_user_and_profile
 
-      get "/users/#{actor.id}", {}, session_for(profile)
+      xget "/users/#{actor.id}", {}, session_for(profile)
       last_response.status.must_equal 200
 
       changes = { first: 'changed', mobile: 'changed' }
@@ -67,7 +67,7 @@ describe API do
       delete "/users/#{actor.id}", {}, session_for(profile)
       last_response.status.must_equal 204
 
-      get "/users/#{actor.id}", {}, session_for(profile)
+      xget "/users/#{actor.id}", {}, session_for(profile)
       last_response.status.must_equal 404
     end
   end # DELETE /users/:id

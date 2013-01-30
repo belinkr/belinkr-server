@@ -21,7 +21,7 @@ describe API do
     outcome 'returns the general timeline for the actor' do
       user, profile, entity = create_user_and_profile
 
-      post '/statuses', { text: 'test' }.to_json, session_for(profile)
+      xpost '/statuses', { text: 'test' }.to_json, session_for(profile)
       last_response.status.must_equal 201
       status = JSON.parse(last_response.body)
 
@@ -36,7 +36,7 @@ describe API do
     outcome 'returns the own timeline for the actor' do
       user, profile, entity = create_user_and_profile
 
-      post '/statuses', { text: 'test' }.to_json, session_for(profile)
+      xpost '/statuses', { text: 'test' }.to_json, session_for(profile)
       last_response.status.must_equal 201
       status = JSON.parse(last_response.body)
 
@@ -84,14 +84,14 @@ describe API do
   request 'DELETE /timelines/:status_id' do
     outcome 'deletes a status in the user scope' do
       user, profile, entity = create_user_and_profile
-      post '/statuses', { text: 'test' }.to_json, session_for(profile)
+      xpost '/statuses', { text: 'test' }.to_json, session_for(profile)
 
       status = JSON.parse(last_response.body)
       delete "/statuses/#{status.fetch('id')}", {}, session_for(profile)
 
       last_response.status.must_equal 204
 
-      get "/statuses/#{status.fetch('id')}", {}, session_for(profile)
+      xget "/statuses/#{status.fetch('id')}", {}, session_for(profile)
       last_response.status.must_equal 404
     end
   end # DELETE /timelines/:status_id
