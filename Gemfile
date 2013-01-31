@@ -1,5 +1,7 @@
-source :rubygems 
+source 'http://ruby.taobao.org' 
 
+group :test do 
+end
 group :production do
   gem 'i18n' 
   gem 'tzinfo' 
@@ -21,9 +23,13 @@ group :production do
   gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
   gem 'tire'
   gem 'thin'
-end
 
-group :test do 
+  platforms :jruby do
+  end
+  platforms :ruby do
+  end
+end
+group :test do
   gem 'rack-test',  require: 'rack/test' 
   gem 'minitest',   require: 'minitest/spec' 
   gem 'guard'
@@ -34,10 +40,14 @@ group :test do
   gem 'rb-fchange', require: false
   gem 'pry'
   gem 'pry-doc'
-  gem 'pry-debugger'
-  gem 'pry-rescue'
-  gem 'pry-stack_explorer'
   gem 'minitest-documenter'
   gem 'rb-readline'
-end
 
+  platforms :jruby do
+  end
+  platforms :ruby do
+    gem 'pry-debugger'
+    gem 'pry-rescue'
+    gem 'pry-stack_explorer'
+  end
+end
