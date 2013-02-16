@@ -108,7 +108,7 @@ describe Belinkr::API do
   end # DELETE /scrapbooks/:id
 
   def create_scrapbook_for(profile)
-    post "/scrapbooks", { name: Factory.random_string }.to_json,
+    xpost "/scrapbooks", { name: Factory.random_string }.to_json,
       session_for(profile)
     scrapbook = JSON.parse(last_response.body)
   end #create_scrapbook_for
