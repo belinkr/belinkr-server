@@ -26,9 +26,21 @@ describe API do
   before { $redis.flushdb }
 
   request 'POST /sessions' do
+
     outcome 'authenticates the user and creates a new session' do
       user, profile, password = create_account
       post '/sessions', { email: user.email, password: password }.to_json
+      last_response.status.must_equal 201
+
+      xget '/users'
+      last_response.status.wont_equal 401
+
+      unregister_redis_session_extension
+    end
+
+    outcome 'authenticates the user with remember false' do
+      user, profile, password = create_account
+      post '/sessions', { email: user.email, password: password, remember: false }.to_json
       last_response.status.must_equal 201
 
       xget '/users'
@@ -70,7 +82,7 @@ describe API do
     outcome 'clears the session' do
       user, profile, password = create_account
 
-      post '/sessions', { email: user.email, password: password }.to_json
+      xpost '/sessions', { email: user.email, password: password }.to_json
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
         .must_be_nil
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
@@ -87,19 +99,19 @@ describe API do
         .must_be_empty
 
       user, profile, password = create_account
-      post '/sessions',
+      xpost '/sessions',
         { email: user.email, password: password, remember: true }.to_json
 
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
         .wont_be_nil
 
-      delete '/sessions/1', {}.to_json, session_for(user.profiles.first)
+      xdelete '/sessions/1', {}.to_json, session_for(user.profiles.first)
       rack_mock_session.cookie_jar[Belinkr::Config::REMEMBER_COOKIE]
         .must_be_empty
       rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
         .must_be_empty
 
-      get '/scrapbooks'
+      xget '/scrapbooks'
       last_response.status.must_equal 401
 
       unregister_redis_session_extension
@@ -109,7 +121,7 @@ describe API do
   request 'auth_token HTTP params' do
     outcome 'gets the auth_token from params for Flash uploads' do
       user, profile, password = create_account
-      post '/sessions', { email: user.email, password: password }.to_json
+      xpost '/sessions', { email: user.email, password: password }.to_json
       token = rack_mock_session.cookie_jar[Belinkr::Config::AUTH_TOKEN_COOKIE]
 
       file  = Rack::Test::UploadedFile.new(image_file_path, "image/png", true)
