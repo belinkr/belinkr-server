@@ -72,7 +72,7 @@ describe API do
     end
   end # GET /timelines/files
 
-  request 'POST /timelines' do
+  request 'POST /statuses' do
     outcome 'creates a new status in the user scope' do
       user, profile, entity = create_user_and_profile
       post '/statuses', { text: 'test' }.to_json, session_for(profile)
@@ -81,7 +81,7 @@ describe API do
     end
   end # POST /timelines
 
-  request 'DELETE /timelines/:status_id' do
+  request 'DELETE /statuses/:status_id' do
     outcome 'deletes a status in the user scope' do
       user, profile, entity = create_user_and_profile
       xpost '/statuses', { text: 'test' }.to_json, session_for(profile)
