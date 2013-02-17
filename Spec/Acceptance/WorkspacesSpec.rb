@@ -49,49 +49,49 @@ describe API do
       last_response.body    .must_be_empty
     end
 
-    outcome 'returns the relationship with the current user' do
-      skip
-    end
+    #outcome 'returns the relationship with the current user' do
+    #  skip
+    #end
 
-    outcome 'returns the number of statuses in the workspace' do
-      actor, profile, entity = create_user_and_profile
-      workspace = workspace_by(profile)
-      get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
+    #outcome 'returns the number of statuses in the workspace' do
+    #  actor, profile, entity = create_user_and_profile
+    #  workspace = workspace_by(profile)
+    #  get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
 
-      last_response.status        .must_equal 200
-      json_workspace = JSON.parse(last_response.body)
-      json_workspace.fetch('counters').fetch('users').must_equal 0
-    end
+    #  last_response.status        .must_equal 200
+    #  json_workspace = JSON.parse(last_response.body)
+    #  json_workspace.fetch('counters').fetch('users').must_equal 0
+    #end
 
-    outcome 'returns the number of participants in the workspace' do
-      actor, profile, entity = create_user_and_profile
-      workspace = workspace_by(profile)
-      get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
+    #outcome 'returns the number of participants in the workspace' do
+    #  actor, profile, entity = create_user_and_profile
+    #  workspace = workspace_by(profile)
+    #  get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
 
-      last_response.status        .must_equal 200
-      json_workspace = JSON.parse(last_response.body)
-      json_workspace.fetch('counters').fetch('statuses').must_equal 0
-    end
+    #  last_response.status        .must_equal 200
+    #  json_workspace = JSON.parse(last_response.body)
+    #  json_workspace.fetch('counters').fetch('statuses').must_equal 0
+    #end
 
-    outcome 'returns the number of administrators in the workspace' do
-      actor, profile, entity = create_user_and_profile
-      workspace = workspace_by(profile)
-      get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
+    #outcome 'returns the number of administrators in the workspace' do
+    #  actor, profile, entity = create_user_and_profile
+    #  workspace = workspace_by(profile)
+    #  get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
 
-      last_response.status        .must_equal 200
-      json_workspace = JSON.parse(last_response.body)
-      json_workspace.fetch('counters').fetch('administrators').must_equal 1
-    end
+    #  last_response.status        .must_equal 200
+    #  json_workspace = JSON.parse(last_response.body)
+    #  json_workspace.fetch('counters').fetch('administrators').must_equal 1
+    #end
 
-    outcome 'returns the number of collaborators in the workspace' do
-      actor, profile, entity = create_user_and_profile
-      workspace = workspace_by(profile)
-      get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
+    #outcome 'returns the number of collaborators in the workspace' do
+    #  actor, profile, entity = create_user_and_profile
+    #  workspace = workspace_by(profile)
+    #  get "/workspaces/#{workspace.fetch('id')}", {}, session_for(profile)
 
-      last_response.status        .must_equal 200
-      json_workspace = JSON.parse(last_response.body)
-      json_workspace.fetch('counters').fetch('collaborators').must_equal 0
-    end
+    #  last_response.status        .must_equal 200
+    #  json_workspace = JSON.parse(last_response.body)
+    #  json_workspace.fetch('counters').fetch('collaborators').must_equal 0
+    #end
   end # GET /workspaces/:workspace_id
 
   request "GET /workspaces" do
