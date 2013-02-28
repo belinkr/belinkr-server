@@ -46,8 +46,8 @@ group :test do
   platforms :jruby do
   end
   platforms :ruby do
-    gem 'pry-debugger'
-    gem 'pry-rescue'
+    #gem 'pry-debugger'
+    #gem 'pry-rescue'
     #gem 'pry-stack_explorer'
   end
 end
