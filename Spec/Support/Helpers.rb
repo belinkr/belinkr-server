@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'pry'
-require 'pry-rescue'
-require 'pry-stack_explorer'
+#require 'pry-rescue'
+#require 'pry-stack_explorer'
 require_relative '../Factories/User'
 require_relative '../Factories/Profile'
 require_relative '../Factories/Entity'
@@ -16,9 +16,9 @@ module Belinkr
       module Helpers
         def session_for(profile)
           session = Session::Member.new(
-            user_id:      profile.user_id, 
+            user_id:      profile.user_id,
             profile_id:   profile.id,
-            entity_id:    profile.entity_id 
+            entity_id:    profile.entity_id
           ).sync
 
           { "rack.session" => { auth_token: session.id } }
@@ -31,9 +31,9 @@ module Belinkr
           profiles  = Profile::Collection.new(entity_id: entity.id)
 
           context   = CreateProfileInEntity::Context.new(
-                        actor:    user, 
-                        profile:  profile, 
-                        profiles: profiles, 
+                        actor:    user,
+                        profile:  profile,
+                        profiles: profiles,
                         entity:   entity
                       )
           context.run
