@@ -12,7 +12,7 @@ $redis ||= Redis.new
 $redis.select 8
 module Belinkr
   class API
-    use PryRescue::Rack
+    #use PryRescue::Rack
   end
 end
 
