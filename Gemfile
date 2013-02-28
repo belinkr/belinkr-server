@@ -48,6 +48,6 @@ group :test do
   platforms :ruby do
     gem 'pry-debugger'
     gem 'pry-rescue'
-    gem 'pry-stack_explorer'
+    #gem 'pry-stack_explorer'
   end
 end
