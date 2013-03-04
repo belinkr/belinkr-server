@@ -3,7 +3,8 @@ require 'rest-client'
 require 'yaml'
 require 'json'
 ES_HOST = 'http://localhost:9200'
-ES = YAML.load File.open('config/elastic_search.yaml')
+ES = YAML.load File.open(File.expand_path(
+  './elastic_search.yaml', File.dirname(__FILE__)))
 INDEX_LIST = ES.fetch("index_mapping").keys
 
 module ESConfig

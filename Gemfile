@@ -1,7 +1,5 @@
 source 'http://ruby.taobao.org' 
 
-group :test do 
-end
 group :production do
   gem 'i18n' 
   gem 'tzinfo' 
@@ -20,15 +18,12 @@ group :production do
   gem 'pony'
   gem 'sanitize'
   gem 'tinto'
-  gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
+  #gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
+  gem 'warbler', platform: :jruby, git:'https://github.com/jruby/warbler.git', ref:'ce3ce4df137504822e4cbb9399dee7e7dd767c44'
   gem 'tire'
   gem 'thin'
-
-  platforms :jruby do
-  end
-  platforms :ruby do
-  end
 end
+
 group :test do
   gem 'rack-test',  require: 'rack/test' 
   gem 'minitest',   require: 'minitest/spec' 
@@ -43,11 +38,7 @@ group :test do
   gem 'minitest-documenter'
   gem 'rb-readline'
 
-  platforms :jruby do
-  end
-  platforms :ruby do
-    #gem 'pry-debugger'
-    #gem 'pry-rescue'
-    #gem 'pry-stack_explorer'
-  end
+  gem 'pry-debugger'
+  gem 'pry-rescue'
+  gem 'pry-stack_explorer'
 end

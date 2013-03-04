@@ -1,4 +1,4 @@
-require_relative 'config/config_elasticsearch'
+require './Config/Elasticsearch'
 task :default => [:reset_elasticsearch]
 
 desc "reset all elasticsearch index"
@@ -21,5 +21,7 @@ task :config_es_index_map do
   esindex.put_mappings(index)
   esindex.get_mappings(index)
 end
-
-
+desc "seeds"
+task :seeds do
+  require './Spec/Support/Seeds' 
+end

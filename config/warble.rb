@@ -8,13 +8,13 @@ Warbler::Config.new do |config|
   # - gemjar: package the gem repository in a jar file in WEB-INF/lib
   # - executable: embed a web server and make the war executable
   # - compiled: compile .rb files to .class files
-  config.features = %w(gemjar compiled)
+  config.features = %w(gemjar compiled runnable executable)
 
   # Application directories to be included in the webapp.
-  config.dirs = %w(API Cases Resources Services config Locales Workers)
+  config.dirs = %w(API Cases config Config config Locales Resources Services Spec tmp Workers)
 
   # Additional files/directories to include, above those in config.dirs
-  config.includes = ['API.rb', 'Config.rb']
+  config.includes = ['API.rb', 'Config.rb', 'Spec.rb', 'Rakefile']
 
   # Additional files/directories to exclude
   # config.excludes = FileList["lib/tasks/*"]
