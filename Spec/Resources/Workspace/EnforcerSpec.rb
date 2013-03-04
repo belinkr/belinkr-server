@@ -20,7 +20,7 @@ describe Workspace::Enforcer do
 
     @collaborator   = OpenStruct.new(id: 1)
     @administrator  = OpenStruct.new(id: 2)
-    @not_involved   = OpenStruct.new(id: 3)
+    @not_involved   = OpenStruct.new(id: 300)
 
     @enforcer       = Workspace::Enforcer.new(@workspace, @tracker)
     @tracker.track_collaborator(@workspace, @collaborator)
