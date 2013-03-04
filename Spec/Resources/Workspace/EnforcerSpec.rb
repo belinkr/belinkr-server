@@ -5,21 +5,26 @@ require 'Tinto/Exceptions'
 require_relative '../../../Resources/Workspace/Enforcer'
 require_relative '../../../Services/Tracker'
 
+require 'redis'
+$redis ||= Redis.new
+$redis.select 8
+$redis.flushdb
+
 include Belinkr
 include Tinto::Exceptions
 
 describe Workspace::Enforcer do
   before do
     @workspace      = OpenStruct.new(id: 0)
-    @tracker        = Workspace::Tracker.new(Workspace::Tracker::MemoryBackend.new)
+    @tracker        = Workspace::Tracker.new(Workspace::Tracker::RedisBackend.new)
 
     @collaborator   = OpenStruct.new(id: 1)
     @administrator  = OpenStruct.new(id: 2)
     @not_involved   = OpenStruct.new(id: 3)
 
     @enforcer       = Workspace::Enforcer.new(@workspace, @tracker)
-    @tracker.register(@workspace, @collaborator, :collaborator)
-    @tracker.register(@workspace, @administrator, :administrator)
+    @tracker.track_collaborator(@workspace, @collaborator)
+    @tracker.track_administrator(@workspace, @administrator)
   end
 
   describe '#authorize' do
