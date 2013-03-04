@@ -5,6 +5,10 @@ require 'Tinto/Exceptions'
 require_relative '../../../../Resources/Workspace/Autoinvitation/Enforcer'
 require_relative '../../../../Services/Tracker'
 
+require 'redis'
+$redis ||= Redis.new
+$redis.select 8
+$redis.flushdb
 
 include Belinkr
 include Tinto::Exceptions
@@ -14,7 +18,7 @@ describe Workspace::Autoinvitation::Enforcer do
     @workspace      = OpenStruct.new(id: 0)
     @autoinvitation = OpenStruct.new(id: 0)
     @tracker        = Workspace::Tracker
-                        .new(Workspace::Tracker::MemoryBackend.new)
+                        .new(Workspace::Tracker::RedisBackend.new)
     @enforcer       = Workspace::Autoinvitation::Enforcer
                         .new(@workspace, @autoinvitation, @tracker)
 
@@ -22,10 +26,11 @@ describe Workspace::Autoinvitation::Enforcer do
     @collaborator   = OpenStruct.new(id: 3)
     @invited        = OpenStruct.new(id: 4)
     @autoinvited    = OpenStruct.new(id: 5)
+    @invitation     = OpenStruct.new(id: 1)
 
-    @tracker.register(@workspace, @collaborator, :collaborator)
-    @tracker.register(@workspace, @invited, :invited)
-    @tracker.register(@workspace, @autoinvited, :autoinvited)
+    @tracker.track_collaborator(@workspace, @collaborator)
+    @tracker.track_invitation(@workspace, @invited, @invitation)
+    @tracker.track_autoinvitation(@workspace, @autoinvited, @autoinvitation)
   end
 
   describe '#autoinvite' do
@@ -36,7 +41,7 @@ describe Workspace::Autoinvitation::Enforcer do
     it 'raises if the actor is already invited' do
       lambda { @enforcer.autoinvite(@invited) }.must_raise NotAllowed
     end
-    
+
     it 'raises if the actor is already autoinvited' do
       lambda { @enforcer.autoinvite(@autoinvited) }.must_raise NotAllowed
     end

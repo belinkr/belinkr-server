@@ -45,15 +45,15 @@ module Belinkr
           relationship == 'collaborator' || relationship == 'administrator'
         end #is_in?
 
-        #  validation_error "validation.errors.already_in_workspace" if 
-        #  validation_error "validation.errors.already_requested" if 
-        #  validation_error "validation.errors.already_invited" if 
+        #  validation_error "validation.errors.already_in_workspace" if
+        #  validation_error "validation.errors.already_requested" if
+        #  validation_error "validation.errors.already_invited" if
 
         def validation_error(message_key)
           violation = Aequitas::Violation
                       .new(@invitation, I18n::t(message_key))
           @invitation.errors[:invited_id] << violation
-          raise InvalidResource 
+          raise InvalidResource
         end
       end # Enforcer
     end # Invitation
