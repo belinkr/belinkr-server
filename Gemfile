@@ -38,7 +38,8 @@ group :test do
   gem 'minitest-documenter'
   gem 'rb-readline'
 
-  gem 'pry-debugger'
-  gem 'pry-rescue'
-  gem 'pry-stack_explorer'
+  # not available in ruby2.0
+  #gem 'pry-debugger'
+  #gem 'pry-rescue'
+  #gem 'pry-stack_explorer'
 end
