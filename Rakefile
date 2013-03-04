@@ -21,7 +21,16 @@ task :config_es_index_map do
   esindex.put_mappings(index)
   esindex.get_mappings(index)
 end
-desc "seeds"
+
+desc <<-EOL
+seeds
+set following environment variables first:
+belinkr_init_entity_name
+belinkr_init_user_first
+belinkr_init_user_last
+belinkr_init_user_email
+belinkr_init_user_password
+EOL
 task :seeds do
   require './Spec/Support/Seeds' 
 end

@@ -13,16 +13,16 @@ $redis.flushdb
 
 include Belinkr
 
-@entity = Entity::Member.new(name: 'belinkr labs')
+@entity = Entity::Member.new(name: ENV['belinkr_init_entity_name'] || 'belinkr labs')
 @entities = Entity::Collection.new
 
 CreateEntity::Context.new(entity: @entity, entities: @entities).run
 
 @user   = User::Member.new(
-  first:    'Lorenzo',
-  last:     'Planas',
-  email:    'lp@belinkr.com',
-  password: 'changeme'
+  first:    ENV['belinkr_init_user_first'] || 'Lorenzo',
+  last:     ENV['belinkr_init_user_last'] || 'Planas',
+  email:    ENV['belinkr_init_user_email'] || 'lp@belinkr.com',
+  password: ENV['belinkr_init_user_password'] || 'changeme'
 )
 @profile = Profile::Member.new
 @profiles = Profile::Collection.new entity_id: @entity.id
