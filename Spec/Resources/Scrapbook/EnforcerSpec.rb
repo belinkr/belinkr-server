@@ -16,8 +16,8 @@ describe Scrapbook::Enforcer do
   end #initialize
 
   describe '#authorize' do
-    it 'raises unless the actor is the same as the inviter' do
-      scrapbook = OpenStruct.new(inviter_id: 8)
+    it 'raises unless the actor is the same as the user' do
+      scrapbook = OpenStruct.new(user_id: 8)
       enforcer  = Scrapbook::Enforcer.new(scrapbook)
 
       lambda { enforcer.authorize(OpenStruct.new(id: 5), 'update') }
