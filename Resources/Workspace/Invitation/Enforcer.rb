@@ -21,8 +21,8 @@ module Belinkr
           relationship = tracker.relationship_for(workspace, invited)
           raise NotAllowed unless is_in?(actor)
           raise NotAllowed if is_in?(invited)
-          raise NotAllowed if relationship == 'invited'
-          raise NotAllowed if relationship == 'autoinvited'
+          raise NotAllowed if relationship =~ /invitation/
+          raise NotAllowed if relationship =~ /autoinvitation/
           true
         end
 
