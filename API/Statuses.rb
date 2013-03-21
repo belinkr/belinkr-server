@@ -28,7 +28,7 @@ module Belinkr
       end
     end # get /timelines/:kind
 
-    post '/statuses' do
+    post %r{(/statuses)|(/timelines)$} do
       data    = CreateStatus::Request.new(request_data).prepare
       status  = data.fetch(:status)
 
