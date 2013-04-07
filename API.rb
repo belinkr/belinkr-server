@@ -99,7 +99,7 @@ module Belinkr
         return User::Member.new unless current_session
         @current_user ||= User::Member.new(id: current_session.user_id).fetch
       end
-      
+
       def current_profile
         return Profile::Member.new unless current_session
         @current_profile ||= Profile::Member.new(
@@ -109,20 +109,20 @@ module Belinkr
       end
 
       def request_data
-        @request_data ||= { 
+        @request_data ||= {
           payload:    combined_input,
           actor:      current_user,
           entity:     current_entity
         }
       end #request_data
-      
+
       def auth_token_cookie
-        token = request.cookies[Config::AUTH_TOKEN_COOKIE] 
+        token = request.cookies[Config::AUTH_TOKEN_COOKIE]
         token && !token.empty? ? token : false
       end
 
       def remember_cookie
-        token = request.cookies[Config::REMEMBER_COOKIE] 
+        token = request.cookies[Config::REMEMBER_COOKIE]
         token && !token.empty? ? token : false
       end
 
