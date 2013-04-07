@@ -41,7 +41,7 @@ group :contexts do
   guard :minitest, test_folders: ["Spec/Cases"], 
   test_file_patterns: ["*ContextSpec.rb"] do
     watch(%r|^Cases/(.*)/(.*)\.rb|) { |matches| 
-      "Spec/#{matches[1]}/#{matches[2]}Spec.rb" 
+      "Spec/Cases/#{matches[1]}/#{matches[2]}Spec.rb" 
     }
     watch(%r|^Spec/Cases/(.*)/(.*)Spec\.rb|)
   end
@@ -51,7 +51,7 @@ group :requests do
   guard :minitest, test_folders: ["Spec/Cases"], 
   test_file_patterns: ["*RequestSpec.rb"] do
     watch(%r|^Cases/(.*)/(.*)\.rb|) { |matches| 
-      "Spec/#{matches[1]}/#{matches[2]}Spec.rb" 
+      "Spec/Cases/#{matches[1]}/#{matches[2]}Spec.rb" 
     }
     watch(%r|^Spec/Cases/(.*)/(.*)Spec\.rb|)
   end
@@ -60,8 +60,8 @@ end
 group :api do
   guard :minitest, test_folders: ["Spec/API"], 
   test_file_patterns: ["*Spec.rb"] do
-    watch(%r|^Cases/(.*)/(.*)\.rb|) { |matches| 
-      "Spec/#{matches[1]}Spec.rb" 
+    watch(%r|^API/(.*)\.rb|) { |matches| 
+      "Spec/API/#{matches[1]}Spec.rb" 
     }
     watch(%r|^Spec/API/(.*)Spec\.rb|)
   end
