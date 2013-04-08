@@ -8,6 +8,14 @@ require_relative '../Polymorphic/Polymorphic'
 module Belinkr
   module Reply
     class Member
+    end
+  end
+end
+require_relative '../Status/Member'
+
+module Belinkr
+  module Reply
+    class Member
       extend Forwardable
       include Virtus
       include Aequitas
@@ -51,7 +59,8 @@ module Belinkr
       private
 
       def base_storage_key
-
+        @status ||= Status::Member.new(id: status_id)
+        "#{@status.storage_key}:#{status_id}"
       end
 
     end # Reply

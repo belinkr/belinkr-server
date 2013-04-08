@@ -6,8 +6,8 @@ module Belinkr
     class Enforcer
       include Tinto::Exceptions
 
-      def self.authorize(user, action, status, reply)
-        new(status, reply).send :"#{action}_by?", user
+      def authorize(user, action)
+        send :"#{action}_by?", user
       end
 
       def initialize(status, reply)
@@ -16,17 +16,21 @@ module Belinkr
       end
 
       def create_by?(user)
+        true
       end
 
       def read_by?(user)
+        true
       end
 
       def update_by?(user)
         raise NotAllowed unless user.id == @reply.user_id
+        true
       end
 
       def delete_by?(user)
         raise NotAllowed unless user.id == @reply.user_id
+        true
       end
 
       alias_method :undelete_by?,   :delete_by?

@@ -23,8 +23,8 @@ module Belinkr
       attribute :scope,             Polymorphic
       attribute :files,             Set[String], default: Set.new
       attribute :replies,           Set[Reply::Member]
-      attribute :created_at,        Time 
-      attribute :updated_at,        Time 
+      attribute :created_at,        Time
+      attribute :updated_at,        Time
       attribute :deleted_at,        Time
 
       validates_presence_of         :author, :text
@@ -59,7 +59,7 @@ module Belinkr
       end #storage_key
 
       private
-      
+
       attr_reader :base_storage_key
     end # Member
   end # Status

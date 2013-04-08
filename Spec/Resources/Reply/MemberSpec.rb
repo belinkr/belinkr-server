@@ -64,4 +64,17 @@ describe Reply::Member do
     end
   end #author
 
+  describe '#storage_key' do
+    it 'must get from status storage_key' do
+      user = User::Member.new
+      status = Status::Member.new(user_id:user.id)
+      status.scope = user
+      reply = Reply::Member.new(status_id:status.id)
+      reply.instance_variable_set :@status, status
+
+      reply.storage_key
+        .must_equal "users:#{user.id}:statuses:#{status.id}:replies"
+    end
+  end
+
 end
