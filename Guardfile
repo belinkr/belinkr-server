@@ -14,10 +14,10 @@ group :resources do
   guard :minitest, test_folders: ["Spec/Resources"], 
   test_file_patterns: ["*MemberSpec.rb", "*CollectionSpec.rb"] do
     watch(%r|^Resources/(.*)/(.*)\.rb|) { |matches| 
-      "Spec/#{matches[1]}/#{matches[2]}Spec.rb" 
+      "Spec/Resources/#{matches[1]}/#{matches[2]}Spec.rb" 
     }
     watch(%r|^Resources/(.*)/(.*)/(.*)\.rb|) { |matches| 
-      "Spec/#{matches[1]}/#{matches[2]}/#{matches[3]}Spec.rb" 
+      "Spec/Resources/#{matches[1]}/#{matches[2]}/#{matches[3]}Spec.rb" 
     }
     watch(%r|^Spec/Resources/(.*)/(.*)Spec\.rb|)
   end
