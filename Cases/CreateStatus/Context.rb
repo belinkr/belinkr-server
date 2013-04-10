@@ -15,7 +15,7 @@ module Belinkr
 
       def call
         enforcer.authorize(actor, :create_status)
-        timelines.each { |timeline| timeline.add status } 
+        timelines.each { |timeline| timeline.add status }
 
         will_sync status, *timelines
       end #call
