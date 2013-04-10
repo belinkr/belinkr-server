@@ -16,6 +16,16 @@ describe Reply::Enforcer do
   end
 
   describe 'authorize' do
+
+    it 'allow any acor to post new reply' do
+      status = OpenStruct.new(user_id: 8, id: 2)
+      user = OpenStruct.new(id: 9)
+      reply = OpenStruct.new(id: 1, status_id: 2, user_id: 9)
+      enforcer = Reply::Enforcer.new(status, reply)
+      enforcer.authorize(user, 'create').must_equal true
+    end
+
+
     it 'raise unless the acor is the same as the user when delete' do
       user = OpenStruct.new(id: 8)
       status = OpenStruct.new(user_id: 8, id: 2)
