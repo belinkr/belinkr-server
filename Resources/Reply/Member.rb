@@ -30,6 +30,7 @@ module Belinkr
       attribute :status_id,       Integer
       attribute :created_at,      Time
       attribute :updated_at,      Time
+      attribute :deleted_at,      Time
 
       validates_presence_of       :author, :text, :status_id
       validates_length_of         :text, min: 1, max: 10000

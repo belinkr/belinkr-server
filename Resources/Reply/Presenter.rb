@@ -6,6 +6,7 @@ module Belinkr
     class Presenter
       def initialize(reply, scope={})
         @reply = reply
+        @actor      = scope.fetch(:actor)
       end #initialize
 
       def as_json(*args)
@@ -24,14 +25,15 @@ module Belinkr
 
       private
 
+      attr_reader :reply, :actor
       def links
         status_path = "/statuses/#{reply.status_id}"
         {
           links: {
             self:    "#{status_path}/replies/#{reply.id}",
             status:  status_path,
-            author:  "/users/#{reply.user_id}",
-            avatar:  reply.author.avatar
+            author:  "/users/#{actor.id}",
+            avatar:  actor.avatar
           }
         }
       end #links
