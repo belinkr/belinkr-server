@@ -4,6 +4,8 @@ require_relative '../Resources/Reply/Presenter'
 require_relative '../Resources/Reply/Member'
 require_relative '../Cases/CreateReply/Request'
 require_relative '../Cases/CreateReply/Context'
+require_relative '../Cases/EditReply/Request'
+require_relative '../Cases/EditReply/Context'
 
 module Belinkr
   class API < Sinatra::Base
@@ -37,30 +39,16 @@ module Belinkr
         CreateReply::Context.new(data).run
         reply
       end
-
-      #status  = Status::Member
-      #          .new(id: params[:status_id], entity_id: current_user.entity_id)
-      #reply   = Reply::Member.new(payload)
-
-      #dispatch :create, reply do
-      #  Reply::Orchestrator
-      #    .new(current_user, Reply::Enforcer, Status::Timeliner)
-      #    .create(status, reply)
-      #end
     end # post /statuses/:status_id/replies
 
-    #put '/statuses/:status_id/replies/:id' do
-    #  status  = Status::Member
-    #            .new(id: params[:status_id], entity_id: current_user.entity_id)
-    #  reply   = status.replies.get params[:id]
-    #  changes = Reply::Member.new(payload)
-
-    #  dispatch :update, reply do
-    #    Reply::Orchestrator
-    #      .new(current_user, Reply::Enforcer, Status::Timeliner)
-    #      .update(status, reply, changes)
-    #  end
-    #end # put /statuses/:status_id/replies/:id
+    put '/statuses/:status_id/replies/:id' do
+      data = EditReply::Request.new(request_data).prepare
+      reply = data.fetch(:reply)
+      dispatch :update, reply do
+        EditReply::Context.new(data).run
+        reply
+      end
+    end # put /statuses/:status_id/replies/:id
 
     #delete '/statuses/:status_id/replies/:id' do
     #  status  = Status::Member
