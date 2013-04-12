@@ -2,6 +2,7 @@
 require 'minitest/autorun'
 require 'rack/test'
 require 'json'
+require_relative '../../API/Statuses'
 require_relative '../../API/Replies'
 require_relative '../Support/Helpers'
 require_relative '../Factories/Entity'
@@ -43,6 +44,8 @@ describe API do
       post "/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
         session_for(profile)
       last_response.status.must_equal 201
+      reply = JSON.parse(last_response.body)
+      reply['text'].must_equal 'test reply'
     end
   end
 
