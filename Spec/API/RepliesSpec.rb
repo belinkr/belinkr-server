@@ -47,6 +47,19 @@ describe API do
       reply = JSON.parse(last_response.body)
       reply['text'].must_equal 'test reply'
     end
+    it "post a new reply of the status from different user in same entity" do
+      user, profile, entity = create_user_and_profile
+      replier, profile_replier, entity = create_user_and_profile(entity)
+      user.sync
+      replier.sync
+      post '/statuses', { text: 'test' }.to_json, session_for(profile)
+      status = JSON.parse(last_response.body)
+      post "/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
+        session_for(profile_replier)
+      last_response.status.must_equal 201
+      reply = JSON.parse(last_response.body)
+      reply['text'].must_equal 'test reply'
+    end
   end
 
   #describe "PUT /statuses/:status_id/replies/:id" do
