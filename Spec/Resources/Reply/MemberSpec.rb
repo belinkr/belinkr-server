@@ -67,7 +67,7 @@ describe Reply::Member do
   describe '#storage_key' do
     it 'must get from status storage_key' do
       user = User::Member.new
-      status = Status::Member.new(user_id:user.id)
+      status = Status::Member.new
       status.scope = user
       reply = Reply::Member.new(status_id:status.id)
       reply.instance_variable_set :@status, status

@@ -29,7 +29,7 @@ module Belinkr
       end
 
       def delete_by?(user)
-        raise NotAllowed unless user.id == @reply.user_id
+        raise NotAllowed unless user.id == @reply.author.id
         true
       end
 

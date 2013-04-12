@@ -16,32 +16,33 @@ describe Reply::Enforcer do
   end
 
   describe 'authorize' do
+    user = OpenStruct.new id: 8
+    replier = OpenStruct.new id: 9
+    other = OpenStruct.new id: 10
 
-    it 'allow any acor to post new reply' do
-      status = OpenStruct.new(user_id: 8, id: 2)
-      user = OpenStruct.new(id: 9)
-      reply = OpenStruct.new(id: 1, status_id: 2, user_id: 9)
+    it 'allow any actor to post new reply' do
+      status = OpenStruct.new(id: 2, author: user)
+      reply = OpenStruct.new(id: 1, status_id: 2, author:replier)
       enforcer = Reply::Enforcer.new(status, reply)
       enforcer.authorize(user, 'create').must_equal true
     end
 
 
-    it 'raise unless the acor is the same as the user when delete' do
-      user = OpenStruct.new(id: 8)
-      status = OpenStruct.new(user_id: 8, id: 2)
-      reply = OpenStruct.new(id: 1, status_id: 2, user_id: 8)
+    it 'raise unless the actor is the same as the user when delete' do
+      status = OpenStruct.new(author:user, id: 2)
+      reply = OpenStruct.new(id: 1, status_id: 2, author:replier)
       enforcer = Reply::Enforcer.new(status, reply)
-      lambda {enforcer.authorize(OpenStruct.new(id: 9), 'delete')}.must_raise NotAllowed
-      enforcer.authorize(user, 'delete').must_equal true
+      lambda {enforcer.authorize(other, 'delete')}.must_raise NotAllowed
+      enforcer.authorize(replier, 'delete').must_equal true
     end
 
-    it 'raise unless the acor is the same as the user when update' do
+    it 'raise unless the actor is the same as the user when update' do
       user = OpenStruct.new(id: 8)
-      status = OpenStruct.new(user_id: 8, id: 2)
-      reply = OpenStruct.new(id: 1, status_id: 2, user_id: 8)
+      status = OpenStruct.new(author:user, id: 2)
+      reply = OpenStruct.new(id: 1, status_id: 2, author:replier)
       enforcer = Reply::Enforcer.new(status, reply)
-      lambda {enforcer.authorize(OpenStruct.new(id: 9), 'update')}.must_raise NotAllowed
-      enforcer.authorize(user, 'delete').must_equal true
+      lambda {enforcer.authorize(other, 'update')}.must_raise NotAllowed
+      enforcer.authorize(replier, 'delete').must_equal true
     end
 
   end
