@@ -17,7 +17,9 @@ module Belinkr
         {
           id:         status.id,
           text:       status.text,
-          files:      status.files
+          files:      status.files,
+          url:        status.url,
+          replies:    status.replies
         }
          .merge! Tinto::Presenter.timestamps_for(status)
          .merge! Tinto::Presenter.errors_for(status)

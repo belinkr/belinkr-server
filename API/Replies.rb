@@ -32,7 +32,7 @@ module Belinkr
     #  end
     #end # get /statuses/:status_id/replies/:id
 
-    post '/statuses/:status_id/replies' do
+    post '/users/:user_id/statuses/:status_id/replies' do
       data = CreateReply::Request.new(request_data).prepare
       reply = data.fetch(:reply)
       dispatch :create, reply do
@@ -41,7 +41,7 @@ module Belinkr
       end
     end # post /statuses/:status_id/replies
 
-    put '/statuses/:status_id/replies/:id' do
+    put '/users/:user_id/statuses/:status_id/replies/:id' do
       data = EditReply::Request.new(request_data).prepare
       reply = data.fetch(:reply)
       dispatch :update, reply do

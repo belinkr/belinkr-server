@@ -9,7 +9,7 @@ module Belinkr
         @payload    = arguments.fetch(:payload)
         @actor      = arguments.fetch(:actor)
         @entity     = arguments.fetch(:entity)
-        @status_author_id = @payload.delete('status_author_id')
+        @status_author_id = @payload.delete('user_id') || @payload.delete('status_author_id')
         @status_class = arguments.fetch(:status_class,Status::Member)
         @user_class = arguments.fetch(:user_class,User::Member)
         @status_scope_class = arguments.fetch(:status_scope_class,Status::Scope)

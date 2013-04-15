@@ -19,6 +19,7 @@ require_relative './API/Scrapbooks'
 require_relative './API/Files'
 require_relative './API/Users'
 require_relative './API/Statuses'
+require_relative './API/Replies'
 
 require_relative './Resources/Session/Member'
 require_relative './Resources/User/Member'

@@ -17,7 +17,7 @@ describe 'request model for CreateReply' do
     before do
       @entity = OpenStruct.new(id:1)
       @actor = OpenStruct.new(id:2)
-      @payload   = { 'status_id' => 5, 'text' => 'test reply', 'status_author_id'=>6 }
+      @payload   = { 'user_id' => 2, 'status_id' => 5, 'text' => 'test reply', 'status_author_id'=>6 }
 
       @arguments = { payload: @payload, actor: @actor, entity: @entity}
       @arguments.merge! status_class: OpenStruct

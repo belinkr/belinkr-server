@@ -14,7 +14,7 @@ module Belinkr
       include Aequitas
 
       MODEL_NAME  = 'status'
-      WHITELIST   = %w{ text files }
+      WHITELIST   = %w{ text files replies }
 
       attribute :id,                String
       attribute :text,              String
@@ -26,6 +26,7 @@ module Belinkr
       attribute :created_at,        Time
       attribute :updated_at,        Time
       attribute :deleted_at,        Time
+      attribute :url,               String
 
       validates_presence_of         :author, :text
       validates_length_of           :text, min: 1, max: 10000
@@ -57,6 +58,10 @@ module Belinkr
       def storage_key
         "#{base_storage_key}:statuses"
       end #storage_key
+
+      def url
+        "/#{storage_key.split(':').join('/')}/#{id}"
+      end
 
       private
 

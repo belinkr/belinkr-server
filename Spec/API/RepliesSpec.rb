@@ -39,9 +39,9 @@ describe API do
     it "post a new reply of the status" do
       user, profile, entity = create_user_and_profile
       user.sync
-      post '/statuses', { text: 'test' }.to_json, session_for(profile)
+      post "/statuses", { text: 'test' }.to_json, session_for(profile)
       status = JSON.parse(last_response.body)
-      post "/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
+      post "/users/#{user.id}/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
         session_for(profile)
       last_response.status.must_equal 201
       reply = JSON.parse(last_response.body)
@@ -53,9 +53,9 @@ describe API do
       replier, profile_replier, entity = create_user_and_profile(entity)
       user.sync
       replier.sync
-      post '/statuses', { text: 'test' }.to_json, session_for(profile)
+      post "/statuses", { text: 'test' }.to_json, session_for(profile)
       status = JSON.parse(last_response.body)
-      post "/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
+      post "/users/#{user.id}/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
         session_for(profile_replier)
       last_response.status.must_equal 201
       reply = JSON.parse(last_response.body)
@@ -67,13 +67,13 @@ describe API do
     it "update a reply" do
       user, profile, entity = create_user_and_profile
       user.sync
-      post '/statuses', { text: 'test' }.to_json, session_for(profile)
+      post "/statuses", { text: 'test' }.to_json, session_for(profile)
       status = JSON.parse(last_response.body)
-      post "/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
+      post "/users/#{user.id}/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
         session_for(profile)
       reply = JSON.parse(last_response.body)
 
-      put "/statuses/#{status.fetch('id')}/replies/#{reply.fetch('id')}", { status_author_id: user.id, text: 'changed test reply' }.to_json,
+      put "/users/#{user.id}/statuses/#{status.fetch('id')}/replies/#{reply.fetch('id')}", { status_author_id: user.id, text: 'changed test reply' }.to_json,
         session_for(profile)
       last_response.status.must_equal 200
       reply = JSON.parse(last_response.body)
