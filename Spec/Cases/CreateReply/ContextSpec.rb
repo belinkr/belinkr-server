@@ -10,7 +10,7 @@ describe 'create status reply' do
   before do
     @enforcer   = Enforcer::Double.new
     @actor      = OpenStruct.new
-    @reply     = OpenStruct.new
+    @reply     = OpenStruct.new(author:OpenStruct.new(id:3))
 
     @status     = OpenStruct.new
     @status.replies = Minitest::Mock.new

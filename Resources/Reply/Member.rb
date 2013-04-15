@@ -28,6 +28,7 @@ module Belinkr
       attribute :author,          Polymorphic
       attribute :files,           Set[String], default: Set.new
       attribute :status_id,       Integer
+      attribute :author_id,       Integer
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
