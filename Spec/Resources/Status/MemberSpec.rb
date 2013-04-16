@@ -1,9 +1,11 @@
 # encoding: utf-8
 require 'minitest/autorun'
 require 'json'
+require_relative '../../../Config'
 require_relative '../../../Locales/Loader'
 require_relative '../../../Resources/Status/Member'
 require_relative '../../../Resources/User/Member'
+require_relative '../../../Resources/Polymorphic/Polymorphic'
 
 include Belinkr
 
@@ -58,7 +60,8 @@ describe Status::Member do
   describe '#forwarder' do
     it 'returns a polymorphic object that proxies a User' do
       status = Status::Member.new
-      status.forwarder = User::Member.new(id: 1, first: 'John', last: 'Doe')
+      status.forwarder = status.author =
+        User::Member.new(id: 1, first: 'John', last: 'Doe')
       status.forwarder.name.must_equal 'John Doe'
 
       status = Status::Member.new JSON.parse(status.to_json)
