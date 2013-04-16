@@ -12,7 +12,7 @@ end
 
 group :resources do
   guard :minitest, test_folders: ["Spec/Resources"], 
-  test_file_patterns: ["*MemberSpec.rb", "*CollectionSpec.rb", "*EnforcerSpec.rb", "*ScopeSpec.rb"] do
+  test_file_patterns: ["*MemberSpec.rb", "*CollectionSpec.rb", "*EnforcerSpec.rb", "*ScopeSpec.rb", "PolymorphicSpec.rb"] do
     watch(%r|^Resources/(.*)/(.*)\.rb|) { |matches| 
       "Spec/Resources/#{matches[1]}/#{matches[2]}Spec.rb" 
     }
