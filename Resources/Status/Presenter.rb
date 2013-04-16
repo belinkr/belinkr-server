@@ -16,6 +16,7 @@ module Belinkr
       def as_poro
         {
           id:         status.id,
+          author:     status.author.to_clean_hash,
           text:       status.text,
           files:      status.files,
           url:        status.url,
