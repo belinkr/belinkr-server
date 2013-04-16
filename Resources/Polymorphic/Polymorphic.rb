@@ -45,7 +45,8 @@ module Belinkr
       end
 
       def attributes
-        { kind: @kind, resource: @resource.attributes }
+        { kind: @kind,
+          resource: resource.attributes.select {|k| previewable?(k)} }
       end
 
       def to_json(*args)
@@ -55,20 +56,28 @@ module Belinkr
         }.to_json(*args)
       end
 
+      def to_clean_hash
+        {
+          kind:     @kind,
+          resource: resource.attributes.select { |k, v| previewable?(k) }
+        }
+      end
+
       def method_missing(method, *args)
         resource.send method, *args if resource.respond_to? method
       end
 
       def respond_to?(method, include_private=false)
-        resource.respond_to?(method, include_private) || 
+        resource.respond_to?(method, include_private) ||
           super(method, include_private)
       end
 
       private
 
       def json_for(resource)
-        return resource unless resource.respond_to? :keys
-        resource.select { |k, v| previewable?(k) }
+        return resource.select { |k, v| previewable?(k) } if resource.respond_to? :keys
+        return resource.attributes.select { |k, v| previewable?(k) } if resource.respond_to? :attributes
+        return resource #unless resource.respond_to? :keys
       end
 
       def previewable?(key)
@@ -76,7 +85,7 @@ module Belinkr
       end
 
       def hydrate
-        klass = klass_for(MAP.fetch(self.kind)) 
+        klass = klass_for(MAP.fetch(self.kind))
         klass.new(@resource)
       end
 
