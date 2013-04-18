@@ -44,8 +44,10 @@ module Belinkr
 
       def to_json(*args)
         attributes.to_hash
-          .merge!( files: files.to_a, replies: replies.to_a)
-          .to_json
+          .merge!( files: files.to_a,
+                   replies: replies.to_a,
+                   author: author.to_clean_hash,
+                   scope: scope.to_clean_hash).to_json
       end #to_json
 
       def scope=(new_scope)

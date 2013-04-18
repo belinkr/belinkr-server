@@ -18,7 +18,7 @@ module Belinkr
 
       MODEL_NAME          = 'polymorphic'
       MAP                 = Belinkr::Config::RESOURCE_MAP
-      PREVIEWABLE_FIELDS  = %w{ id name kind resource avatar }
+      PREVIEWABLE_FIELDS  = %w{ id name kind resource avatar user_id workspace_id scrapbook_id }
 
       attribute :kind,        String
       attribute :resource,    Hash
