@@ -28,7 +28,6 @@ module Belinkr
       attribute :author,          Polymorphic
       attribute :files,           Set[String], default: Set.new
       attribute :status_id,       Integer
-      attribute :author_id,       Integer
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
@@ -47,8 +46,12 @@ module Belinkr
       end #initialize
 
       def to_json(*args)
-        attributes.to_hash.merge(files: files.to_a).to_json(*args)
+        to_clean_hash.to_json(*args)
       end #to_json
+
+      def to_clean_hash
+        attributes.merge!({files: files.to_a, author: author.to_clean_hash})
+      end
 
       def files?
         !files.empty?

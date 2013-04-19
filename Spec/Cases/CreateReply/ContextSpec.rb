@@ -2,6 +2,7 @@
 require 'minitest/autorun'
 require 'ostruct'
 require_relative '../../../Cases/CreateReply/Context'
+require_relative '../../../Resources/Reply/Member'
 require_relative '../../Doubles/Enforcer/Double'
 
 include Belinkr
@@ -11,6 +12,9 @@ describe 'create status reply' do
     @enforcer   = Enforcer::Double.new
     @actor      = OpenStruct.new
     @reply     = OpenStruct.new(author:OpenStruct.new(id:3))
+    def @reply.to_clean_hash
+      {:id=> 3}
+    end
 
     @status     = OpenStruct.new
     @status.replies = Minitest::Mock.new

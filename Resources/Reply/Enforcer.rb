@@ -24,7 +24,7 @@ module Belinkr
       end
 
       def update_by?(user)
-        raise NotAllowed unless user.id == @reply.author_id
+        raise NotAllowed unless user.id == @reply.author.id
         true
       end
 
