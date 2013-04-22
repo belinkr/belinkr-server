@@ -16,9 +16,9 @@ module Belinkr
 
       def call
         enforcer.authorize(actor, :create)
-        @reply.status_id = @status.id
+        reply.status_id = status.id
 
-        status.replies  << @reply
+        status.replies  << reply
         will_sync status
 
       end
