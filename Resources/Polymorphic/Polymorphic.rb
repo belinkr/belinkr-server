@@ -77,6 +77,7 @@ module Belinkr
       def json_for(resource)
         return resource.select { |k, v| previewable?(k) } if resource.respond_to? :keys
         return resource.attributes.select { |k, v| previewable?(k) } if resource.respond_to? :attributes
+        return resource.marshal_dump.select { |k, v| previewable?(k) } if resource.class == OpenStruct
         return resource #unless resource.respond_to? :keys
       end
 
@@ -85,6 +86,7 @@ module Belinkr
       end
 
       def hydrate
+        return @resource unless @resource.is_a?(Hash)
         klass = klass_for(MAP.fetch(self.kind))
         klass.new(@resource)
       end
