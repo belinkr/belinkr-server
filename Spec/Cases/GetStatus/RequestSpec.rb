@@ -74,6 +74,10 @@ describe 'request model for GetStatus' do
       id:           UUIDTools::UUID.timestamp_create.to_s,
       storage_key:  'test'
     )
+    def double.attributes
+      marshal_dump
+    end
+    double
   end #double
 
   def status_for(scope)
