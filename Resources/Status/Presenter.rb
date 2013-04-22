@@ -20,7 +20,7 @@ module Belinkr
           text:       status.text,
           files:      status.files,
           url:        status.url,
-          replies:    status.replies
+          replies:    status.replies.map(&:to_clean_hash)
         }
          .merge! Tinto::Presenter.timestamps_for(status)
          .merge! Tinto::Presenter.errors_for(status)
