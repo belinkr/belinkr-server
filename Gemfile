@@ -23,7 +23,7 @@ group :production do
   gem 'thin'
 end
 if ENV['RACK_ENV'] == 'staging'
-  gem 'tinto', path: '../../tinto/current'
+  gem 'tinto', path: '../../../tinto/current'
 else
   gem 'tinto', path: '../tinto'
 end
