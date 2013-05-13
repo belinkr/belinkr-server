@@ -16,7 +16,7 @@ module Belinkr
 
       MODEL_NAME  = 'user'
       NAME_ORDERS = %w{ first-last last-first }
-      WHITELIST   = %w{ avatar first last name_order email password 
+      WHITELIST   = %w{ avatar first last name_order email password
                         locale timezone }
 
       attribute :id,              String
@@ -29,14 +29,15 @@ module Belinkr
       attribute :email,           String
       attribute :password,        String
       attribute :profiles,        Array[Profile::Member], default: []
-      attribute :locale,          String, 
+      attribute :locale,          String,
                                     default: Belinkr::Config::DEFAULT_LOCALE
       attribute :timezone,        String
+      attribute :statistics,      String
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
 
-      validates_presence_of       :id, :first, :last, :name_order, :email, 
+      validates_presence_of       :id, :first, :last, :name_order, :email,
                                   :password
       validates_length_of         :first, max: 50
       validates_length_of         :last,  max: 50
@@ -67,7 +68,7 @@ module Belinkr
 
       def register_in(user_locator)
         validate!
-        user_locator.add(email, id) 
+        user_locator.add(email, id)
         self
       end #register_in
 
@@ -140,5 +141,5 @@ module Belinkr
       end #encrypted?
     end # Member
   end # User
-end # Belinkr 
+end # Belinkr
 

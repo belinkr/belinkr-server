@@ -21,14 +21,15 @@ module Belinkr
           name:       user.name,
           first:      user.first,
           last:       user.last,
-          mobile:     profile ? profile.mobile : nil
+          mobile:     profile ? profile.mobile : nil,
+          statistics: user.statistics
         }
           .merge! Tinto::Presenter.timestamps_for(user)
           .merge! Tinto::Presenter.errors_for(user)
       end #as_poro
 
       private
-      
+
       attr_reader :user, :entity
 
       def profile
@@ -37,6 +38,7 @@ module Belinkr
           @profile ||= profile_in_same_entity.fetch
         end
       end #profile
+
     end # Presenter
   end # User
 end # Belinkr

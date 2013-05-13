@@ -24,7 +24,17 @@ CreateEntity::Context.new(entity: @entity, entities: @entities).run
   email:    ENV['belinkr_init_user_email'] || 'lp@belinkr.com',
   password: ENV['belinkr_init_user_password'] || 'changeme'
 )
+
+@user2   = User::Member.new(
+  first:    ENV['belinkr_init_user_first'] || 'LLLLLL',
+  last:     ENV['belinkr_init_user_last'] || 'PPPPPPP',
+  email:    ENV['belinkr_init_user_email'] || 'lp@lp.com',
+  password: ENV['belinkr_init_user_password'] || 'changeme'
+)
+
 @profile = Profile::Member.new
+@profile2 = Profile::Member.new
+
 @profiles = Profile::Collection.new entity_id: @entity.id
 
 CreateProfileInEntity::Context.new(
@@ -34,4 +44,11 @@ CreateProfileInEntity::Context.new(
   entity: @entity,
 ).run
 
+CreateProfileInEntity::Context.new(
+  actor: @user2,
+  profile: @profile2,
+  profiles: @profiles,
+  entity: @entity,
+).run
 p @profile.inspect
+p @profile2.inspect

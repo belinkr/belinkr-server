@@ -14,6 +14,8 @@ require_relative '../Cases/EditUserProfile/Context'
 require_relative '../Cases/RemoveProfileFromEntity/Request'
 require_relative '../Cases/RemoveProfileFromEntity/Context'
 
+require_relative '../Cases/GetUserStatistics/Request'
+require_relative '../Cases/GetUserStatistics/Context'
 module Belinkr
   class API < Sinatra::Base
     get '/users' do
@@ -72,6 +74,15 @@ module Belinkr
         ).page(params.fetch('page', 0))
       end
     end # get /users/:user_id/following
+
+    get '/users/:user_id/statistics' do
+      dispatch :read do
+        data = GetUserStatistics::Request.new(request_data).prepare
+
+        GetUserStatistics::Context.new(data).run
+        data.fetch(:user)
+      end
+    end
   end # API
 end # Belinkr
 

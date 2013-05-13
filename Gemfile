@@ -17,11 +17,15 @@ group :production do
   gem 'mini_magick'
   gem 'pony'
   gem 'sanitize'
-  gem 'tinto', path: '../tinto'
   #gem 'warbler', git: 'https://github.com/vanyak/warbler.git'
   gem 'warbler', platform: :jruby, git:'https://github.com/jruby/warbler.git', ref:'ce3ce4df137504822e4cbb9399dee7e7dd767c44'
   gem 'tire'
   gem 'thin'
+end
+if ENV['RACK_ENV'] == 'staging'
+  gem 'tinto', path: '../../tinto/current'
+else
+  gem 'tinto', path: '../tinto'
 end
 
 group :test do
