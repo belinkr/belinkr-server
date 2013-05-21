@@ -47,21 +47,21 @@ module Belinkr
 
     get '/workspaces/own' do
       dispatch :collection do
-        Workspace::Tracker.new.workspaces_for(current_user, :member)
+        Workspace::Tracker.new.workspaces_for(current_entity, current_user, :member)
           .page(params.fetch('page', 0))
       end
     end # get /workspaces/own
 
     get '/workspaces/autoinvited' do
       dispatch :collection do
-        Workspace::Tracker.new.workspaces_for(current_user, :autoinvited)
+        Workspace::Tracker.new.workspaces_for(current_entity, current_user, :autoinvited)
           .page(params.fetch('page', 0))
       end
     end # get /workspaces/autoinvited
 
     get '/workspaces/invited' do
       dispatch :collection do
-        Workspace::Tracker.new.workspaces_for(current_user, :invited)
+        Workspace::Tracker.new.workspaces_for(current_entity, current_user, :invited)
           .page(params.fetch('page', 0))
       end
     end # get /workspaces/invited
@@ -94,7 +94,7 @@ module Belinkr
         workspace
       end
     end # put /workspaces/:workspace_id
-    
+
     delete '/workspaces/:workspace_id' do
       data      = DeleteWorkspace::Request.new(request_data).prepare
       workspace = data.fetch(:workspace)
@@ -248,7 +248,7 @@ module Belinkr
     get '/workspaces/:workspace_id/collaborators' do
       dispatch :collection do
         workspace = Workspace::Member.new(
-          id:     params.fetch('workspace_id'), 
+          id:     params.fetch('workspace_id'),
           entity: current_entity.id
         )
         tracker   = Workspace::Tracker.new
@@ -260,7 +260,7 @@ module Belinkr
     get '/workspaces/:workspace_id/administrators' do
       dispatch :collection do
         workspace = Workspace::Member.new(
-          id:     params.fetch('workspace_id'), 
+          id:     params.fetch('workspace_id'),
           entity: current_entity.id
         )
         tracker   = Workspace::Tracker.new
