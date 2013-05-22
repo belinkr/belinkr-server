@@ -7,6 +7,9 @@ module Belinkr
 
       def link_to(*args)
       end #link_to
+
+      def increment_user_counter
+      end #increment_user_counter
     end # Double
   end # Workspace
 end # Belinkr

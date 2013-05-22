@@ -17,7 +17,7 @@ describe 'create workspace' do
     @tracker                      = Workspace::TrackerDouble.new
   end
 
-  it 'links the workspace to the entity' do
+  it 'links the workspace to the entity and increase counter' do
     workspace = Minitest::Mock.new
     context   = CreateWorkspace::Context.new(
       actor:                        @actor,
@@ -26,7 +26,8 @@ describe 'create workspace' do
       entity:                       @entity,
       tracker:                      @tracker
     )
-    workspace.expect :link_to, workspace, [@entity]  
+    workspace.expect :link_to, workspace, [@entity]
+    workspace.expect :increment_user_counter, 1
     context.call
     workspace.verify
   end

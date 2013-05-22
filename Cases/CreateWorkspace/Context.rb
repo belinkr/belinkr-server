@@ -18,6 +18,7 @@ module Belinkr
         workspace   .link_to(entity)
         workspaces  .add(workspace)
         tracker     .track_administrator(workspace, actor)
+        workspace   .increment_user_counter
 
         will_sync workspace, workspaces, tracker
       end #call
