@@ -60,7 +60,7 @@ describe API do
 
       last_response.status        .must_equal 200
       json_workspace = JSON.parse(last_response.body)
-      json_workspace.fetch('counters').fetch('users').must_equal 0
+      json_workspace.fetch('counters').fetch('users').must_equal 1
     end
 
     it 'returns the number of participants in the workspace' do
@@ -164,7 +164,7 @@ describe API do
       workspace = workspace_by(profile)
 
       invited = Factory.user.sync
-      post  "/workspaces/#{workspace.fetch('id')}/invitations", 
+      post  "/workspaces/#{workspace.fetch('id')}/invitations",
             { invited_id: invited.id }.to_json, session_for(profile)
 
       last_response.status.must_equal 201
@@ -178,9 +178,9 @@ describe API do
     it "gets a page of invitations" do
       actor, profile, entity = create_user_and_profile
       workspace = workspace_by(profile)
-      users = (1..50).map do 
+      users = (1..50).map do
         invited  = Factory.user.sync
-        post  "/workspaces/#{workspace.fetch('id')}/invitations", 
+        post  "/workspaces/#{workspace.fetch('id')}/invitations",
               { invited_id: invited.id }.to_json, session_for(profile)
       end
 
@@ -202,7 +202,7 @@ describe API do
       invitation  = invitation_for(workspace, profile, invited_user)
 
       get "/workspaces/#{workspace.fetch('id')}" +
-          "/invitations/#{invitation.fetch('id')}", 
+          "/invitations/#{invitation.fetch('id')}",
           {}, session_for(profile)
 
       last_response.status.must_equal 200
@@ -219,8 +219,8 @@ describe API do
       workspace   = workspace_by(profile)
       invitation  = invitation_for(workspace, profile, invited_user)
 
-      post  "/workspaces/#{workspace.fetch('id')}" + 
-            "/invitations/accepted/#{invitation.fetch('id')}", 
+      post  "/workspaces/#{workspace.fetch('id')}" +
+            "/invitations/accepted/#{invitation.fetch('id')}",
             {}, session_for(invited_profile)
 
       last_response.status.must_equal 200
@@ -255,7 +255,7 @@ describe API do
 
       workspace = workspace_by(profile)
 
-      post  "/workspaces/#{workspace.fetch('id')}/autoinvitations", 
+      post  "/workspaces/#{workspace.fetch('id')}/autoinvitations",
             { autoinvited_id: autoinvited_actor.id }.to_json,
             session_for(autoinvited_profile)
 
@@ -270,10 +270,10 @@ describe API do
     it "gets a page of autoinvitations" do
       actor, profile, entity = create_user_and_profile
       workspace = workspace_by(profile)
-      users = (1..50).map do 
+      users = (1..50).map do
         autoinvited_actor, autoinvited_profile =
           create_user_and_profile(entity)
-        post  "/workspaces/#{workspace.fetch('id')}/autoinvitations", 
+        post  "/workspaces/#{workspace.fetch('id')}/autoinvitations",
               { autoinvited_id: autoinvited_actor.id }.to_json,
               session_for(autoinvited_profile)
       end
@@ -298,7 +298,7 @@ describe API do
         autoinvitation_for(workspace, autoinvited_profile, autoinvited_user)
 
       get "/workspaces/#{workspace.fetch('id')}" +
-          "/autoinvitations/#{autoinvitation.fetch('id')}", 
+          "/autoinvitations/#{autoinvitation.fetch('id')}",
           {}, session_for(profile)
 
       last_response.status.must_equal 200
@@ -317,8 +317,8 @@ describe API do
       autoinvitation  =
         autoinvitation_for(workspace, autoinvited_profile, autoinvited_user)
 
-      post  "/workspaces/#{workspace.fetch('id')}" + 
-            "/autoinvitations/accepted/#{autoinvitation.fetch('id')}", 
+      post  "/workspaces/#{workspace.fetch('id')}" +
+            "/autoinvitations/accepted/#{autoinvitation.fetch('id')}",
             {}, session_for(profile)
 
       last_response.status.must_equal 200
@@ -337,8 +337,8 @@ describe API do
       autoinvitation  =
         autoinvitation_for(workspace, autoinvited_profile, autoinvited_user)
 
-      post  "/workspaces/#{workspace.fetch('id')}" + 
-            "/autoinvitations/rejected/#{autoinvitation.fetch('id')}", 
+      post  "/workspaces/#{workspace.fetch('id')}" +
+            "/autoinvitations/rejected/#{autoinvitation.fetch('id')}",
             {}, session_for(profile)
 
       last_response.status.must_equal 200
@@ -463,14 +463,14 @@ describe API do
 
   def invitation_for(workspace, profile, invited)
     invited ||= Factory.user.sync
-    post  "/workspaces/#{workspace.fetch('id')}/invitations", 
+    post  "/workspaces/#{workspace.fetch('id')}/invitations",
           { invited_id: invited.id }.to_json, session_for(profile)
     invitation = JSON.parse(last_response.body)
   end
 
   def autoinvitation_for(workspace, profile, user)
     user ||= Factory.user.sync
-    post  "/workspaces/#{workspace.fetch('id')}/autoinvitations", 
+    post  "/workspaces/#{workspace.fetch('id')}/autoinvitations",
           { autoinvited_id: user.id }.to_json, session_for(profile)
     autoinvitation = JSON.parse(last_response.body)
   end
