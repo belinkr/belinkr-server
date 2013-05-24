@@ -17,7 +17,8 @@ module Belinkr
           enforcer:   scope.enforcer,
           actor:      actor,
           status:     status,
-          timelines:  timelines
+          timelines:  timelines,
+          scope_resource: scope.resource
         }
       end #prepare
 

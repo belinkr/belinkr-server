@@ -8,11 +8,12 @@ include Belinkr
 
 describe 'create status' do
   before do
-    @enforcer   = Enforcer::Double.new
-    @actor      = OpenStruct.new
-    @status     = OpenStruct.new
-    @timeline   = OpenStruct.new
-    @timelines  = [@timeline]
+    @enforcer        = Enforcer::Double.new
+    @actor           = OpenStruct.new
+    @status          = OpenStruct.new
+    @scope_resource  = OpenStruct.new
+    @timeline        = OpenStruct.new
+    @timelines       = [@timeline]
 
     def @timeline.add(*args); true; end
   end
@@ -23,6 +24,7 @@ describe 'create status' do
       enforcer:   enforcer,
       actor:      @actor,
       status:     @status,
+      scope_resource: @scope_resource,
       timelines:  @timelines
     )
     enforcer.expect :authorize, enforcer, [@actor, :create_status]
@@ -36,11 +38,27 @@ describe 'create status' do
       enforcer:   @enforcer,
       actor:      @actor,
       status:     @status,
+      scope_resource: @scope_resource,
       timelines:  [timeline]
     )
     timeline.expect :add, timeline, [@status]
     context.call
     timeline.verify
+  end
+
+  it 'increase scope.resource status_counter if applicable' do
+    scope_resource  = Minitest::Mock.new
+    context   = CreateStatus::Context.new(
+      enforcer:   @enforcer,
+      actor:      @actor,
+      status:     @status,
+      scope_resource: scope_resource,
+      timelines:  @timelines
+    )
+    scope_resource.expect :fetch, scope_resource
+    scope_resource.expect :increment_status_counter, 1
+    context.call
+    scope_resource.verify
   end
 end # create status
 

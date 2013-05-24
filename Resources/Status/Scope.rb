@@ -11,7 +11,7 @@ require_relative '../../Services/Tracker'
 module Belinkr
   module Status
     class Scope
-      RESOURCE_TIMELINES = { 
+      RESOURCE_TIMELINES = {
         workspace:  %w{ general files },
         scrapbook:  %w{ general files },
         user:       %w{ own general files }
@@ -91,6 +91,7 @@ module Belinkr
       def scrapbook_followers
         []
       end #scrapbook_followers
+
     end # Scope
   end # Status
 end # Belinkr
