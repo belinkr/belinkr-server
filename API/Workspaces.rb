@@ -75,16 +75,25 @@ module Belinkr
       end
     end # get /workspaces/:workspace_id
 
-    post '/workspaces' do
-      data      = CreateWorkspace::Request.new(request_data).prepare
-      workspace = data.fetch(:workspace)
+      post '/workspaces' do
+        data      = CreateWorkspace::Request.new(request_data).prepare
+        workspace = data.fetch(:workspace)
 
-      dispatch :create, workspace do
-        CreateWorkspace::Context.new(data).run
-        workspace
-      end
-    end # post /workspaces
+        dispatch :create, workspace do
+          CreateWorkspace::Context.new(data).run
+          workspace
+        end
+      end # post /workspaces
 
+      post '/workspaces/own' do
+        data      = CreateWorkspace::Request.new(request_data).prepare
+        workspace = data.fetch(:workspace)
+
+        dispatch :create, workspace do
+          CreateWorkspace::Context.new(data).run
+          workspace
+        end
+      end # post /workspaces
     put '/workspaces/:workspace_id' do
       data      = EditWorkspace::Request.new(request_data).prepare
       workspace = data.fetch(:workspace)
