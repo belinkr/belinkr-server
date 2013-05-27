@@ -34,7 +34,13 @@ module Belinkr
       end #enforcer
 
       def resource
-        @resource ||= send kind_from(payload)
+        # FIXME: dirty code to fetch the data and let spec passed
+        @resource =
+          begin
+           (send kind_from(payload)).fetch
+          rescue
+            send kind_from(payload)
+          end
       end # resource
 
       def followers

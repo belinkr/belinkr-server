@@ -8,6 +8,7 @@ include Belinkr
 describe Status::Scope do
   before do
     @user   = OpenStruct.new(id: 1)
+    @user.fetch = @user
     @entity = OpenStruct.new(id: 1)
   end
 
@@ -96,7 +97,7 @@ describe Status::Scope do
 
       scope.follower_timelines.wont_be_empty
     end
-    
+
     it 'returns some timeline kinds for a scrapbook scope' do
       payload = { 'scrapbook_id' => 1 }
       scope   = Status::Scope.new(payload, @user, @entity)
