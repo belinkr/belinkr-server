@@ -41,7 +41,7 @@ describe API do
       user.sync
       post "/statuses", { text: 'test' }.to_json, session_for(profile)
       status = JSON.parse(last_response.body)
-      post "/users/#{user.id}/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
+      post "/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
         session_for(profile)
       last_response.status.must_equal 201
       reply = JSON.parse(last_response.body)
@@ -55,7 +55,7 @@ describe API do
       replier.sync
       post "/statuses", { text: 'test' }.to_json, session_for(profile)
       status = JSON.parse(last_response.body)
-      post "/users/#{user.id}/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
+      post "/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
         session_for(profile_replier)
       last_response.status.must_equal 201
       reply = JSON.parse(last_response.body)
@@ -69,11 +69,11 @@ describe API do
       user.sync
       post "/statuses", { text: 'test' }.to_json, session_for(profile)
       status = JSON.parse(last_response.body)
-      post "/users/#{user.id}/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
+      post "/statuses/#{status.fetch('id')}/replies", { status_author_id: user.id, text: 'test reply' }.to_json,
         session_for(profile)
       reply = JSON.parse(last_response.body)
 
-      put "/users/#{user.id}/statuses/#{status.fetch('id')}/replies/#{reply.fetch('id')}", { status_author_id: user.id, text: 'changed test reply' }.to_json,
+      put "/statuses/#{status.fetch('id')}/replies/#{reply.fetch('id')}", { status_author_id: user.id, text: 'changed test reply' }.to_json,
         session_for(profile)
       last_response.status.must_equal 200
       reply = JSON.parse(last_response.body)

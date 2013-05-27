@@ -30,7 +30,8 @@ module Belinkr
         :status_scope_class, :user_class, :reply_id
 
       def status
-        status_class.new(id: payload.fetch("status_id"), scope: status_scope.resource).fetch
+        #status_class.new(id: payload.fetch("status_id"), scope: status_scope.resource).fetch
+        status_class.new(id: payload.fetch("status_id")).fetch
       end
 
       def status_scope
