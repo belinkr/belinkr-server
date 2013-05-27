@@ -46,16 +46,16 @@ module Belinkr
         attributes.to_hash
           .merge!( files: files.to_a,
                    replies: replies.to_a.map(&:to_clean_hash),
-                   author: author.to_clean_hash).to_json
-                   #scope: scope.to_clean_hash).to_json
+                   author: author.to_clean_hash,
+                   scope: scope.to_clean_hash).to_json
       end #to_json
 
-      def scope=(new_scope)
-        return unless new_scope.respond_to? :storage_key
+      #def scope=(new_scope)
+      #  return unless new_scope.respond_to? :storage_key
 
-        @base_storage_key = "#{new_scope.storage_key}:#{new_scope.id}"
-        super new_scope
-      end #scope=
+      #  @base_storage_key = "#{new_scope.storage_key}:#{new_scope.id}"
+      #  super new_scope
+      #end #scope=
 
       def storage_key
         #"#{base_storage_key}:statuses"
