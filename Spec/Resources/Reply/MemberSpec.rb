@@ -73,7 +73,7 @@ describe Reply::Member do
       reply.instance_variable_set :@status, status
 
       reply.storage_key
-        .must_equal "users:#{user.id}:statuses:#{status.id}:replies"
+        .must_equal "statuses:#{status.id}:replies"
     end
   end
 

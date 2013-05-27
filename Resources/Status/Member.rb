@@ -58,7 +58,8 @@ module Belinkr
       end #scope=
 
       def storage_key
-        "#{base_storage_key}:statuses"
+        #"#{base_storage_key}:statuses"
+        "statuses"
       end #storage_key
 
       def url
