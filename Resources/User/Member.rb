@@ -16,7 +16,7 @@ module Belinkr
 
       MODEL_NAME  = 'user'
       NAME_ORDERS = %w{ first-last last-first }
-      WHITELIST   = %w{ avatar first last name_order email password
+      WHITELIST   = %w{ name avatar first last name_order email password
                         locale timezone }
 
       attribute :id,              String
@@ -110,6 +110,7 @@ module Belinkr
         unlink_from(profile)
         profile.update(profile_changes)
         link_to(profile)
+        self.deleted_at = nil
 
         self.update(user_changes)
         self

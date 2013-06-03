@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'Tinto/Context'
-
 module Belinkr
   module EditUserProfile
     class Context
@@ -18,7 +17,7 @@ module Belinkr
       def call
         enforcer.authorize(actor, :update)
         user.update_details(
-          profile:          profile, 
+          profile:          profile,
           user_changes:     user_changes,
           profile_changes:  profile_changes
         )
@@ -28,7 +27,7 @@ module Belinkr
 
       private
 
-      attr_reader :enforcer, :actor, :user, :profile, :user_changes, 
+      attr_reader :enforcer, :actor, :user, :profile, :user_changes,
                   :profile_changes
     end # Context
   end # EditUserProfile
