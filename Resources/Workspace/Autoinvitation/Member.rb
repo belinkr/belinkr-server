@@ -19,6 +19,7 @@ module Belinkr
         attribute :workspace_id,    String
         attribute :entity_id,       String
         attribute :autoinvited_id,  String
+        attribute :autoinvited_name,  String
         attribute :state,           String
         attribute :created_at,      Time
         attribute :updated_at,      Time
@@ -27,7 +28,7 @@ module Belinkr
 
         validates_presence_of       :entity_id, :workspace_id, :autoinvited_id,
                                     :state
-        
+
         def_delegators  :@state_machine, :accept, :reject
         def_delegators  :@member,   *Tinto::Member::INTERFACE
 
@@ -79,6 +80,7 @@ module Belinkr
           workspace           = arguments.fetch(:workspace)
 
           self.autoinvited_id = autoinvited.id
+          self.autoinvited_name = autoinvited.name
           self.workspace_id   = workspace.id
           self.entity_id      = workspace.entity_id
           self

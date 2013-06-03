@@ -17,6 +17,8 @@ module Belinkr
         def as_poro
           {
             id:           autoinvitation.id,
+            autoinvited_id: autoinvitation.autoinvited_id,
+            autoinvited_name: autoinvitation.autoinvited_name,
             state:        autoinvitation.state,
             rejected_at:  autoinvitation.rejected_at
           }
