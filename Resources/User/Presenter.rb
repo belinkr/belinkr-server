@@ -22,6 +22,10 @@ module Belinkr
           first:      user.first,
           last:       user.last,
           mobile:     profile ? profile.mobile : nil,
+          landline:   profile ? profile.landline : nil,
+          fax:        profile ? profile.fax : nil,
+          position:   profile ? profile.position : nil,
+          department: profile ? profile.department : nil,
           statistics: user.statistics
         }
           .merge! Tinto::Presenter.timestamps_for(user)

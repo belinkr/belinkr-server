@@ -22,7 +22,7 @@ module Belinkr
       end #initialize
 
       def prepare
-        { 
+        {
           actor:      actor,
           collection: collection,
           enforcer:   enforcer
