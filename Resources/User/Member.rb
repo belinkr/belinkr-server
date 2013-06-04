@@ -32,7 +32,6 @@ module Belinkr
       attribute :locale,          String,
                                     default: Belinkr::Config::DEFAULT_LOCALE
       attribute :timezone,        String
-      attribute :statistics,      String
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time

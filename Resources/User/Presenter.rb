@@ -2,6 +2,9 @@
 require 'json'
 require 'ostruct'
 require 'Tinto/Presenter'
+require_relative '../Status/Collection'
+require_relative '../Following/Collection'
+require_relative '../Following/Collection'
 
 module Belinkr
   module User
@@ -26,7 +29,7 @@ module Belinkr
           fax:        profile ? profile.fax : nil,
           position:   profile ? profile.position : nil,
           department: profile ? profile.department : nil,
-          statistics: user.statistics
+          statistics: statistics
         }
           .merge! Tinto::Presenter.timestamps_for(user)
           .merge! Tinto::Presenter.errors_for(user)
@@ -35,6 +38,28 @@ module Belinkr
       private
 
       attr_reader :user, :entity
+
+      def statistics
+        @user.statistics
+        {
+          following: following_count,
+          followers: follower_count,
+          statuses: status_count
+        }
+      end
+
+      def following_count
+        Following::Collection.new(user_id: user.id, entity_id: entity.id).size
+      end
+
+      def follower_count
+        Following::Collection.new(user_id: user.id, entity_id: entity.id).size
+      end
+
+      def status_count
+        Status::Collection.new(
+          user_id: user.id, entity_id: entity.id, kind: 'own', scope: user).size
+      end
 
       def profile
         profile_in_same_entity = user.profile_for(entity)
