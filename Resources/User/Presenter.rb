@@ -40,7 +40,6 @@ module Belinkr
       attr_reader :user, :entity
 
       def statistics
-        @user.statistics
         {
           following: following_count,
           followers: follower_count,

@@ -72,15 +72,5 @@ describe API do
     end
   end # DELETE /users/:id
 
-  describe 'GET /users/:user_id/statistics' do
-    it 'get user statistics' do
-      actor, profile = create_user_and_profile
-      get "/users/#{actor.id}/statistics", {}, session_for(profile)
-      last_response.status.must_equal 200
-      user_json = JSON.parse(last_response.body)
-      user_json.fetch('statistics').fetch('statuses_count').must_equal 0
-
-    end
-  end
 end # API
 
