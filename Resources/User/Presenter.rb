@@ -21,6 +21,7 @@ module Belinkr
       def as_poro
         {
           id:         user.id,
+          avatar:     user.avatar,
           name:       user.name,
           first:      user.first,
           last:       user.last,
