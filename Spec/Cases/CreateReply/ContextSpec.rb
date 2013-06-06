@@ -12,7 +12,7 @@ describe 'create status reply' do
     @enforcer   = Enforcer::Double.new
     @actor      = OpenStruct.new
     @reply     = OpenStruct.new(author:OpenStruct.new(id:3))
-    def @reply.to_clean_hash
+    def @reply.include_author_files_hash
       {:id=> 3}
     end
 

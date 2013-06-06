@@ -26,7 +26,6 @@ module Belinkr
       validates_within        :kind, set: MAP.keys
 
       alias_method :to_hash, :attributes
-      alias_method :to_clean_hash, :to_hash
 
       def initialize(resource_or_options={})
         if resource_or_options.is_a? Hash

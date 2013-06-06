@@ -16,12 +16,12 @@ module Belinkr
       def as_poro
         {
           id:         status.id,
-          author:     status.author.to_clean_hash,
-          scope:      status.scope.to_clean_hash,
+          author:     status.author.attributes,
+          scope:      status.scope.attributes,
           text:       status.text,
           files:      status.files,
           url:        status.url,
-          replies:    status.replies.map(&:to_clean_hash)
+          replies:    status.replies.map(&:include_author_files_hash)
         }
          .merge! Tinto::Presenter.timestamps_for(status)
          .merge! Tinto::Presenter.errors_for(status)

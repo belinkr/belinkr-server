@@ -46,11 +46,11 @@ module Belinkr
       end #initialize
 
       def to_json(*args)
-        to_clean_hash.to_json(*args)
+        include_author_files_hash.to_json(*args)
       end #to_json
 
-      def to_clean_hash
-        attributes.merge!({files: files.to_a, author: author.to_clean_hash})
+      def include_author_files_hash
+        attributes.merge!({files: files.to_a, author: author.attributes})
       end
 
       def files?
