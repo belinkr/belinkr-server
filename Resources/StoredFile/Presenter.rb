@@ -14,9 +14,9 @@ module Belinkr
 
       def as_poro
         {
-          id:                 stored_file.id, 
-          mime_type:          stored_file.mime_type, 
-          original_filename:  stored_file.original_filename 
+          id:                 stored_file.id,
+          mime_type:          stored_file.mime_type,
+          original_filename:  stored_file.original_filename
         }.merge! Tinto::Presenter.timestamps_for(stored_file)
          .merge! Tinto::Presenter.errors_for(stored_file)
          .merge! links
@@ -35,8 +35,8 @@ module Belinkr
       def thumbnail_links
         return {} unless stored_file.image?
         return {
-          mini:   "#/files/#{stored_file.id}?version=mini&inline=true",
-          small:  "#/files/#{stored_file.id}?version=small&inline=true"
+          mini:   "/files/#{stored_file.id}?version=mini&inline=true",
+          small:  "/files/#{stored_file.id}?version=small&inline=true"
         }
       end #thumbnail_links
     end # Presenter
