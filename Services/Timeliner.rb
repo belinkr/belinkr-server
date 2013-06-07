@@ -18,7 +18,7 @@ module Belinkr
     attr_reader :timeline_klass, :status
 
     def resource_timelines_for(resource, kinds)
-      @resource_timelines ||= 
+      @resource_timelines ||=
         applicable_resource_kinds_for(kinds).map do |kind|
           timeline_klass.new(kind: kind, scope: resource)
         end
@@ -26,19 +26,19 @@ module Belinkr
 
     def follower_timelines_for(followers, kinds)
       @follower_timelines ||= followers.flat_map do |follower|
-        applicable_follower_kinds_for(kinds).map do |kind| 
+        applicable_follower_kinds_for(kinds).map do |kind|
           timeline_klass.new(kind: kind, scope: follower)
         end
       end
     end #follower_timelines
 
     def applicable_resource_kinds_for(kinds)
-      @applicable_resource_kinds ||= 
+      @applicable_resource_kinds ||=
         kinds.select { |kind| applicable_for?(status, kind) }
     end #applicable_resource_kinds
 
     def applicable_follower_kinds_for(kinds)
-      @applicable_follower_kinds ||= 
+      @applicable_follower_kinds ||=
         kinds.select { |kind| applicable_for?(status, kind) }
     end #applicable_follower_kinds
 

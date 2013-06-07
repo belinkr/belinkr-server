@@ -66,7 +66,8 @@ module Belinkr
       end
     end # get /workspaces/:workspace_id/timelines
 
-    get '/workspaces/:workspace_id/timelines/files' do
+    #get '/workspaces/:workspace_id/timelines/files' do
+    get '/workspaces/:workspace_id/timelines/:kind' do
       dispatch :collection do
         data  = GetTimeline::Request.new(request_data).prepare
         GetTimeline::Context.new(data).run
