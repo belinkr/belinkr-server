@@ -53,7 +53,7 @@ module Belinkr
       end
 
       def follower_count
-        Following::Collection.new(user_id: user.id, entity_id: entity.id).size
+        Follower::Collection.new(user_id: user.id, entity_id: entity.id).size
       end
 
       def status_count
