@@ -8,7 +8,7 @@ module Belinkr
       include Tinto::Exceptions
 
       ADMINISTRATOR_ACTIONS = %w{ update delete undelete promote demote
-                                  remove get_status get_timeline }
+                                  remove get_status}
       COLLABORATOR_ACTIONS  = %w{create leave create_status get_timeline}
       ACTIONS               = COLLABORATOR_ACTIONS + ADMINISTRATOR_ACTIONS
 
