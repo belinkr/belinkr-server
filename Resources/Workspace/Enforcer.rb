@@ -7,9 +7,9 @@ module Belinkr
     class Enforcer
       include Tinto::Exceptions
 
-      ADMINISTRATOR_ACTIONS = %w{ update delete undelete promote demote 
+      ADMINISTRATOR_ACTIONS = %w{ update delete undelete promote demote
                                   remove get_status get_timeline }
-      COLLABORATOR_ACTIONS  = %w{create leave}
+      COLLABORATOR_ACTIONS  = %w{create leave create_status get_timeline}
       ACTIONS               = COLLABORATOR_ACTIONS + ADMINISTRATOR_ACTIONS
 
       def initialize(workspace, tracker=Workspace::Tracker.new)
