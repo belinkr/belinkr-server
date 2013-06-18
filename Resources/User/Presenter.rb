@@ -25,6 +25,7 @@ module Belinkr
           name:       user.name,
           first:      user.first,
           last:       user.last,
+          jid:        profile ? profile.jid : nil,
           mobile:     profile ? profile.mobile : nil,
           landline:   profile ? profile.landline : nil,
           fax:        profile ? profile.fax : nil,

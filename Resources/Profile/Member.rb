@@ -12,9 +12,10 @@ module Belinkr
       include Aequitas
 
       MODEL_NAME          = 'profile'
-      WHITELIST           = 'mobile landline fax position department'
+      WHITELIST           = 'jid mobile landline fax position department'
 
       attribute :id,                String
+      attribute :jid,               String
       attribute :mobile,            String
       attribute :landline,          String
       attribute :fax,               String
