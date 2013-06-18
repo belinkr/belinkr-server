@@ -45,7 +45,10 @@ describe API do
       get "/resets/#{reset.id}"
 
       last_response.status.must_equal 200
-      last_response.body.must_be_empty
+      last_response.body.wont_be_empty
+      response_reset = JSON.parse(last_response.body)
+      response_reset.fetch('id').must_equal reset.id
+      response_reset.fetch('email').must_equal reset.email
     end
   end # GET /resets/:reset_id
 

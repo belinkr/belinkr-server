@@ -1,5 +1,6 @@
 # encoding: utf-8
 require_relative '../API'
+require_relative '../Resources/Reset/Presenter'
 require_relative '../Cases/RequestPasswordReset/Context'
 require_relative '../Cases/RequestPasswordReset/Request'
 require_relative '../Cases/ResetPassword/Context'
@@ -18,8 +19,13 @@ module Belinkr
 
     get '/resets/:reset_id' do
       dispatch :read do
-        Reset::Member.new(id: params.fetch('reset_id'))
-        return 200
+        reset = Reset::Member.new(id: params.fetch('reset_id'))
+        begin
+          reset.fetch
+        rescue Tinto::Exceptions::NotFound
+          return 200
+        end
+        reset
       end
     end # get /resets/:id
 
