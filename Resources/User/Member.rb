@@ -85,7 +85,8 @@ module Belinkr
 
       def unlink_from(profile)
         profiles = self.profiles
-        profiles.delete(profile)
+        fake_entity = OpenStruct.new id: profile.entity_id
+        profiles.delete(profile_for(fake_entity))
         self.profiles = profiles
         self.delete if self.profiles.empty?
         self
