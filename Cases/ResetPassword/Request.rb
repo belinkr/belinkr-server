@@ -13,7 +13,7 @@ module Belinkr
       def prepare
         {
           actor:        user,
-          user_changes: payload,
+          user_changes: {"password"=>payload.fetch('password')},
           reset:        reset,
           resets:       resets
         }

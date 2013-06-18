@@ -25,6 +25,7 @@ module Belinkr
         rescue Tinto::Exceptions::NotFound
           return 200
         end
+        return 200 if reset.deleted?
         reset
       end
     end # get /resets/:id
