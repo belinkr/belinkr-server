@@ -21,6 +21,8 @@ module Belinkr
       def as_poro
         {
           id:         user.id,
+          email:      user.email,
+          entity:     entity.short_name,
           avatar:     user.avatar,
           name:       user.name,
           first:      user.first,

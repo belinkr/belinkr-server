@@ -12,10 +12,11 @@ module Belinkr
       include Aequitas
 
       MODEL_NAME  = 'entity'
-      WHITELIST   = %w{ name }
- 
+      WHITELIST   = %w{ name short_name }
+
       attribute :id,              String
       attribute :name,            String
+      attribute :short_name,      String
       attribute :created_at,      Time
       attribute :updated_at,      Time
       attribute :deleted_at,      Time
